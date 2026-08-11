@@ -1,7 +1,8 @@
-<footer class="footer">
-    <div class="footer-text">
-        <p class="mb-0">
-            &copy; {{ date('Y') }} <strong>Liga Perkasa</strong>. All Rights Reserved.
-        </p>
+<footer class="app-footer">
+    <div class="footer-content">
+        <span class="footer-text">
+            <i class="fas fa-copyright me-1"></i>
+            {{ date('Y') }} <strong>Liga Perkasa</strong>. All Rights Reserved.
+        </span>
     </div>
 </footer>

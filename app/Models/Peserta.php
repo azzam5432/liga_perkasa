@@ -6,12 +6,19 @@ use Illuminate\Database\Eloquent\Model;
 
 class Peserta extends Model
 {
-    // inisialisasi Tabel Produk
     protected $table = 'tb_peserta';
-    
-    // Inisialisasi Primary Key
     protected $primaryKey = 'id_peserta';
+    
+    protected $fillable = [
+        'id_tim',
+        'ketua_peserta',
+        'nama_peserta',
+        'prodi',
+        'no_telp',
+    ];
 
-    // Inisialisasi data yang dapat di isi
-    protected $fillable = ['nama_peserta', 'no_telp'];
+    public function tim()
+    {
+        return $this->belongsTo(Tim::class, 'id_tim', 'id_tim');
+    }
 }

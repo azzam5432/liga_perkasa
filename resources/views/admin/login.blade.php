@@ -68,6 +68,7 @@
         
         .right-panel {
             flex: 1;
+            padding-top: auto;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -169,7 +170,7 @@
                         <i class="fas fa-user-lock text-white display-6 m-auto"></i>
                     </div>
                     <h2>Login Admin</h2>
-                    <p>Masukkan kredensial Anda untuk melanjutkan</p>
+                    <p>Masukkan Username dan Password Anda untuk melanjutkan</p>
                 </div>
                 @if ($errors->any())
                     <div class="alert alert-danger alert-custom d-flex align-items-center" role="alert">
@@ -263,7 +264,7 @@
                         Demo: admin@example.com / password123
                     </p>
                     <p class="text-muted small">
-                        &copy; {{ date('Y') }} Your Company. All rights reserved.
+                        &copy; {{ date('Y') }} Politeknik Mitra Industri. All rights reserved.
                     </p>
                 </div>
             </div>

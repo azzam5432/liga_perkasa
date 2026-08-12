@@ -105,7 +105,7 @@
                     <div class="card mb-4 border-0 shadow-sm">
                         <div class="card-header bg-light d-flex justify-content-between align-items-center">
                             <h6 class="mb-0"><i class="fas fa-users text-dark me-2"></i> Daftar Anggota</h6>
-                            <span class="badge bg-info text-white" id="totalAnggota">4 Anggota</span>
+                            <span class="badge bg-dark text-white" id="totalAnggota">4 Anggota</span>
                         </div>
                         <div class="card-body">
                             <div id="participant-list">
@@ -280,7 +280,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         div.innerHTML = `
             <div class="flex-grow-1">
-                <label class="form-label mb-0 small fw-bold text-primary">
+                <label class="form-label mb-0 small fw-bold text-dark">
                     <i class="fas fa-user me-1"></i> Anggota ${newIndex} <span class="text-danger">*</span>
                 </label>
                 <input type="text" 

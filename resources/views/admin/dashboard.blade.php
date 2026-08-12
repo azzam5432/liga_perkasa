@@ -184,6 +184,6 @@
         .card-header h5 {
             font-size: 0.9rem;
         }
-    }
+}
 </style>
 @endsection

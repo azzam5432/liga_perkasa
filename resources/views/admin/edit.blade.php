@@ -35,7 +35,7 @@
                     <!-- Nama Tim -->
                     <div class="mb-4">
                         <label for="nama_tim" class="form-label fw-bold">
-                            <i class="fas fa-trophy text-primary me-1"></i> Nama Tim <span class="text-danger">*</span>
+                            <i class="fas fa-trophy text-dark me-1"></i> Nama Tim <span class="text-danger">*</span>
                         </label>
                         <input type="text" 
                                class="form-control @error('nama_tim') is-invalid @enderror" 
@@ -52,7 +52,7 @@
                     <!-- Data Ketua -->
                     <div class="card mb-4 border-0 shadow-sm">
                         <div class="card-header bg-light">
-                            <h6 class="mb-0"><i class="fas fa-user-tie text-primary me-2"></i> Data Ketua Tim</h6>
+                            <h6 class="mb-0"><i class="fas fa-user-tie text-dark me-2"></i> Data Ketua Tim</h6>
                         </div>
                         <div class="card-body">
                             <div class="row">
@@ -110,7 +110,7 @@
                     <!-- Daftar Anggota -->
                     <div class="card mb-4 border-0 shadow-sm">
                         <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                            <h6 class="mb-0"><i class="fas fa-users text-primary me-2"></i> Daftar Anggota</h6>
+                            <h6 class="mb-0"><i class="fas fa-users text-dark me-2"></i> Daftar Anggota</h6>
                             <span class="badge bg-info text-white" id="totalAnggota">{{ $anggota->count() }} Anggota</span>
                         </div>
                         <div class="card-body">
@@ -118,7 +118,7 @@
                                 @forelse ($anggota as $index => $peserta)
                                 <div class="participant-item d-flex align-items-center gap-2 mb-2" data-index="{{ $index + 2 }}">
                                     <div class="flex-grow-1">
-                                        <label class="form-label mb-0 small fw-bold text-primary">
+                                        <label class="form-label mb-0 small fw-bold text-dark">
                                             <i class="fas fa-user me-1"></i> Anggota {{ $index + 1 }} <span class="text-danger">*</span>
                                         </label>
                                         <input type="text" 
@@ -359,14 +359,14 @@ document.getElementById('formEditTim').addEventListener('submit', function(e) {
     }
     
     .btn-primary {
-        background: linear-gradient(135deg, #4e73df, #224abe);
+        background: linear-gradient(135deg, #1a2332, #2d3748);
         border: none;
         transition: all 0.2s ease;
     }
     
     .btn-primary:hover {
         transform: translateY(-2px);
-        box-shadow: 0 0.5rem 1rem rgba(78, 115, 223, 0.4);
+        box-shadow: 0 0.5rem 1rem rgba(108, 117, 125, 0.3);
     }
     
     .btn-secondary {

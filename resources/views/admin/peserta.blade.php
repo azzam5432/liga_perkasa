@@ -42,9 +42,9 @@
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-start mb-2">
                                 <h6 class="card-title fw-bold mb-0">
-                                    <i class="fas fa-users text-primary me-1"></i> {{ $item->nama_tim }}
+                                    <i class="fas fa-users text-dark me-1"></i> {{ $item->nama_tim }}
                                 </h6>
-                                <span class="badge bg-info rounded-pill px-3 py-2">
+                                <span class="badge bg-info rounded-pill px-4 py-3">
                                     <i class="fas fa-user me-1"></i> {{ $jumlahPeserta }}
                                 </span>
                             </div>
@@ -105,7 +105,7 @@
                                     <div class="card-header bg-gradient-info text-white border-0 py-3" style="background: linear-gradient(135deg, #1a2332, #2d3748);">
                                         <div class="d-flex justify-content-between align-items-center">
                                             <h6 class="mb-0 fw-bold">
-                                                <i class="fas fa-trophy me-2"></i>{{ $item->nama_tim }}
+                                                <i class="fas fa-users me-2"></i>{{ $item->nama_tim }}
                                             </h6>
                                             <span class="badge bg-light text-dark rounded-pill px-3 py-2">
                                                 <i class="fas fa-users me-1"></i> {{ $jumlahPeserta }} Anggota

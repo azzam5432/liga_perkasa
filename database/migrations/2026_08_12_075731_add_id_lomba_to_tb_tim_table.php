@@ -4,18 +4,15 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateTimsTable extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
      */
     public function up(): void
     {
-        Schema::create('tb_tim', function (Blueprint $table) {
-            $table->id('id_tim')->unique();
-            $table->foreignId('id_lomba')->nullable()->constrained('tb_lomba', 'id_lomba')->onDelete('set null');
-            $table->string('nama_tim');
-            $table->timestamps();
+        Schema::table('tb_tim', function (Blueprint $table) {
+            $table->foreignId('id_lomba')->nullable()->after('id_tim')->constrained('tb_lomba', 'id_lomba')->onDelete('set null');
         });
     }
 

@@ -40,10 +40,10 @@
             </div>
         </a>
 
-        <a href="#" class="menu-item">
+        <a href="{{ route('lomba.index') }}" class="menu-item {{ request()->routeIs('lomba.*') ? 'active' : '' }}">
             <div class="menu-link">
                 <img src="{{ asset('icon/event.svg') }}" alt="" class="menu-icon">
-                <span class="menu-text">Event</span>
+                <span class="menu-text">Daftar Lomba</span>
             </div>
         </a>
 

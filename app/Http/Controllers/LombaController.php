@@ -1,155 +1,167 @@
 <?php
+// app/Http/Controllers/LombaController.php
 
 namespace App\Http\Controllers;
 
+use App\Models\Lomba;
+use App\Models\Tim;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
-use App\Models\Peserta;
-use App\Models\Tim;
 use Illuminate\View\View;
 
 class LombaController extends Controller
 {
+    
     public function index(): View
     {
-        $tim = Tim::with(['pesertas' => function($query) {
-        $query->select('id_tim', 'ketua_peserta', 'prodi', 'no_telp', 'id_peserta');
-    }])->withCount('pesertas')->select('id_tim', 'nama_tim', 'created_at')->latest()->paginate(10);
-        $total_tim = Tim::count();
-        return view('admin.peserta', ['tim' => $tim]);
+        $lombas = Lomba::withCount('tims')->latest()->paginate(10);
+        return view('lomba.index', compact('lombas'));
     }
-    
+
     public function create(): View
     {
-        return view('admin.create');
+        $kategoris = [
+            'Videografi & Sinematografi',
+            'Desain Grafis & Branding',
+            'Seni Pertunjukan & Musik',
+            'Public Speaking & Bahasa',
+            'Bisnis, Inovasi & Gagasan Ilmiah',
+            'Teknologi Informasi & Konten Digital',
+            'Olahraga & Game Kompetitif',
+            'Pengembangan Karier & Profesionalitas',
+            'Lainnya',
+        ];
+        
+        return view('lomba.create', compact('kategoris'));
     }
-    
+
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
-            'nama_tim' => 'required|string|max:255',
-            'ketua_peserta' => 'required|string|max:255',
-            'prodi' => 'required|string|max:255',
-            'no_telp' => 'required|string|max:15',
-            'nama_peserta' => 'required|array',
-            'nama_peserta.*' => 'required|string|max:255',
+            'nama_lomba' => 'required|string|max:255',
+            'kategori' => 'required|string|max:255',
+            'deskripsi' => 'nullable|string',
+            'tanggal_mulai' => 'required|date',
+            'tanggal_selesai' => 'required|date|after_or_equal:tanggal_mulai',
+            'tempat' => 'required|string|max:255',
+            'status' => 'required|in:draft,open,closed,selesai',
+            'kuota_tim' => 'required|integer|min:1',
+            'min_anggota' => 'required|integer|min:1|max:20',
+            'max_anggota' => 'required|integer|min:1|max:20|gte:min_anggota',
         ]);
-        
-        $totalPeserta = 1 + count($request->nama_peserta);
-        if ($totalPeserta < 5) {
-            return back()->withErrors([
-                'nama_peserta' => 'Minimal total peserta 5 orang (1 ketua + minimal 4 anggota)'
-            ])->withInput();
-        }
-        
-        if ($totalPeserta > 20) {
-            return back()->withErrors([
-                'nama_peserta' => 'Maksimal total peserta 20 orang (1 ketua + maksimal 19 anggota)'
-            ])->withInput();
-        }
-        
-        $tim = Tim::create([
-            'nama_tim' => $request->nama_tim,
-        ]);
-        
-        Peserta::create([
-            'id_tim' => $tim->id_tim,
-            'ketua_peserta' => $request->ketua_peserta,
-            'nama_peserta' => $request->ketua_peserta,
-            'prodi' => $request->prodi,
-            'no_telp' => $request->no_telp,
-        ]);
-        
-        foreach ($request->nama_peserta as $nama) {
-            if (!empty($nama)) {
-                Peserta::create([
-                    'id_tim' => $tim->id_tim,
-                    'ketua_peserta' => null,
-                    'nama_peserta' => $nama,
-                    'prodi' => null,
-                    'no_telp' => null,
-                ]);
-            }
-        }
-        
-        return redirect()->route('admin.index')->with('success', 'Tim dan Peserta Berhasil Disimpan!');
+
+        $lomba = Lomba::create($request->all());
+
+        return redirect()->route('lomba.index')
+                         ->with('success', 'Lomba "' . $lomba->nama_lomba . '" berhasil ditambahkan!');
     }
 
     public function show($id): View
-    {
-        $tim = Tim::with(['pesertas' => function($query) {
-        $query->select('id_tim', 'ketua_peserta', 'nama_peserta', 'prodi', 'no_telp', 'id_peserta');}])->findOrFail($id);  
-        return view('admin.show', compact('tim'));
-    }
+{
+    $lomba = Lomba::with(['tims' => function($query) {
+        $query->withCount('pesertas')->with('pesertas');
+    }])->withCount('tims')->findOrFail($id);
+    $timTerdaftarIds = $lomba->tims->pluck('id_tim')->toArray();
+    $timAvailable = Tim::whereNotIn('id_tim', $timTerdaftarIds)->whereNull('id_lomba') ->get();
+    
+    return view('lomba.show', compact('lomba', 'timAvailable'));
+}
 
     public function edit($id): View
     {
-        $tim = Tim::with(['pesertas' => function($query) {
-            $query->select('id_tim', 'ketua_peserta', 'nama_peserta', 'prodi', 'no_telp', 'id_peserta');
-        }])->findOrFail($id);
+        $lomba = Lomba::findOrFail($id);
         
-        return view('admin.edit', compact('tim'));
+        $kategoris = [
+            'Videografi & Sinematografi',
+            'Desain Grafis & Branding',
+            'Seni Pertunjukan & Musik',
+            'Public Speaking & Bahasa',
+            'Bisnis, Inovasi & Gagasan Ilmiah',
+            'Teknologi Informasi & Konten Digital',
+            'Olahraga & Game Kompetitif',
+            'Pengembangan Karier & Profesionalitas',
+            'Lainnya',
+        ];
+        
+        return view('lomba.edit', compact('lomba', 'kategoris'));
     }
-    
+
     public function update(Request $request, $id): RedirectResponse
     {
         $request->validate([
-            'nama_tim' => 'required|string|max:255',
-            'ketua_peserta' => 'required|string|max:255',
-            'nama_peserta' => 'required|array',
-            'nama_peserta.*' => 'required|string|max:255',
-            'prodi' => 'required|string|max:255',
-            'no_telp' => 'required|string|max:15',
-        ]);
-        
-        $totalPeserta = 1 + count($request->nama_peserta);
-        if ($totalPeserta < 5) {
-            return back()->withErrors([
-                'nama_peserta' => 'Minimal total peserta 5 orang (1 ketua + minimal 4 anggota)'
-            ])->withInput();
-        }
-        
-        if ($totalPeserta > 20) {
-            return back()->withErrors([
-                'nama_peserta' => 'Maksimal total peserta 20 orang (1 ketua + maksimal 19 anggota)'
-            ])->withInput();
-        }
-        
-        $tim = Tim::findOrFail($id);
-        $tim->update([
-            'nama_tim' => $request->nama_tim,
-        ]);
-        
-        Peserta::where('id_tim', $id)->delete();
-        
-        Peserta::create([
-            'id_tim' => $tim->id_tim,
-            'ketua_peserta' => $request->ketua_peserta,
-            'nama_peserta' => $request->ketua_peserta,
-            'prodi' => $request->prodi,
-            'no_telp' => $request->no_telp,
+            'nama_lomba' => 'required|string|max:255',
+            'kategori' => 'nullable|string|max:255',
+            'deskripsi' => 'nullable|string',
+            'tanggal_mulai' => 'nullable|date',
+            'tanggal_selesai' => 'nullable|date|after_or_equal:tanggal_mulai',
+            'tempat' => 'nullable|string|max:255',
+            'status' => 'required|in:draft,open,closed,selesai',
+            'kuota_tim' => 'nullable|integer|min:1',
+            'min_anggota' => 'required|integer|min:1|max:20',
+            'max_anggota' => 'required|integer|min:1|max:20|gte:min_anggota',
         ]);
 
-        foreach ($request->nama_peserta as $nama) {
-            if (!empty($nama)) {
-                Peserta::create([
-                    'id_tim' => $tim->id_tim,
-                    'ketua_peserta' => null,
-                    'nama_peserta' => $nama,
-                    'prodi' => null,
-                    'no_telp' => null,
-                ]);
-            }
-        }
-        
-        return redirect()->route('admin.index')->with('success', 'Data Berhasil Diupdate!');
+        $lomba = Lomba::findOrFail($id);
+        $lomba->update($request->all());
+
+        return redirect()->route('lomba.index')
+                         ->with('success', 'Lomba "' . $lomba->nama_lomba . '" berhasil diupdate!');
     }
 
     public function destroy($id): RedirectResponse
     {
-        $tim = Tim::findOrFail($id);
-        $tim->delete();
+        $lomba = Lomba::findOrFail($id);
+        $nama = $lomba->nama_lomba;
+        Tim::where('id_lomba', $id)->update(['id_lomba' => null]);    
+        $lomba->delete();
+
+        return redirect()->route('lomba.index')
+                        ->with('success', 'Lomba "' . $nama . '" berhasil dihapus!');
+    }
+
+    public function tambahTim(Request $request, $id): RedirectResponse
+    {
+        $request->validate([
+            'id_tim' => 'required|exists:tb_tim,id_tim',
+        ]);
+
+        $lomba = Lomba::findOrFail($id);
+        $tim = Tim::findOrFail($request->id_tim);
+
+        if ($tim->id_lomba) {
+            return back()->with('error', 'Tim "' . $tim->nama_tim . '" sudah terdaftar di lomba lain!');
+        }
         
-        return redirect()->route('admin.index')->with('success', 'Data Berhasil Dihapus!');
+        if ($lomba->kuota_tim && $lomba->tims()->count() >= $lomba->kuota_tim) {
+            return back()->with('error', 'Kuota tim untuk lomba ini sudah penuh!');
+        }
+
+        try {
+            $tim->id_lomba = $lomba->id_lomba;
+            $tim->save();
+            return back()->with('success', 'Tim "' . $tim->nama_tim . '" berhasil ditambahkan ke lomba!');
+            
+        } 
+        
+        catch (\Exception $e) {
+            return back()->with('error', 'Gagal menambahkan tim: ' . $e->getMessage());
+        }
+    }
+
+    public function hapusTim($id, $id_tim): RedirectResponse
+    {
+        try {
+            $tim = Tim::where('id_lomba', $id)->findOrFail($id_tim);
+            $nama = $tim->nama_tim;
+            $tim->id_lomba = null;
+            $tim->save();
+            
+            return back()->with('success', 'Tim "' . $nama . '" berhasil dihapus dari lomba!');
+            
+        } 
+        
+        catch (\Exception $e) {
+            return back()->with('error', 'Gagal menghapus tim: ' . $e->getMessage());
+        }
     }
 }

@@ -6,6 +6,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TimController;
 use App\Http\Controllers\PanitiaController;
+use App\Http\Controllers\SuperAdminDashboardController;
 use App\Models\Peserta;
 use Illuminate\Support\Facades\Route;
 
@@ -14,6 +15,7 @@ Route::post('/login', [LoginController::class, 'login']);
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 Route::middleware(['auth', 'super_admin'])->group(function () {
+    Route::get('/admin/dashboard', [SuperAdminDashboardController::class, 'index'])->name('admin.dashboard');
     Route::resource('admin', PanitiaController::class);
 });
 

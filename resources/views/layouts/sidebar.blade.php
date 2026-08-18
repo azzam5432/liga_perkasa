@@ -18,14 +18,22 @@
                 <span class="menu-text">Dashboard</span>
             </div>
         </a>
-        @if(Auth::user()->isSuperAdmin())
-        <a class="menu-item {{ request()->routeIs('data-panitia') ? 'active' : '' }}" href="{{ route('admin.index') }}">
-            <div class="menu-link">
-                <img src="{{ asset('icon/dashboard.svg') }}" alt="" class="menu-icon">
-                <span class="menu-text">Data Panitia</span>
-            </div>
-        </a>
-        @endif
+        @auth
+            @if(Auth::user()->isSuperAdmin())
+                <a class="menu-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" href="{{ route('admin.dashboard') }}">
+                    <div class="menu-link">
+                        <img src="{{ asset('icon/dashboard.svg') }}" alt="" class="menu-icon">
+                        <span class="menu-text">Dashboard Super Admin</span>
+                    </div>
+                </a>
+                <a class="menu-item {{ request()->routeIs('admin.index') ? 'active' : '' }}" href="{{ route('admin.index') }}">
+                    <div class="menu-link">
+                        <img src="{{ asset('icon/dashboard.svg') }}" alt="" class="menu-icon">
+                        <span class="menu-text">Data Panitia</span>
+                    </div>
+                </a>
+            @endif
+        @endauth
         <a href="#" class="menu-item">
             <div class="menu-link">
                 <img src="{{ asset('icon/analytic.svg') }}" alt="" class="menu-icon">

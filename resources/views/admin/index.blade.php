@@ -79,10 +79,47 @@
         background: linear-gradient(135deg, #48bb78, #38a169);
         color: white;
     }
+
+    .custom-pagination-container {
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 12px 20px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    }
+
+    .custom-pagination-container .pagination {
+        margin-bottom: 0;
+        gap: 4px;
+    }
+
+    .custom-pagination-container .page-item .page-link {
+        border: none;
+        border-radius: 8px !important;
+        color: #4a5568;
+        font-weight: 500;
+        font-size: 13px;
+        padding: 6px 12px;
+        transition: all 0.2s ease;
+    }
+
+    .custom-pagination-container .page-item.active .page-link {
+        background-color: #1a2332;
+        color: #ffffff;
+        box-shadow: 0 2px 6px rgba(26, 35, 50, 0.3);
+    }
+
+    .custom-pagination-container .page-item:not(.active) .page-link:hover {
+        background-color: #edf2f7;
+        color: #1a2332;
+    }
+
+    .custom-pagination-container .page-item.disabled .page-link {
+        color: #cbd5e0;
+        background-color: transparent;
+    }
 </style>
 
 <div class="container-fluid">
-    {{-- Header Section --}}
     <div class="header-gradient text-white d-flex justify-content-between align-items-center mb-4 shadow-sm">
         <div>
             <h5 class="mb-0 fw-bold"><i class="fas fa-users-cog me-2"></i> Data Panitia</h5>
@@ -93,7 +130,6 @@
         </a>
     </div>
 
-    {{-- Alert Success --}}
     @if (session('success'))
         <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm rounded-3 mb-4">
             <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
@@ -101,7 +137,6 @@
         </div>
     @endif
 
-    {{-- Profile Cards Grid --}}
     <div class="row g-4">
         @forelse ($panitias as $item)
             <div class="col-12 col-md-6 col-lg-4 col-xl-3">
@@ -152,7 +187,6 @@
                             @endif
                         </div>
 
-                        {{-- Actions Section --}}
                         <div class="mt-auto pt-3 d-flex gap-2 justify-content-center w-100">
                             <a href="{{ route('admin.show', $item->id) }}" class="btn btn-sm btn-outline-dark flex-fill" title="Detail">
                                 <i class="fas fa-eye me-1"></i> Detail
@@ -184,8 +218,15 @@
         @endforelse
     </div>
 
-    <div class="mt-4 d-flex justify-content-center">
-        {{ $panitias->links() }}
-    </div>
+    @if ($panitias->hasPages())
+        <div class="custom-pagination-container mt-4 d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
+            <div class="small text-muted">
+                Menampilkan <strong>{{ $panitias->firstItem() }}</strong> sampai <strong>{{ $panitias->lastItem() }}</strong> dari <strong>{{ $panitias->total() }}</strong> panitia
+            </div>
+            <div>
+                {{ $panitias->links('pagination::bootstrap-5') }}
+            </div>
+        </div>
+    @endif
 </div>
 @endsection

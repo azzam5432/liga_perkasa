@@ -6,13 +6,21 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use App\Models\Tim;
+use App\Models\Peserta;
+use App\Models\lomba;
 
 class ProfileController extends Controller
 {
     public function index()
     {
         $user = Auth::user();
-        return view('profile.index', compact('user'));
+
+        $totalTim = Tim::count();
+        $totalPeserta = Peserta::count();
+        $totalLomba = Lomba::count();
+
+        return view('profile.index', compact('user','totalTim', 'totalPeserta', 'totalLomba'));
     }
 
     public function edit()

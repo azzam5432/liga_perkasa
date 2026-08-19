@@ -12,18 +12,58 @@
 
     <!-- Menu Sidebar -->
     <div class="sidebar-menu">
-        <a href="{{ route('dashboard') }}" class="menu-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
-            <div class="menu-link">
-                <img src="{{ asset('icon/dashboard.svg') }}" alt="" class="menu-icon">
-                <span class="menu-text">Dashboard</span>
-            </div>
-        </a>
+        @auth
+            @if(Auth::user()->isPanitia())
+                <a href="{{ route('dashboard') }}" class="menu-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+                    <div class="menu-link">
+                        <img src="{{ asset('icon/dashboard.svg') }}" alt="" class="menu-icon">
+                        <span class="menu-text">Dashboard</span>
+                    </div>
+                </a>
+                <a href="#" class="menu-item">
+                    <div class="menu-link">
+                        <img src="{{ asset('icon/analytic.svg') }}" alt="" class="menu-icon">
+                        <span class="menu-text">Analytic</span>
+                    </div>
+                </a>
+
+                <a href="#" class="menu-item">
+                    <div class="menu-link">
+                        <img src="{{ asset('icon/category.svg') }}" alt="" class="menu-icon">
+                        <span class="menu-text">Category</span>
+                    </div>
+                </a>
+
+                <a href="{{ route('panitia.index') }}" class="menu-item {{ request()->routeIs('panitia.*') ? 'active' : '' }}">
+                    <div class="menu-link">
+                        <img src="{{ asset('icon/team.svg') }}" alt="" class="menu-icon">
+                        <span class="menu-text">Peserta Lomba</span>
+                    </div>
+                </a>
+
+                <a href="{{ route('lomba.index') }}" class="menu-item {{ request()->routeIs('lomba.*') ? 'active' : '' }}">
+                    <div class="menu-link">
+                        <img src="{{ asset('icon/event.svg') }}" alt="" class="menu-icon">
+                        <span class="menu-text">Daftar Lomba</span>
+                    </div>
+                </a>
+
+                <a href="#" class="menu-item">
+                    <div class="menu-link">
+                        <img src="{{ asset('icon/explore.svg') }}" alt="" class="menu-icon">
+                        <span class="menu-text">Explore</span>
+                    </div>
+                </a>
+
+            @endif
+        @endauth
+        
         @auth
             @if(Auth::user()->isSuperAdmin())
                 <a class="menu-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" href="{{ route('admin.dashboard') }}">
                     <div class="menu-link">
                         <img src="{{ asset('icon/dashboard.svg') }}" alt="" class="menu-icon">
-                        <span class="menu-text">Dashboard Super Admin</span>
+                        <span class="menu-text">Dashboard Admin</span>
                     </div>
                 </a>
                 <a class="menu-item {{ request()->routeIs('admin.index') ? 'active' : '' }}" href="{{ route('admin.index') }}">
@@ -34,45 +74,12 @@
                 </a>
             @endif
         @endauth
-        <a href="#" class="menu-item">
-            <div class="menu-link">
-                <img src="{{ asset('icon/analytic.svg') }}" alt="" class="menu-icon">
-                <span class="menu-text">Analytic</span>
-            </div>
-        </a>
-
-        <a href="#" class="menu-item">
-            <div class="menu-link">
-                <img src="{{ asset('icon/category.svg') }}" alt="" class="menu-icon">
-                <span class="menu-text">Category</span>
-            </div>
-        </a>
-
-        <a href="{{ route('panitia.index') }}" class="menu-item {{ request()->routeIs('panitia.*') ? 'active' : '' }}">
-            <div class="menu-link">
-                <img src="{{ asset('icon/team.svg') }}" alt="" class="menu-icon">
-                <span class="menu-text">Peserta Lomba</span>
-            </div>
-        </a>
-
-        <a href="{{ route('lomba.index') }}" class="menu-item {{ request()->routeIs('lomba.*') ? 'active' : '' }}">
-            <div class="menu-link">
-                <img src="{{ asset('icon/event.svg') }}" alt="" class="menu-icon">
-                <span class="menu-text">Daftar Lomba</span>
-            </div>
-        </a>
-
-        <a href="#" class="menu-item">
-            <div class="menu-link">
-                <img src="{{ asset('icon/explore.svg') }}" alt="" class="menu-icon">
-                <span class="menu-text">Explore</span>
-            </div>
-        </a>
+        
         
     </div>
 
     <!-- Logout -->
-    <div class="sidebar-footer">
+    <!-- <div class="sidebar-footer">
         <form method="POST" action="{{ route('logout') }}">
             @csrf
             <button type="submit" class="logout-btn">
@@ -80,5 +87,5 @@
                 <span class="logout-text">Logout</span>
             </button>
         </form>
-    </div>
+    </div> -->
 </div>

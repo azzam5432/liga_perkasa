@@ -18,7 +18,7 @@
                         Total Tim: <strong>{{ $tim->total() }}</strong>
                     </div>
                     <a href="{{ route('panitia.create') }}" class="btn btn-success btn-sm rounded-pill px-4">
-                        <i class="fas fa-plus me-1"></i> Tambah Tim
+                        <i class="fas fa-plus me-1"></i>  Tim
                     </a>
                 </div>
 
@@ -185,7 +185,7 @@
                 <div class="d-flex justify-content-center justify-content-sm-between align-items-center flex-column flex-sm-row gap-2 mt-4 pt-3 border-top">
                     <div class="text-muted small">
                         <i class="fas fa-info-circle me-1"></i>
-                        Menampilkan {{ $tim->firstItem() ?? 0 }} - {{ $tim->lastItem() ?? 0 }} dari {{ $tim->total() }} data
+                        Menampilkan {{ $tim->firstItem() ?? 0 }} - {{ $tim->lastItem() ?? 0 }} dari {{ $tim->total() }} Tim
                     </div>
                     <div class="d-flex justify-content-center">
                         {{ $tim->links('pagination::bootstrap-5') }}

@@ -89,7 +89,6 @@ class PanitiaController extends Controller
 
         $data = $request->except(['foto_profil', 'password']);
 
-        // Update password jika diisi
         if ($request->filled('password')) {
             $data['password'] = Hash::make($request->password);
         }

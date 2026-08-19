@@ -16,6 +16,7 @@
         transition: all 0.3s ease;
         box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         background: #ffffff;
+        height: 100%;
     }
 
     .panitia-card:hover {
@@ -23,14 +24,42 @@
         box-shadow: 0 12px 25px rgba(0,0,0,0.12);
     }
 
+    /* Avatar dengan inisial */
     .panitia-avatar {
         width: 90px;
         height: 90px;
         border-radius: 50%;
         object-fit: cover;
-        border: 3px solid #a1a1a198;
+        border: 3px solid rgba(161, 161, 161, 0.6);
         padding: 3px;
         background: white;
+        transition: all 0.3s ease;
+    }
+
+    .panitia-avatar-initial {
+        width: 90px;
+        height: 90px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 36px;
+        font-weight: 700;
+        color: white;
+        border: 3px solid rgba(161, 161, 161, 0.6);
+        margin: 0 auto;
+        transition: all 0.3s ease;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .panitia-card:hover .panitia-avatar-initial {
+        transform: scale(1.05);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+
+    .panitia-card:hover .panitia-avatar {
+        transform: scale(1.05);
     }
 
     .panitia-social {
@@ -117,16 +146,31 @@
         color: #cbd5e0;
         background-color: transparent;
     }
+
+    .no-avatar-text {
+        font-size: 11px;
+        color: #a0aec0;
+        margin-top: 4px;
+    }
+
+    @media (max-width: 768px) {
+        .panitia-avatar,
+        .panitia-avatar-initial {
+            width: 70px;
+            height: 70px;
+            font-size: 28px;
+        }
+    }
 </style>
 
 <div class="container-fluid">
     <div class="header-gradient text-white d-flex justify-content-between align-items-center mb-4 shadow-sm">
         <div>
             <h5 class="mb-0 fw-bold"><i class="fas fa-users-cog me-2"></i> Data Panitia</h5>
-            <small class="opacity-75">Kelola data panitia yang terdaftar</small>
+            <small class="opacity-75">Kelola data panitia</small>
         </div>
-        <a href="{{ route('admin.create') }}" class="btn btn-light btn-sm fw-semibold shadow-sm">
-            <i class="fas fa-plus me-1"></i> Tambah Panitia
+        <a href="{{ route('panitia.create') }}" class="btn btn-light btn-sm fw-semibold shadow-sm">
+            <i class="fas fa-plus me-1"></i> Panitia
         </a>
     </div>
 
@@ -143,7 +187,17 @@
                 <div class="card panitia-card h-100 text-center p-3">
                     <div class="card-body d-flex flex-column align-items-center p-2">
                         <div class="position-relative mb-3">
-                            <img src="{{ $item->foto_profil_url }}" alt="{{ $item->name }}" class="panitia-avatar shadow-sm">
+                            @if($item->foto_profil && file_exists(public_path('uploads/profil/' . $item->foto_profil)))
+
+                                <img src="{{ asset('uploads/profil/' . $item->foto_profil) }}" 
+                                     alt="{{ $item->name }}" 
+                                     class="panitia-avatar shadow-sm">
+                            @else
+                                <div class="panitia-avatar-initial shadow-sm" 
+                                     style="background: {{ $item->avatar_color }};">
+                                    {{ $item->initials }}
+                                </div>
+                            @endif
                         </div>
 
                         <h6 class="fw-bold mb-1 text-dark">{{ $item->name }}</h6>
@@ -155,11 +209,11 @@
 
                         <div class="w-100 border-top border-bottom py-2 my-2 text-start small text-muted">
                             <div class="d-flex align-items-center mb-1">
-                                <i class="fas fa-envelope text-primary me-2" style="width: 16px;"></i>
+                                <i class="fas fa-envelope text-dark me-2" style="width: 16px;"></i>
                                 <span class="text-truncate">{{ $item->email }}</span>
                             </div>
                             <div class="d-flex align-items-center">
-                                <i class="fas fa-phone text-success me-2" style="width: 16px;"></i>
+                                <i class="fas fa-phone text-dark me-2" style="width: 16px;"></i>
                                 <span>{{ $item->no_telp ?? '-' }}</span>
                             </div>
                         </div>

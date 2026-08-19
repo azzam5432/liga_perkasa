@@ -3,18 +3,92 @@
 @section('title', 'Detail Panitia')
 
 @section('content')
+<style>
+    .panitia-avatar-large {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 5px solid #e2e8f0;
+    }
+
+    .panitia-avatar-initial-large {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 56px;
+        font-weight: 700;
+        color: white;
+        border: 5px solid #e2e8f0;
+        margin: 0 auto;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .badge-role {
+        padding: 5px 20px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .badge-super-admin {
+        background: linear-gradient(135deg, #1a2332, #2d3748);
+        color: white;
+    }
+
+    .badge-panitia {
+        background: linear-gradient(135deg, #48bb78, #38a169);
+        color: white;
+    }
+
+    .panitia-social a {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 15px;
+        border-radius: 8px;
+        color: white;
+        text-decoration: none;
+        margin-right: 8px;
+        transition: all 0.3s ease;
+        font-size: 14px;
+    }
+
+    .panitia-social a:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .social-instagram { background: #E4405F; }
+    .social-facebook { background: #1877F2; }
+    .social-twitter { background: #1DA1F2; }
+    .social-linkedin { background: #0A66C2; }
+</style>
+
 <div class="row">
     <div class="col-lg-8 offset-lg-2">
         <div class="card border-0 shadow-sm">
-            <div class="card-header bg-info text-white">
+            <div class="card-header bg-dark text-white">
                 <h5 class="mb-0"><i class="fas fa-user-circle me-2"></i> Detail Panitia</h5>
             </div>
             <div class="card-body p-4">
                 <div class="text-center mb-4">
-                    <img src="{{ $panitia->foto_profil_url }}" 
-                         alt="{{ $panitia->name }}" 
-                         class="rounded-circle" 
-                         style="width: 150px; height: 150px; object-fit: cover; border: 5px solid #e2e8f0;">
+                    @if($panitia->foto_profil && file_exists(public_path('uploads/profil/' . $panitia->foto_profil)))
+                        <img src="{{ asset('uploads/profil/' . $panitia->foto_profil) }}" 
+                             alt="{{ $panitia->name }}" 
+                             class="panitia-avatar-large">
+                    @else
+                        <div class="panitia-avatar-initial-large" 
+                             style="background: {{ $panitia->avatar_color }};">
+                            {{ $panitia->initials }}
+                        </div>
+                    @endif
                     <h3 class="mt-3">{{ $panitia->name }}</h3>
                     <span class="badge-role {{ $panitia->role === 'super_admin' ? 'badge-super-admin' : 'badge-panitia' }}">
                         {{ $panitia->role_label }}
@@ -79,6 +153,9 @@
                                 <i class="fab fa-linkedin-in"></i> LinkedIn
                             </a>
                         @endif
+                        @if(!$panitia->instagram && !$panitia->facebook && !$panitia->twitter && !$panitia->linkedin)
+                            <p class="text-muted">Tidak ada media sosial</p>
+                        @endif
                     </div>
                 </div>
 
@@ -96,48 +173,4 @@
         </div>
     </div>
 </div>
-
-<style>
-    .badge-role {
-        padding: 5px 20px;
-        border-radius: 20px;
-        font-size: 13px;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-
-    .badge-super-admin {
-        background: linear-gradient(135deg, #667eea, #764ba2);
-        color: white;
-    }
-
-    .badge-panitia {
-        background: linear-gradient(135deg, #48bb78, #38a169);
-        color: white;
-    }
-
-    .panitia-social a {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        padding: 8px 15px;
-        border-radius: 8px;
-        color: white;
-        text-decoration: none;
-        margin-right: 8px;
-        transition: all 0.3s ease;
-        font-size: 14px;
-    }
-
-    .panitia-social a:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    }
-
-    .social-instagram { background: #E4405F; }
-    .social-facebook { background: #1877F2; }
-    .social-twitter { background: #1DA1F2; }
-    .social-linkedin { background: #0A66C2; }
-</style>
 @endsection

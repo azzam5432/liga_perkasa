@@ -11,6 +11,7 @@
         transition: all 0.3s ease;
         position: relative;
         overflow: hidden;
+        background: white;
     }
 
     .stat-card::before {
@@ -101,6 +102,7 @@
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
         transition: all 0.3s ease;
         height: 100%;
+        background: white;
     }
 
     .dashboard-card:hover {
@@ -267,13 +269,32 @@
         border-radius: 8px;
     }
 
-    .panitia-item .panitia-avatar {
+    /* Avatar dengan foto */
+    .panitia-avatar {
         width: 40px;
         height: 40px;
         border-radius: 50%;
         object-fit: cover;
         margin-right: 12px;
         border: 2px solid #e2e8f0;
+        flex-shrink: 0;
+    }
+
+    /* Avatar dengan inisial */
+    .panitia-avatar-initial {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        font-weight: 700;
+        color: white;
+        margin-right: 12px;
+        flex-shrink: 0;
+        border: 2px solid #e2e8f0;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.1);
     }
 
     .panitia-item .panitia-info {
@@ -295,6 +316,7 @@
         border-radius: 20px;
         font-size: 11px;
         font-weight: 600;
+        flex-shrink: 0;
     }
 
     .badge-role-superadmin {
@@ -326,7 +348,7 @@
     <div class="col-12">
         <div class="welcome-section">
             <div class="welcome-text">
-                <h2>👋 Selamat Datang, {{ Auth::user()->name }}!</h2>
+                <h2>Selamat Datang, {{ Auth::user()->name }}!</h2>
                 <p>Anda login sebagai <strong>Super Admin</strong> — {{ now()->format('l, d F Y') }}</p>
                 <div class="mt-2">
                     <span class="badge bg-light text-dark">
@@ -484,7 +506,7 @@
         <div class="card dashboard-card">
             <div class="card-header-custom d-flex justify-content-between align-items-center">
                 <span><i class="fas fa-users text-success me-2"></i> Tim Terbaru</span>
-                <a href="{{ route('panitia.index') }}" class="btn btn-sm btn-outline-primary">Lihat Semua</a>
+                <a href="{{ route('admin.index') }}" class="btn btn-sm btn-outline-primary">Lihat Semua</a>
             </div>
             <div class="card-body p-3" style="max-height: 300px; overflow-y: auto;">
                 @forelse ($timTerbaru as $tim)
@@ -523,9 +545,20 @@
             <div class="card-body p-3" style="max-height: 300px; overflow-y: auto;">
                 @forelse ($panitiaTerbaru as $panitia)
                 <div class="panitia-item">
-                    <img src="{{ $panitia->foto_profil_url }}" 
-                         alt="{{ $panitia->name }}" 
-                         class="panitia-avatar">
+                    {{-- Cek apakah ada foto profil --}}
+                    @if($panitia->foto_profil && file_exists(public_path('uploads/profil/' . $panitia->foto_profil)))
+                        {{-- Tampilkan foto profil --}}
+                        <img src="{{ asset('uploads/profil/' . $panitia->foto_profil) }}" 
+                             alt="{{ $panitia->name }}" 
+                             class="panitia-avatar">
+                    @else
+                        {{-- Tampilkan inisial dengan warna --}}
+                        <div class="panitia-avatar-initial" 
+                             style="background: {{ $panitia->avatar_color }};">
+                            {{ $panitia->initials }}
+                        </div>
+                    @endif
+                    
                     <div class="panitia-info">
                         <div class="panitia-name">{{ $panitia->name }}</div>
                         <div class="panitia-jabatan">

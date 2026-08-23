@@ -273,6 +273,120 @@
             font-weight: 500;
         }
 
+        .menu-item.has-submenu {
+            cursor: pointer;
+        }
+
+        .menu-item.has-submenu .menu-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .menu-item.has-submenu .menu-link:hover {
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .menu-arrow {
+            margin-left: auto;
+            font-size: 12px;
+            transition: transform 0.3s ease;
+        }
+
+        .submenu {
+            display: none;
+            padding-left: 20px;
+            margin-left: 10px;
+            border-left: 2px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .submenu.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .submenu-item {
+            display: block;
+            padding: 8px 12px;
+            border-radius: 6px;
+            color: #4a5568;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            font-size: 14px;
+        }
+
+        .submenu-item:hover {
+            background: rgba(102, 126, 234, 0.08);
+            color: #667eea;
+        }
+
+        .submenu-item.active {
+            background: rgba(102, 126, 234, 0.12);
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .submenu-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .submenu-icon {
+            font-size: 18px;
+            color: #a0aec0;
+        }
+
+        .submenu-item.active .submenu-icon {
+            color: #667eea;
+        }
+
+        /* Logout Button */
+        .sidebar-footer {
+            padding: 16px;
+            border-top: 1px solid #e2e8f0;
+            margin-top: auto;
+        }
+
+        .logout-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 8px;
+            background: #fee2e2;
+            color: #dc2626;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .logout-btn:hover {
+            background: #fecaca;
+            transform: translateY(-2px);
+        }
+
+        .logout-icon {
+            width: 20px;
+            height: 20px;
+        }
+
         /* Sidebar Footer */
         .sidebar-footer {
             margin-top: auto;

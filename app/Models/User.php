@@ -138,4 +138,14 @@ class User extends Authenticatable
                "&size=200&background=" . $color . 
                "&color=ffffff&bold=true&font-size=0.5&length=2";
     }
+
+    public function juri()
+    {
+        return $this->hasOne(Juri::class, 'user_id', 'id');
+    }
+
+    public function isJuri(): bool
+    {
+        return $this->juri()->exists();
+    }
 }

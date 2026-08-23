@@ -169,7 +169,7 @@
             <h5 class="mb-0 fw-bold"><i class="fas fa-users-cog me-2"></i> Data Panitia</h5>
             <small class="opacity-75">Kelola data panitia</small>
         </div>
-        <a href="{{ route('panitia.create') }}" class="btn btn-light btn-sm fw-semibold shadow-sm">
+        <a href="{{ route('admin.create') }}" class="btn btn-light btn-sm fw-semibold shadow-sm">
             <i class="fas fa-plus me-1"></i> Panitia
         </a>
     </div>

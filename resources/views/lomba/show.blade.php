@@ -151,7 +151,7 @@
                                             </span>
                                         </td>
                                         <td class="text-center">
-                                            <a href="{{ route('admin.show', $tim->id_tim) }}" class="btn btn-sm btn-dark text-white" title="Detail Tim">
+                                            <a href="{{ route('panitia.show', $tim->id_tim) }}" class="btn btn-sm btn-dark text-white" title="Detail Tim">
                                                 <i class="fas fa-eye"></i>
                                             </a>
                                             <form action="{{ route('lomba.hapus-tim', [$lomba->id_lomba, $tim->id_tim]) }}" method="POST" class="d-inline">
@@ -239,6 +239,46 @@
                 </div>
             </form>
         </div>
+    </div>
+</div>
+
+<!-- Daftar Juri -->
+<div class="card mt-4">
+    <div class="card-header bg-info text-white">
+        <h6 class="mb-0"><i class="fas fa-user-tie me-2"></i> Daftar Juri</h6>
+    </div>
+    <div class="card-body">
+        @if($lomba->juri->count() > 0)
+            <div class="row">
+                @foreach($lomba->juri as $juri)
+                    <div class="col-md-4 mb-3">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                @if($juri->user->foto_profil && file_exists(public_path('uploads/profil/' . $juri->user->foto_profil)))
+                                    <img src="{{ asset('uploads/profil/' . $juri->user->foto_profil) }}" 
+                                         alt="{{ $juri->user->name }}" 
+                                         class="rounded-circle" 
+                                         style="width: 60px; height: 60px; object-fit: cover;">
+                                @else
+                                    <div class="rounded-circle d-inline-flex align-items-center justify-content-center" 
+                                         style="width: 60px; height: 60px; background: {{ $juri->user->avatar_color ?? '#667eea' }}; color: white; font-size: 24px; font-weight: 700;">
+                                        {{ $juri->user->initials ?? strtoupper(substr($juri->user->name, 0, 2)) }}
+                                    </div>
+                                @endif
+                                <h6 class="mt-2 mb-0">{{ $juri->user->name }}</h6>
+                                <small class="text-muted">{{ $juri->spesialisasi ?? '-' }}</small>
+                                <br>
+                                <span class="badge {{ $juri->pivot->status == 'aktif' ? 'bg-success' : 'bg-danger' }}">
+                                    {{ ucfirst($juri->pivot->status) }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        @else
+            <p class="text-muted text-center">Belum ada juri yang ditugaskan untuk lomba ini.</p>
+        @endif
     </div>
 </div>
 

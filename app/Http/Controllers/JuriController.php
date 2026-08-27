@@ -10,11 +10,26 @@ use Illuminate\Http\RedirectResponse;
 
 class JuriController extends Controller
 {
-
-    public function index(): View
+    public function index(Request $request)
     {
-        $juris = Juri::with('user')->latest()->paginate(10);
-        return view('juri.index', compact('juris'));
+        $query = Juri::with('user');
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->whereHas('user', function($q) use ($search) {
+                $q->where('name', 'LIKE', "%{$search}%")
+                  ->orWhere('email', 'LIKE', "%{$search}%");
+            });
+        }
+
+        $juris = $query->latest()->paginate(10);
+        $users = User::whereDoesntHave('juri')->where('role', 'panitia')->get();
+
+        if ($request->ajax()) {
+            return view('juri.index', compact('juris', 'users'));
+        }
+
+        return view('juri.index', compact('juris', 'users'));
     }
 
     public function create(): View
@@ -23,17 +38,24 @@ class JuriController extends Controller
         return view('juri.create', compact('users'));
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request)
     {
         $request->validate([
             'user_id' => 'required|exists:users,id|unique:tb_juri,user_id',
-            'spesialisasi' => 'nullable|string|max:255',
-            'institusi' => 'nullable|string|max:255',
-            'pengalaman' => 'nullable|string',
-            'status' => 'required|in:aktif,nonaktif',
+            'spesialisasi' => 'required|string|max:255',
         ]);
 
-        Juri::create($request->all());
+        $juri = Juri::create([
+            'user_id' => $request->user_id,
+            'spesialisasi' => $request->spesialisasi,
+        ]);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Juri berhasil ditambahkan!'
+            ]);
+        }
 
         return redirect()->route('juri.index')
             ->with('success', 'Juri berhasil ditambahkan!');
@@ -51,18 +73,24 @@ class JuriController extends Controller
         return view('juri.edit', compact('juri'));
     }
 
-    public function update(Request $request, $id): RedirectResponse
+    public function update(Request $request, $id)
     {
         $juri = Juri::findOrFail($id);
 
         $request->validate([
-            'spesialisasi' => 'nullable|string|max:255',
-            'institusi' => 'nullable|string|max:255',
-            'pengalaman' => 'nullable|string',
-            'status' => 'required|in:aktif,nonaktif',
+            'spesialisasi' => 'required|string|max:255',
         ]);
 
-        $juri->update($request->all());
+        $juri->update([
+            'spesialisasi' => $request->spesialisasi,
+        ]);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Data juri berhasil diupdate!'
+            ]);
+        }
 
         return redirect()->route('juri.index')
             ->with('success', 'Data juri berhasil diupdate!');

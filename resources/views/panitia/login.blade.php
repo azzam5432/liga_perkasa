@@ -260,10 +260,6 @@
                 </form>
                 <div class="text-center mt-4">
                     <p class="text-muted small">
-                        <i class="fas fa-shield-alt me-1"></i> 
-                        Demo: admin@example.com / password123
-                    </p>
-                    <p class="text-muted small">
                         &copy; {{ date('Y') }} Politeknik Mitra Industri. All rights reserved.
                     </p>
                 </div>

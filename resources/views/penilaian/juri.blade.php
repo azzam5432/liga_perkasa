@@ -61,37 +61,37 @@
                                     <span class="badge bg-primary">Tim #{{ $loop->iteration }}</span>
                                 </div>
                                 <div class="card-body">
-                                    @foreach($kriteria as $kIndex => $kriteria)
+                                    @foreach($kriteria as $kIndex => $kriteriaItem)
                                         <div class="mb-3 pb-3 {{ !$loop->last ? 'border-bottom' : '' }}">
                                             <div class="d-flex justify-content-between align-items-center mb-2">
                                                 <label class="fw-bold">
-                                                    {{ $kriteria->nama_kriteria }}
-                                                    <small class="text-muted">(Bobot: {{ $kriteria->bobot }}%)</small>
+                                                    {{ $kriteriaItem->nama_kriteria ?? 'Kriteria' }}
+                                                    <small class="text-muted">(Bobot: {{ $kriteriaItem->bobot ?? 0 }}%)</small>
                                                 </label>
-                                                @if($kriteria->tipe == 'skala')
+                                                @if($kriteriaItem->tipe == 'skala')
                                                     <span class="nilai-display" 
-                                                          id="nilai-{{ $tim->id_tim }}-{{ $kriteria->id_kriteria }}">
-                                                        {{ $kriteria->skala_min }}
+                                                          id="nilai-{{ $tim->id_tim }}-{{ $kriteriaItem->id_kriteria }}">
+                                                        {{ $kriteriaItem->skala_min ?? 1 }}
                                                     </span>
                                                 @endif
                                             </div>
                                             
-                                            @if($kriteria->tipe == 'skala')
+                                            @if($kriteriaItem->tipe == 'skala')
                                                 <input type="range" 
                                                        class="form-range nilai-slider" 
                                                        name="penilaian[{{ $index }}][nilai]" 
-                                                       min="{{ $kriteria->skala_min }}" 
-                                                       max="{{ $kriteria->skala_max }}" 
-                                                       value="{{ $kriteria->skala_min }}"
-                                                       oninput="updateNilai(this, 'nilai-{{ $tim->id_tim }}-{{ $kriteria->id_kriteria }}')">
+                                                       min="{{ $kriteriaItem->skala_min ?? 1 }}" 
+                                                       max="{{ $kriteriaItem->skala_max ?? 100 }}" 
+                                                       value="{{ $kriteriaItem->skala_min ?? 1 }}"
+                                                       oninput="updateNilai(this, 'nilai-{{ $tim->id_tim }}-{{ $kriteriaItem->id_kriteria }}')">
                                                 <div class="d-flex justify-content-between text-muted small">
-                                                    <span>{{ $kriteria->skala_min }}</span>
-                                                    <span>{{ $kriteria->skala_max }}</span>
+                                                    <span>{{ $kriteriaItem->skala_min ?? 1 }}</span>
+                                                    <span>{{ $kriteriaItem->skala_max ?? 100 }}</span>
                                                 </div>
-                                            @elseif($kriteria->tipe == 'pilihan_ganda')
+                                            @elseif($kriteriaItem->tipe == 'pilihan_ganda')
                                                 <select class="form-select" name="penilaian[{{ $index }}][nilai]">
                                                     <option value="">Pilih Nilai</option>
-                                                    @for($i = $kriteria->skala_min; $i <= $kriteria->skala_max; $i++)
+                                                    @for($i = $kriteriaItem->skala_min ?? 1; $i <= $kriteriaItem->skala_max ?? 10; $i++)
                                                         <option value="{{ $i }}">{{ $i }}</option>
                                                     @endfor
                                                 </select>
@@ -103,7 +103,7 @@
                                             @endif
                                             
                                             <input type="hidden" name="penilaian[{{ $index }}][id_tim]" value="{{ $tim->id_tim }}">
-                                            <input type="hidden" name="penilaian[{{ $index }}][id_kriteria]" value="{{ $kriteria->id_kriteria }}">
+                                            <input type="hidden" name="penilaian[{{ $index }}][id_kriteria]" value="{{ $kriteriaItem->id_kriteria }}">
                                         </div>
                                     @endforeach
                                 </div>

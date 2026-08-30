@@ -14,7 +14,6 @@ use Illuminate\Support\Facades\Auth;
 
 class PenilaianController extends Controller
 {
-
     public function index(): View
     {
         $user = Auth::user();
@@ -132,7 +131,8 @@ class PenilaianController extends Controller
             ->with('success', 'Penilaian berhasil dihapus!');
     }
 
-    public function juriPenilaian(): View
+    // ✅ PERBAIKAN: Hapus return type :View
+    public function juriPenilaian()
     {
         $user = Auth::user();
         $juri = Juri::where('user_id', $user->id)->first();

@@ -1,4 +1,5 @@
 <?php
+// app/Models/Kriteria.php
 
 namespace App\Models;
 
@@ -10,24 +11,33 @@ class Kriteria extends Model
     protected $primaryKey = 'id_kriteria';
     
     protected $fillable = [
+        'id_lomba',
         'nama_kriteria',
         'deskripsi',
         'bobot',
         'tipe',
         'skala_min',
         'skala_max',
-        'is_active'
+        'is_active',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
     ];
 
+    // Relasi ke Lomba
+    public function lomba()
+    {
+        return $this->belongsTo(Lomba::class, 'id_lomba', 'id_lomba');
+    }
+
+    // Relasi ke Penilaian
     public function penilaians()
     {
         return $this->hasMany(Penilaian::class, 'id_kriteria', 'id_kriteria');
     }
 
+    // Scope
     public function scopeActive($query)
     {
         return $query->where('is_active', true);

@@ -1,4 +1,5 @@
 <?php
+// app/Http/Controllers/DashboardController.php
 
 namespace App\Http\Controllers;
 
@@ -17,15 +18,17 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
         
+        // Data untuk Panitia
         $dataPeserta = Tim::with(['pesertas' => function($query) {
             $query->select('id_tim', 'ketua_peserta', 'nama_peserta', 'prodi', 'no_telp');
-        }])->withCount('pesertas')->select('id_tim', 'nama_tim')->latest()->paginate(10);
+        }])->withCount('pesertas')->select('id_tim', 'nama_tim')->latest()->paginate(5);
         
         $totalTim = Tim::count();
         $totalPeserta = Peserta::count();
         
+        // Data untuk Juri
         $juri = Juri::where('user_id', $user->id)->first();
-        $lombaDitugaskan = [];
+        $lombaDitugaskan = collect();
         $totalPenilaian = 0;
         $totalLomba = 0;
         
@@ -35,7 +38,6 @@ class DashboardController extends Controller
                 ->get();
             
             $totalLomba = $lombaDitugaskan->count();
-            
             $totalPenilaian = Penilaian::where('id_juri', $juri->id_juri)->count();
         }
         

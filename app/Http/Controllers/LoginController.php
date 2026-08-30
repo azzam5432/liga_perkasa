@@ -23,11 +23,18 @@ class LoginController extends Controller
             $request->session()->regenerate();
 
             $user = Auth::user();
+            
+            // Arahkan langsung tanpa menggunakan intended()
             if ($user->isSuperAdmin()) {
-                return redirect()->intended('/admin/dashboard');
+                return redirect()->route('admin.dashboard');
             }
 
-            return redirect()->intended('/dashboard');
+            if ($user->isPanitia()) {
+                return redirect()->route('dashboard');
+            }
+
+            // Jika role lain (misal Juri)
+            return redirect()->intended('/');
         }
 
         return back()->withErrors([

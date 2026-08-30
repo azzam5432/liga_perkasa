@@ -13,9 +13,9 @@ class TimController extends Controller
     public function index(): View
     {
         $tim = Tim::with(['pesertas' => function($query) {
-        $query->select('id_tim', 'ketua_peserta', 'prodi', 'no_telp', 'id_peserta');
-    }])->withCount('pesertas')->select('id_tim', 'nama_tim', 'created_at')->latest()->paginate(10);
-        $total_tim = Tim::count();
+            $query->select('id_tim', 'ketua_peserta', 'prodi', 'no_telp', 'id_peserta', 'nama_peserta');
+        }])->withCount('pesertas')->select('id_tim', 'nama_tim', 'created_at')->latest()->paginate(10);
+        
         return view('panitia.peserta', ['tim' => $tim]);
     }
     
@@ -24,34 +24,22 @@ class TimController extends Controller
         return view('panitia.create');
     }
     
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request)
     {
         $request->validate([
             'nama_tim' => 'required|string|max:255',
             'ketua_peserta' => 'required|string|max:255',
             'prodi' => 'required|string|max:255',
             'no_telp' => 'required|string|max:15',
-            'nama_peserta' => 'required|array',
-            'nama_peserta.*' => 'required|string|max:255',
+            'anggota' => 'required|array|min:4|max:19',
+            'anggota.*' => 'required|string|max:255',
         ]);
-        
-        $totalPeserta = 1 + count($request->nama_peserta);
-        if ($totalPeserta < 5) {
-            return back()->withErrors([
-                'nama_peserta' => 'Minimal total peserta 5 orang (1 ketua + minimal 4 anggota)'
-            ])->withInput();
-        }
-        
-        if ($totalPeserta > 20) {
-            return back()->withErrors([
-                'nama_peserta' => 'Maksimal total peserta 20 orang (1 ketua + maksimal 19 anggota)'
-            ])->withInput();
-        }
         
         $tim = Tim::create([
             'nama_tim' => $request->nama_tim,
         ]);
         
+        // Simpan Ketua
         Peserta::create([
             'id_tim' => $tim->id_tim,
             'ketua_peserta' => $request->ketua_peserta,
@@ -60,7 +48,8 @@ class TimController extends Controller
             'no_telp' => $request->no_telp,
         ]);
         
-        foreach ($request->nama_peserta as $nama) {
+        // Simpan Anggota
+        foreach ($request->anggota as $nama) {
             if (!empty($nama)) {
                 Peserta::create([
                     'id_tim' => $tim->id_tim,
@@ -72,13 +61,22 @@ class TimController extends Controller
             }
         }
         
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Tim dan Peserta Berhasil Disimpan!'
+            ]);
+        }
+        
         return redirect()->route('panitia.index')->with('success', 'Tim dan Peserta Berhasil Disimpan!');
     }
 
     public function show($id): View
     {
         $tim = Tim::with(['pesertas' => function($query) {
-        $query->select('id_tim', 'ketua_peserta', 'nama_peserta', 'prodi', 'no_telp', 'id_peserta');}])->findOrFail($id);  
+            $query->select('id_tim', 'ketua_peserta', 'nama_peserta', 'prodi', 'no_telp', 'id_peserta');
+        }])->findOrFail($id);  
+        
         return view('panitia.show', compact('tim'));
     }
 
@@ -91,37 +89,26 @@ class TimController extends Controller
         return view('panitia.edit', compact('tim'));
     }
     
-    public function update(Request $request, $id): RedirectResponse
+    public function update(Request $request, $id)
     {
         $request->validate([
             'nama_tim' => 'required|string|max:255',
             'ketua_peserta' => 'required|string|max:255',
-            'nama_peserta' => 'required|array',
-            'nama_peserta.*' => 'required|string|max:255',
             'prodi' => 'required|string|max:255',
             'no_telp' => 'required|string|max:15',
+            'edit_anggota' => 'required|array|min:4|max:19',
+            'edit_anggota.*' => 'required|string|max:255',
         ]);
-        
-        $totalPeserta = 1 + count($request->nama_peserta);
-        if ($totalPeserta < 5) {
-            return back()->withErrors([
-                'nama_peserta' => 'Minimal total peserta 5 orang (1 ketua + minimal 4 anggota)'
-            ])->withInput();
-        }
-        
-        if ($totalPeserta > 20) {
-            return back()->withErrors([
-                'nama_peserta' => 'Maksimal total peserta 20 orang (1 ketua + maksimal 19 anggota)'
-            ])->withInput();
-        }
         
         $tim = Tim::findOrFail($id);
         $tim->update([
             'nama_tim' => $request->nama_tim,
         ]);
         
+        // Hapus semua peserta lama
         Peserta::where('id_tim', $id)->delete();
         
+        // Simpan Ketua baru
         Peserta::create([
             'id_tim' => $tim->id_tim,
             'ketua_peserta' => $request->ketua_peserta,
@@ -130,7 +117,8 @@ class TimController extends Controller
             'no_telp' => $request->no_telp,
         ]);
 
-        foreach ($request->nama_peserta as $nama) {
+        // Simpan Anggota baru
+        foreach ($request->edit_anggota as $nama) {
             if (!empty($nama)) {
                 Peserta::create([
                     'id_tim' => $tim->id_tim,
@@ -142,13 +130,27 @@ class TimController extends Controller
             }
         }
         
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Data Berhasil Diupdate!'
+            ]);
+        }
+        
         return redirect()->route('panitia.index')->with('success', 'Data Berhasil Diupdate!');
     }
 
-    public function destroy($id): RedirectResponse
+    public function destroy($id)
     {
         $tim = Tim::findOrFail($id);
         $tim->delete();
+        
+        if (request()->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Data Berhasil Dihapus!'
+            ]);
+        }
         
         return redirect()->route('panitia.index')->with('success', 'Data Berhasil Dihapus!');
     }

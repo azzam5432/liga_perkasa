@@ -19,11 +19,18 @@ class SuperAdminDashboardController extends Controller
         $totalPeserta = Peserta::count();
         $totalLomba = Lomba::count();
 
+        // Pendaftaran Bulanan
         $pendaftaranBulanan = Tim::select(
             DB::raw('MONTH(created_at) as bulan'),
             DB::raw('YEAR(created_at) as tahun'),
             DB::raw('COUNT(*) as total')
-        )->where('created_at', '>=', now()->subMonths(6))->groupBy('tahun', 'bulan')->orderBy('tahun', 'asc')->orderBy('bulan', 'asc')->get()->map(function ($item) {
+        )
+        ->where('created_at', '>=', now()->subMonths(6))
+        ->groupBy('tahun', 'bulan')
+        ->orderBy('tahun', 'asc')
+        ->orderBy('bulan', 'asc')
+        ->get()
+        ->map(function ($item) {
             $namaBulan = [
                 1 => 'Jan', 2 => 'Feb', 3 => 'Mar', 4 => 'Apr',
                 5 => 'Mei', 6 => 'Jun', 7 => 'Jul', 8 => 'Agu',
@@ -35,7 +42,10 @@ class SuperAdminDashboardController extends Controller
             ];
         });
 
-        $lombaPerKategori = Lomba::select('kategori', DB::raw('COUNT(*) as total'))->groupBy('kategori')->get();
+        $lombaPerKategori = Lomba::select('kategori', DB::raw('COUNT(*) as total'))
+            ->groupBy('kategori')
+            ->get();
+            
         $timTerbaru = Tim::with('pesertas')->latest()->take(5)->get();
         $panitiaTerbaru = User::where('role', 'panitia')->latest()->take(5)->get();
         $aktivitasTerakhir = $this->getRecentActivities();
@@ -68,24 +78,24 @@ class SuperAdminDashboardController extends Controller
         $activities = [];
 
         $timBaru = Tim::with('pesertas')->latest()->take(3)->get()->map(function ($item) {
-                return [
-                    'user' => $item->nama_tim,
-                    'action' => 'mendaftarkan tim',
-                    'time' => $item->created_at->diffForHumans(),
-                    'icon' => 'fa-users',
-                    'color' => 'primary'
-                ];
-            });
+            return [
+                'user' => $item->nama_tim,
+                'action' => 'mendaftarkan tim',
+                'time' => $item->created_at->diffForHumans(),
+                'icon' => 'fa-users',
+                'color' => 'primary'
+            ];
+        });
 
         $panitiaBaru = User::where('role', 'panitia')->latest()->take(2)->get()->map(function ($item) {
-                return [
-                    'user' => $item->name,
-                    'action' => 'bergabung sebagai panitia',
-                    'time' => $item->created_at->diffForHumans(),
-                    'icon' => 'fa-user-plus',
-                    'color' => 'success'
-                ];
-            });
+            return [
+                'user' => $item->name,
+                'action' => 'bergabung sebagai panitia',
+                'time' => $item->created_at->diffForHumans(),
+                'icon' => 'fa-user-plus',
+                'color' => 'success'
+            ];
+        });
 
         $activities = $timBaru->merge($panitiaBaru)->sortByDesc('time')->take(5)->values();
 

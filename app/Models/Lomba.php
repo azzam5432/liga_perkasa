@@ -12,64 +12,61 @@ class Lomba extends Model
     
     protected $fillable = [
         'nama_lomba',
-        'kategori',
         'deskripsi',
+        'kategori',
         'tanggal_mulai',
         'tanggal_selesai',
-        'tempat',
         'status',
-        'kuota_tim',
-        'min_anggota',
-        'max_anggota',
+        'jenis',
+        'jumlah_finalis',
+        'is_penyisihan_active',
     ];
 
     protected $casts = [
         'tanggal_mulai' => 'date',
         'tanggal_selesai' => 'date',
+        'is_penyisihan_active' => 'boolean',
     ];
 
-    public function scopeOpen($query)
+    // Relasi ke Juri
+    public function juri()
     {
-        return $query->where('status', 'open');
+        return $this->belongsToMany(Juri::class, 'tb_juri_lomba', 'id_lomba', 'id_juri')
+                    ->withPivot('status', 'catatan')
+                    ->withTimestamps();
     }
 
-    // Scope untuk lomba yang selesai
-    public function scopeSelesai($query)
+    // Relasi ke Finalis
+    public function finalis()
     {
-        return $query->where('status', 'selesai');
+        return $this->hasMany(Finalis::class, 'id_lomba', 'id_lomba');
     }
 
-    // Scope untuk lomba yang masih draft
-    public function scopeDraft($query)
+    // Relasi ke Tim melalui finalis
+    public function timFinalis()
     {
-        return $query->where('status', 'draft');
+        return $this->belongsToMany(Tim::class, 'tb_finalis', 'id_lomba', 'id_tim')
+                    ->withPivot('peringkat', 'catatan')
+                    ->withTimestamps();
     }
 
-    // Scope untuk lomba yang closed
-    public function scopeClosed($query)
+    // Relasi ke Kriteria
+    public function kriterias()
     {
-        return $query->where('status', 'closed');
+        return $this->hasMany(Kriteria::class, 'id_lomba', 'id_lomba');
     }
 
-    // Scope untuk lomba yang bisa dinilai (open atau selesai)
-    public function scopeDapatDinilai($query)
+    // Helper
+    public function getJenisLabelAttribute()
     {
-        return $query->whereIn('status', ['open', 'selesai']);
-    }
-
-    // Helper status badge
-    public function getStatusBadgeAttribute()
-    {
-        $badges = [
-            'draft' => 'secondary',
-            'open' => 'success',
-            'selesai' => 'info',
-            'closed' => 'danger',
+        $labels = [
+            'langsung' => 'Langsung',
+            'penyisihan' => 'Penyisihan + Final',
+            'final' => 'Final',
         ];
-        return $badges[$this->status] ?? 'secondary';
+        return $labels[$this->jenis] ?? $this->jenis;
     }
 
-    // Helper status label
     public function getStatusLabelAttribute()
     {
         $labels = [
@@ -81,36 +78,14 @@ class Lomba extends Model
         return $labels[$this->status] ?? $this->status;
     }
 
-    // Relasi ke Tim
-    public function tims()
+    public function getStatusBadgeAttribute()
     {
-        return $this->hasMany(Tim::class, 'id_lomba', 'id_lomba');
-    }
-
-    public function juri()
-    {
-        return $this->belongsToMany(Juri::class, 'tb_juri_lomba', 'id_lomba', 'id_juri')->withPivot('status', 'catatan')->withTimestamps();
-    }
-
-    public function hasJuri()
-    {
-        return $this->juri()->count() > 0;
-    }
-
-    public function getJumlahJuriAttribute()
-    {
-        return $this->juri()->count();
-    }
-
-    public function pesertas()
-    {
-        return $this->hasManyThrough(Peserta::class, Tim::class, 'id_lomba', 'id_tim', 'id_lomba', 'id_tim');
-    }
-    
-    public function getKuotaPersentaseAttribute()
-    {
-        if (!$this->kuota_tim || $this->kuota_tim == 0) return 0;
-        $total = $this->tims()->count();
-        return round(($total / $this->kuota_tim) * 100);
+        $badges = [
+            'draft' => 'secondary',
+            'open' => 'success',
+            'selesai' => 'info',
+            'closed' => 'danger',
+        ];
+        return $badges[$this->status] ?? 'secondary';
     }
 }

@@ -204,7 +204,7 @@
 
                     <!-- Tombol Aksi -->
                     <div class="d-flex flex-column flex-sm-row justify-content-between gap-2">
-                        <a href="{{ route('admin.index') }}" class="btn btn-secondary rounded-pill px-4">
+                        <a href="{{ route('panitia.index') }}" class="btn btn-secondary rounded-pill px-4">
                             <i class="fas fa-arrow-left me-1"></i> Kembali
                         </a>
                         <button type="submit" class="btn btn-primary rounded-pill px-4">

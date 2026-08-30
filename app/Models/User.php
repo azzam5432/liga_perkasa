@@ -53,7 +53,7 @@ class User extends Authenticatable
     {
         return match($this->role) {
             'super_admin' => 'Super Admin',
-            'panitia' => 'Panitia',
+            'panitia' => 'panitia',
             default => 'panitia'
         };
     }

@@ -4,247 +4,251 @@
 @section('title', 'Tambah Lomba')
 
 @section('content')
-<div class="row justify-content-center">
-    <div class="col-lg-8 col-md-10">
-        <div class="card shadow-sm border-0">
-            <div class="card-header bg-gradient-primary text-white" style="background: linear-gradient(135deg, #4e73df, #224abe);">
-                <h5 class="mb-0"><i class="fas fa-plus me-2"></i> Tambah Lomba Baru</h5>
-            </div>
-            <div class="card-body p-4">
-                @if ($errors->any())
-                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                        <i class="fas fa-exclamation-circle me-2"></i>
-                        <strong>Ada kesalahan:</strong>
-                        <ul class="mb-0 mt-1">
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                @endif
-
-                <form action="{{ route('lomba.store') }}" method="POST">
-                    @csrf
-
-                    <!-- Nama Lomba -->
-                    <div class="mb-3">
-                        <label for="nama_lomba" class="form-label fw-bold">
-                            <i class="fas fa-trophy text-primary me-1"></i> Nama Lomba <span class="text-danger">*</span>
-                        </label>
-                        <input type="text" 
-                               class="form-control @error('nama_lomba') is-invalid @enderror" 
-                               id="nama_lomba" 
-                               name="nama_lomba" 
-                               value="{{ old('nama_lomba') }}" 
-                               placeholder="Masukkan Nama Lomba" 
-                               required>
-                        @error('nama_lomba')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <!-- Kategori & Status -->
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="kategori" class="form-label fw-bold">
-                                <i class="fas fa-tag me-1"></i> Kategori
-                            </label>
-                            <select class="form-select @error('kategori') is-invalid @enderror" id="kategori" name="kategori">
-                                <option value="">Pilih Kategori</option>
-                                @foreach ($kategoris as $kat)
-                                    <option value="{{ $kat }}" {{ old('kategori') == $kat ? 'selected' : '' }}>{{ $kat }}</option>
-                                @endforeach
-                            </select>
-                            @error('kategori')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="status" class="form-label fw-bold">
-                                <i class="fas fa-circle me-1"></i> Status <span class="text-danger">*</span>
-                            </label>
-                            <select class="form-select @error('status') is-invalid @enderror" id="status" name="status" required>
-                                <option value="draft" {{ old('status') == 'draft' ? 'selected' : '' }}>Draft</option>
-                                <option value="open" {{ old('status') == 'open' ? 'selected' : '' }}>Open</option>
-                                <option value="closed" {{ old('status') == 'closed' ? 'selected' : '' }}>Closed</option>
-                                <option value="selesai" {{ old('status') == 'selesai' ? 'selected' : '' }}>Selesai</option>
-                            </select>
-                            @error('status')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-
-                    <!-- Deskripsi -->
-                    <div class="mb-3">
-                        <label for="deskripsi" class="form-label fw-bold">
-                            <i class="fas fa-align-left me-1"></i> Deskripsi
-                        </label>
-                        <textarea class="form-control @error('deskripsi') is-invalid @enderror" 
-                                  id="deskripsi" 
-                                  name="deskripsi" 
-                                  rows="4" 
-                                  placeholder="Masukkan deskripsi lomba">{{ old('deskripsi') }}</textarea>
-                        @error('deskripsi')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <!-- Tanggal -->
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="tanggal_mulai" class="form-label fw-bold">
-                                <i class="fas fa-calendar-alt me-1"></i> Tanggal Mulai
-                            </label>
-                            <input type="date" 
-                                   class="form-control @error('tanggal_mulai') is-invalid @enderror" 
-                                   id="tanggal_mulai" 
-                                   name="tanggal_mulai" 
-                                   value="{{ old('tanggal_mulai') }}">
-                            @error('tanggal_mulai')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="tanggal_selesai" class="form-label fw-bold">
-                                <i class="fas fa-calendar-check me-1"></i> Tanggal Selesai
-                            </label>
-                            <input type="date" 
-                                   class="form-control @error('tanggal_selesai') is-invalid @enderror" 
-                                   id="tanggal_selesai" 
-                                   name="tanggal_selesai" 
-                                   value="{{ old('tanggal_selesai') }}">
-                            @error('tanggal_selesai')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-
-                    <!-- Tempat & Kuota -->
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="tempat" class="form-label fw-bold">
-                                <i class="fas fa-map-marker-alt me-1"></i> Tempat
-                            </label>
-                            <input type="text" 
-                                   class="form-control @error('tempat') is-invalid @enderror" 
-                                   id="tempat" 
-                                   name="tempat" 
-                                   value="{{ old('tempat') }}" 
-                                   placeholder="Masukkan tempat lomba">
-                            @error('tempat')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="kuota_tim" class="form-label fw-bold">
-                                <i class="fas fa-users me-1"></i> Kuota Tim
-                            </label>
-                            <input type="number" 
-                                   class="form-control @error('kuota_tim') is-invalid @enderror" 
-                                   id="kuota_tim" 
-                                   name="kuota_tim" 
-                                   value="{{ old('kuota_tim') }}" 
-                                   placeholder="Maksimal tim" 
-                                   min="1">
-                            @error('kuota_tim')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-
-                    <!-- Min & Max Anggota -->
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="min_anggota" class="form-label fw-bold">
-                                <i class="fas fa-user-plus me-1"></i> Minimal Anggota <span class="text-danger">*</span>
-                            </label>
-                            <input type="number" 
-                                   class="form-control @error('min_anggota') is-invalid @enderror" 
-                                   id="min_anggota" 
-                                   name="min_anggota" 
-                                   value="{{ old('min_anggota', 5) }}" 
-                                   min="1" 
-                                   max="20" 
-                                   required>
-                            @error('min_anggota')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="max_anggota" class="form-label fw-bold">
-                                <i class="fas fa-user-friends me-1"></i> Maksimal Anggota <span class="text-danger">*</span>
-                            </label>
-                            <input type="number" 
-                                   class="form-control @error('max_anggota') is-invalid @enderror" 
-                                   id="max_anggota" 
-                                   name="max_anggota" 
-                                   value="{{ old('max_anggota', 20) }}" 
-                                   min="1" 
-                                   max="20" 
-                                   required>
-                            @error('max_anggota')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-
-                    <!-- Tombol Aksi -->
-                    <div class="d-flex flex-column flex-sm-row justify-content-between gap-2 mt-4">
-                        <a href="{{ route('lomba.index') }}" class="btn btn-secondary rounded-pill px-4">
-                            <i class="fas fa-arrow-left me-1"></i> Kembali
-                        </a>
-                        <button type="submit" class="btn btn-primary rounded-pill px-4" style="background: linear-gradient(135deg, #4e73df, #224abe); border: none;">
-                            <i class="fas fa-save me-1"></i> Simpan Lomba
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
 <style>
-    .bg-gradient-primary {
-        background: linear-gradient(135deg, #4e73df, #224abe) !important;
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 0 16px 0;
+        border-bottom: 1px solid #edf2f7;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 12px;
     }
-    
+
+    .page-header h4 {
+        font-weight: 700;
+        color: #1a2332;
+        margin: 0;
+        font-size: 20px;
+    }
+
+    .form-section {
+        background: #ffffff;
+        border-radius: 10px;
+        border: 1px solid #edf2f7;
+        padding: 24px;
+    }
+
+    .form-label {
+        font-weight: 600;
+        font-size: 13px;
+        color: #1a2332;
+    }
+
+    .form-control, .form-select {
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 8px 14px;
+        font-size: 14px;
+        transition: all 0.2s ease;
+    }
+
     .form-control:focus, .form-select:focus {
-        border-color: #4e73df;
-        box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+        border-color: #1a365d;
+        box-shadow: 0 0 0 3px rgba(26, 54, 93, 0.06);
     }
-    
-    .card.shadow-sm {
-        transition: box-shadow 0.3s ease;
+
+    .jenis-card {
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 16px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: center;
     }
-    
-    .card.shadow-sm:hover {
-        box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.1) !important;
+
+    .jenis-card:hover {
+        border-color: #1a365d;
+        background: #f7fafc;
     }
-    
-    .btn-primary {
+
+    .jenis-card.selected {
+        border-color: #1a365d;
+        background: #ebf8ff;
+    }
+
+    .jenis-card .jenis-icon {
+        font-size: 32px;
+        color: #1a365d;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .jenis-card .jenis-title {
+        font-weight: 600;
+        color: #1a2332;
+    }
+
+    .jenis-card .jenis-desc {
+        font-size: 13px;
+        color: #718096;
+    }
+
+    .btn-secondary-custom {
+        background: #edf2f7;
+        border: none;
+        color: #4a5568;
+        padding: 8px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        text-decoration: none;
+    }
+
+    .btn-secondary-custom:hover {
+        background: #e2e8f0;
+    }
+
+    .btn-primary-custom {
+        background: #1a365d;
+        border: none;
+        color: #ffffff;
+        padding: 8px 24px;
+        border-radius: 8px;
+        font-weight: 600;
         transition: all 0.2s ease;
     }
-    
-    .btn-primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 0.5rem 1rem rgba(78, 115, 223, 0.4);
+
+    .btn-primary-custom:hover {
+        background: #2b6cb0;
     }
-    
-    .btn-secondary {
-        transition: all 0.2s ease;
-    }
-    
-    .btn-secondary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 0.5rem 1rem rgba(108, 117, 125, 0.3);
-    }
-    
-    @media (max-width: 576px) {
-        .card-body {
-            padding: 1rem !important;
+
+    @media (max-width: 768px) {
+        .jenis-card .jenis-icon {
+            font-size: 24px;
+        }
+        .jenis-card .jenis-title {
+            font-size: 13px;
+        }
+        .jenis-card .jenis-desc {
+            font-size: 11px;
         }
     }
 </style>
+
+<div class="page-header">
+    <h4><i class="fas fa-plus-circle me-2"></i> Tambah Lomba</h4>
+    <a href="{{ route('lomba.index') }}" class="btn-secondary-custom">
+        <i class="fas fa-arrow-left me-1"></i> Kembali
+    </a>
+</div>
+
+<div class="form-section">
+    <form action="{{ route('lomba.store') }}" method="POST">
+        @csrf
+
+        <div class="mb-3">
+            <label for="nama_lomba" class="form-label">Nama Lomba <span class="text-danger">*</span></label>
+            <input type="text" class="form-control @error('nama_lomba') is-invalid @enderror" 
+                   id="nama_lomba" name="nama_lomba" value="{{ old('nama_lomba') }}" required>
+            @error('nama_lomba')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>
+
+        <div class="mb-3">
+            <label for="deskripsi" class="form-label">Deskripsi</label>
+            <textarea class="form-control @error('deskripsi') is-invalid @enderror" 
+                      id="deskripsi" name="deskripsi" rows="3">{{ old('deskripsi') }}</textarea>
+            @error('deskripsi')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="kategori" class="form-label">Kategori</label>
+                    <input type="text" class="form-control @error('kategori') is-invalid @enderror" 
+                           id="kategori" name="kategori" value="{{ old('kategori') }}" placeholder="Contoh: Akademik, Teknologi, Seni">
+                    @error('kategori')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="jenis" class="form-label">Jenis Lomba <span class="text-danger">*</span></label>
+                    <div class="row g-2" id="jenisContainer">
+                        <div class="col-4">
+                            <div class="jenis-card" data-value="langsung" onclick="pilihJenis(this)">
+                                <span class="jenis-icon">🏆</span>
+                                <div class="jenis-title">Langsung</div>
+                                <div class="jenis-desc">Tanpa babak</div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="jenis-card" data-value="penyisihan" onclick="pilihJenis(this)">
+                                <span class="jenis-icon">📊</span>
+                                <div class="jenis-title">Penyisihan</div>
+                                <div class="jenis-desc">Ada babak penyisihan</div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="jenis-card" data-value="final" onclick="pilihJenis(this)">
+                                <span class="jenis-icon">👑</span>
+                                <div class="jenis-title">Final</div>
+                                <div class="jenis-desc">Babak final</div>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="hidden" id="jenis" name="jenis" value="langsung">
+                    @error('jenis')
+                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                    @enderror
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="tanggal_mulai" class="form-label">Tanggal Mulai</label>
+                    <input type="date" class="form-control @error('tanggal_mulai') is-invalid @enderror" 
+                           id="tanggal_mulai" name="tanggal_mulai" value="{{ old('tanggal_mulai') }}">
+                    @error('tanggal_mulai')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="tanggal_selesai" class="form-label">Tanggal Selesai</label>
+                    <input type="date" class="form-control @error('tanggal_selesai') is-invalid @enderror" 
+                           id="tanggal_selesai" name="tanggal_selesai" value="{{ old('tanggal_selesai') }}">
+                    @error('tanggal_selesai')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between mt-4">
+            <a href="{{ route('lomba.index') }}" class="btn-secondary-custom">
+                <i class="fas fa-arrow-left me-1"></i> Kembali
+            </a>
+            <button type="submit" class="btn-primary-custom">
+                <i class="fas fa-save me-1"></i> Simpan
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+function pilihJenis(element) {
+    document.querySelectorAll('.jenis-card').forEach(card => {
+        card.classList.remove('selected');
+    });
+    element.classList.add('selected');
+    document.getElementById('jenis').value = element.dataset.value;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const defaultCard = document.querySelector('.jenis-card[data-value="langsung"]');
+    if (defaultCard) {
+        defaultCard.classList.add('selected');
+    }
+});
+</script>
 @endsection

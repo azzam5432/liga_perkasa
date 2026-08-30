@@ -1,3 +1,5 @@
+{{-- resources/views/layouts/sidebar.blade.php --}}
+
 <div class="sidebar" id="sidebar">
     <div class="sidebar-header">
         <div class="brand-wrapper">
@@ -6,99 +8,162 @@
         </div>
     </div>
 
-    <div class="sidebar-menu">
+    <ul class="sidebar-menu">
         @auth
-            @if(Auth::user()->isPanitia())
-                <a href="{{ route('dashboard') }}" class="menu-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
-                    <div class="menu-link">
-                        <img src="{{ asset('icon/dashboard.svg') }}" alt="" class="menu-icon">
-                        <span class="menu-text">Dashboard</span>
-                    </div>
-                </a>
-
-                <a href="{{ route('panitia.index') }}" class="menu-item {{ request()->routeIs('panitia.*') ? 'active' : '' }}">
-                    <div class="menu-link">
-                        <img src="{{ asset('icon/team.svg') }}" alt="" class="menu-icon">
-                        <span class="menu-text">Peserta Lomba</span>
-                    </div>
-                </a>
-
-                <a href="{{ route('lomba.index') }}" class="menu-item {{ request()->routeIs('lomba.*') ? 'active' : '' }}">
-                    <div class="menu-link">
-                        <img src="{{ asset('icon/event.svg') }}" alt="" class="menu-icon">
-                        <span class="menu-text">Daftar Lomba</span>
-                    </div>
-                </a>
-
-                <a href="{{ route('juri.penilaian') }}" class="menu-item {{ request()->routeIs('juri.penilaian') ? 'active' : '' }}">
-                    <div class="menu-link">
-                        <img src="{{ asset('icon/penilaian.svg') }}" alt="" class="menu-icon">
-                        <span class="menu-text">Penilaian Juri</span>
-                    </div>
-                </a>
-            @endif
-
             @if(Auth::user()->isSuperAdmin())
-                <a href="{{ route('admin.dashboard') }}" class="menu-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
-                    <div class="menu-link">
-                        <img src="{{ asset('icon/dashboard.svg') }}" alt="" class="menu-icon">
-                        <span class="menu-text">Dashboard Admin</span>
+                {{-- SUPER ADMIN MENU --}}
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" 
+                       href="{{ route('admin.dashboard') }}">
+                        <i class="fas fa-chart-pie me-2"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('admin.*') && !request()->routeIs('admin.dashboard') ? 'active' : '' }}" 
+                       href="{{ route('admin.index') }}">
+                        <i class="fas fa-users-cog me-2"></i>
+                        <span>Data Panitia</span>
+                    </a>
+                </li>
+
+                {{-- PENILAIAN MENU --}}
+                <li class="nav-item">
+                    <a class="nav-link" href="#penilaianMenu" data-bs-toggle="collapse" role="button" aria-expanded="{{ request()->routeIs('kriteria.*') || request()->routeIs('juri.*') || request()->routeIs('penilaian.*') || request()->routeIs('juri_lomba.*') ? 'true' : 'false' }}">
+                        <i class="fas fa-clipboard-list me-2"></i>
+                        <span>Penilaian</span>
+                        <i class="fas fa-chevron-down ms-auto"></i>
+                    </a>
+                    <div class="collapse {{ request()->routeIs('kriteria.*') || request()->routeIs('juri.*') || request()->routeIs('penilaian.*') || request()->routeIs('juri_lomba.*') ? 'show' : '' }}" id="penilaianMenu">
+                        <ul class="nav flex-column ms-3">
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->routeIs('kriteria.*') ? 'active' : '' }}" 
+                                   href="{{ route('kriteria.index') }}">
+                                    <i class="fas fa-circle me-2" style="font-size: 6px;"></i> Kriteria
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->routeIs('juri.*') ? 'active' : '' }}" 
+                                   href="{{ route('juri.index') }}">
+                                    <i class="fas fa-circle me-2" style="font-size: 6px;"></i> Data Juri
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->routeIs('juri_lomba.*') ? 'active' : '' }}" 
+                                   href="{{ route('juri_lomba.index') }}">
+                                    <i class="fas fa-circle me-2" style="font-size: 6px;"></i> Penugasan Juri
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->routeIs('penilaian.index') ? 'active' : '' }}" 
+                                   href="{{ route('penilaian.index') }}">
+                                    <i class="fas fa-circle me-2" style="font-size: 6px;"></i> Data Penilaian
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->routeIs('penilaian.rekap') ? 'active' : '' }}" 
+                                   href="{{ route('penilaian.rekap') }}">
+                                    <i class="fas fa-circle me-2" style="font-size: 6px;"></i> Rekap Penilaian
+                                </a>
+                            </li>
+                        </ul>
                     </div>
-                </a>
+                </li>
 
-                <a href="{{ route('admin.index') }}" class="menu-item {{ request()->routeIs('admin.*') && !request()->routeIs('admin.dashboard') ? 'active' : '' }}">
-                    <div class="menu-link">
-                        <img src="{{ asset('icon/team.svg') }}" alt="" class="menu-icon">
-                        <span class="menu-text">Data Panitia</span>
+            @elseif(Auth::user()->isPanitia())
+                {{-- PANITIA MENU --}}
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" 
+                       href="{{ route('dashboard') }}">
+                        <i class="fas fa-chart-pie me-2"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('panitia.*') ? 'active' : '' }}" 
+                       href="{{ route('panitia.index') }}">
+                        <i class="fas fa-users me-2"></i>
+                        <span>Data Tim</span>
+                    </a>
+                </li>
+
+                {{-- MANAJEMEN LOMBA (KHUSUS PANITIA) --}}
+                <li class="nav-item">
+                    <a class="nav-link" href="#lombaMenu" data-bs-toggle="collapse" role="button" aria-expanded="{{ request()->routeIs('lomba.*') ? 'true' : 'false' }}">
+                        <i class="fas fa-trophy me-2"></i>
+                        <span>Manajemen Lomba</span>
+                        <i class="fas fa-chevron-down ms-auto"></i>
+                    </a>
+                    <div class="collapse {{ request()->routeIs('lomba.*') ? 'show' : '' }}" id="lombaMenu">
+                        <ul class="nav flex-column ms-3">
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->routeIs('lomba.index') ? 'active' : '' }}" 
+                                   href="{{ route('lomba.index') }}">
+                                    <i class="fas fa-list me-2"></i> Daftar Lomba
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->routeIs('lomba.create') ? 'active' : '' }}" 
+                                   href="{{ route('lomba.create') }}">
+                                    <i class="fas fa-plus me-2"></i> Tambah Lomba
+                                </a>
+                            </li>
+                        </ul>
                     </div>
-                </a>
+                </li>
 
-                <div class="menu-item has-submenu">
-                    <div class="menu-link" onclick="toggleSubmenu(this)">
-                        <img src="{{ asset('icon/penilaian.svg') }}" alt="" class="menu-icon">
-                        <span class="menu-text">Penilaian</span>
-                        <span class="menu-arrow">▼</span>
-                    </div>
-                    <div class="submenu {{ request()->routeIs('kriteria.*') || request()->routeIs('juri.*') || request()->routeIs('penilaian.*') || request()->routeIs('juri_lomba.*') ? 'show' : '' }}">
-                        <a href="{{ route('kriteria.index') }}" class="submenu-item {{ request()->routeIs('kriteria.*') ? 'active' : '' }}">
-                            <div class="submenu-link">
-                                <span class="submenu-icon">•</span>
-                                <span class="submenu-text">Kriteria</span>
-                            </div>
+                {{-- JURI MENU --}}
+                @if(Auth::user()->isJuri())
+                    @php
+                        $juri = App\Models\Juri::where('user_id', Auth::user()->id)->first();
+                        $lombaDitugaskan = $juri ? $juri->lomba()->where('tb_juri_lomba.status', 'aktif')->get() : collect();
+                    @endphp
+                    
+                    @if($lombaDitugaskan->count() > 0)
+                    <li class="nav-item">
+                        <a class="nav-link" href="#kriteriaMenu" data-bs-toggle="collapse" role="button" aria-expanded="{{ request()->routeIs('juri.kriteria') ? 'true' : 'false' }}">
+                            <i class="fas fa-list-check me-2"></i>
+                            <span>Kriteria Penilaian</span>
+                            <i class="fas fa-chevron-down ms-auto"></i>
                         </a>
+                        <div class="collapse {{ request()->routeIs('juri.kriteria') ? 'show' : '' }}" id="kriteriaMenu">
+                            <ul class="nav flex-column ms-3">
+                                @foreach($lombaDitugaskan as $lomba)
+                                <li class="nav-item">
+                                    <a class="nav-link {{ request()->routeIs('juri.kriteria') && request()->route('juri.kriteria', $lomba->id_lomba) ? 'active' : '' }}" 
+                                       href="{{ route('juri.kriteria', $lomba->id_lomba) }}">
+                                        <i class="fas fa-circle me-2" style="font-size: 6px;"></i> {{ Str::limit($lomba->nama_lomba, 20) }}
+                                    </a>
+                                </li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    </li>
+                    @endif
 
-                        <a href="{{ route('juri.index') }}" class="submenu-item {{ request()->routeIs('juri.*') ? 'active' : '' }}">
-                            <div class="submenu-link">
-                                <span class="submenu-icon">•</span>
-                                <span class="submenu-text">Data Juri</span>
-                            </div>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('juri.penilaian') ? 'active' : '' }}" 
+                           href="{{ route('juri.penilaian') }}">
+                            <i class="fas fa-pen me-2"></i>
+                            <span>Penilaian Juri</span>
                         </a>
+                    </li>
+                @endif
 
-                        <a href="{{ route('juri_lomba.index') }}" class="submenu-item {{ request()->routeIs('juri_lomba.*') ? 'active' : '' }}">
-                            <div class="submenu-link">
-                                <span class="submenu-icon">•</span>
-                                <span class="submenu-text">Penugasan Juri</span>
-                            </div>
-                        </a>
-
-                        <a href="{{ route('penilaian.index') }}" class="submenu-item {{ request()->routeIs('penilaian.index') ? 'active' : '' }}">
-                            <div class="submenu-link">
-                                <span class="submenu-icon">•</span>
-                                <span class="submenu-text">Data Penilaian</span>
-                            </div>
-                        </a>
-
-                        <a href="{{ route('penilaian.rekap') }}" class="submenu-item {{ request()->routeIs('penilaian.rekap') ? 'active' : '' }}">
-                            <div class="submenu-link">
-                                <span class="submenu-icon">•</span>
-                                <span class="submenu-text">Rekap Penilaian</span>
-                            </div>
-                        </a>
-                    </div>
-                </div>
             @endif
+
+            {{-- PROFILE MENU (Semua User) --}}
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('profile.*') ? 'active' : '' }}" 
+                   href="{{ route('profile.index') }}">
+                    <i class="fas fa-user-circle me-2"></i>
+                    <span>Profile</span>
+                </a>
+            </li>
         @endauth
-    </div>
+    </ul>
 
     <div class="sidebar-footer">
         <form method="POST" action="{{ route('logout') }}">
@@ -111,34 +176,220 @@
     </div>
 </div>
 
-<script>
-function toggleSubmenu(element) {
-    var parent = element.closest('.menu-item');
-    var submenu = parent.querySelector('.submenu');
-    
-    document.querySelectorAll('.submenu').forEach(function(item) {
-        if (item !== submenu) {
-            item.classList.remove('show');
-            var arrow = item.closest('.menu-item').querySelector('.menu-arrow');
-            if (arrow) arrow.textContent = '▼';
-        }
-    });
-    
-    submenu.classList.toggle('show');
-    var arrow = element.querySelector('.menu-arrow');
-    if (arrow) {
-        arrow.textContent = submenu.classList.contains('show') ? '▲' : '▼';
+<style>
+    .sidebar {
+        width: 260px;
+        min-width: 260px;
+        background: #111827;
+        padding: 20px 16px;
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        position: sticky;
+        top: 0;
+        overflow-y: auto;
+        z-index: 1000;
+        transition: all 0.3s ease;
+        border-right: 1px solid rgba(255,255,255,0.05);
+        flex-shrink: 0;
     }
-}
 
-document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('.submenu').forEach(function(submenu) {
-        if (submenu.querySelector('.active')) {
-            submenu.classList.add('show');
-            var parent = submenu.closest('.menu-item');
-            var arrow = parent.querySelector('.menu-arrow');
-            if (arrow) arrow.textContent = '▲';
+    .sidebar .sidebar-menu {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        padding: 0;
+        margin: 0;
+        list-style: none;
+    }
+
+    .sidebar .nav-item {
+        list-style: none;
+    }
+
+    .sidebar .nav-link {
+        display: flex;
+        align-items: center;
+        padding: 12px 14px;
+        border-radius: 10px;
+        color: rgba(255,255,255,0.8);
+        text-decoration: none;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        font-weight: 500;
+        font-size: 15px;
+        gap: 14px;
+    }
+
+    .sidebar .nav-link:hover {
+        background: rgba(255, 153, 0, 0.08);
+        color: #ffffff;
+    }
+
+    .sidebar .nav-link.active {
+        background: #ff9900;
+        color: #ffffff;
+        box-shadow: 0 4px 15px rgba(255, 153, 0, 0.3);
+    }
+
+    .sidebar .nav-link .fas {
+        width: 22px;
+        font-size: 16px;
+    }
+
+    .sidebar .nav-link .ms-auto {
+        margin-left: auto;
+        font-size: 12px;
+        transition: all 0.3s ease;
+    }
+
+    .sidebar .nav-link[aria-expanded="true"] .ms-auto {
+        transform: rotate(180deg);
+    }
+
+    .sidebar .collapse .nav {
+        padding-left: 12px;
+        border-left: 2px solid rgba(255, 153, 0, 0.2);
+        margin-left: 8px;
+    }
+
+    .sidebar .collapse .nav-link {
+        padding: 8px 12px;
+        font-size: 14px;
+        color: rgba(255,255,255,0.6);
+    }
+
+    .sidebar .collapse .nav-link:hover {
+        color: #ffffff;
+        background: rgba(255, 153, 0, 0.08);
+    }
+
+    .sidebar .collapse .nav-link.active {
+        color: #ff9900;
+        background: rgba(255, 153, 0, 0.12);
+    }
+
+    .sidebar .collapse .nav-link .fas {
+        width: 16px;
+        font-size: 6px;
+    }
+
+    .sidebar-footer {
+        margin-top: auto;
+        padding-top: 16px;
+        border-top: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .logout-btn {
+        width: 100%;
+        padding: 12px 14px;
+        border: none;
+        border-radius: 10px;
+        background: rgba(220, 53, 69, 0.15);
+        color: #ef4444;
+        font-size: 15px;
+        font-weight: 500;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        transition: all 0.3s ease;
+    }
+
+    .logout-btn:hover {
+        background: #dc3545;
+        color: #ffffff;
+        box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+    }
+
+    .logout-icon {
+        width: 22px;
+        height: 22px;
+        flex-shrink: 0;
+        filter: brightness(0) invert(1);
+        opacity: 0.7;
+        transition: all 0.3s ease;
+    }
+
+    .logout-btn:hover .logout-icon {
+        opacity: 1;
+        filter: brightness(0) invert(1);
+    }
+
+    .brand-wrapper {
+        display: flex;
+        align-items: center;
+        padding: 8px 0;
+        margin-bottom: 20px;
+    }
+
+    .brand-icon {
+        width: 36px;
+        height: 36px;
+        margin-right: 12px;
+        filter: brightness(0) invert(1);
+        flex-shrink: 0;
+    }
+
+    .brand-text {
+        font-weight: 800;
+        font-size: 20px;
+        color: #ffffff;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
+    }
+
+    .brand-text span {
+        color: #ff9900;
+    }
+
+    @media (max-width: 992px) {
+        .sidebar {
+            width: 70px;
+            min-width: 70px;
+            padding: 16px 10px;
         }
+        .sidebar .brand-text {
+            display: none;
+        }
+        .sidebar .nav-link span:not(.fas) {
+            display: none;
+        }
+        .sidebar .nav-link .ms-auto {
+            display: none;
+        }
+        .sidebar .collapse {
+            display: none !important;
+        }
+        .sidebar .logout-text {
+            display: none;
+        }
+        .sidebar .logout-btn {
+            justify-content: center;
+            padding: 12px 8px;
+        }
+        .sidebar .logout-icon {
+            margin-right: 0;
+        }
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.sidebar .nav-link[data-bs-toggle="collapse"]').forEach(function(link) {
+        link.addEventListener('click', function(e) {
+            var target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                document.querySelectorAll('.sidebar .collapse.show').forEach(function(item) {
+                    if (item !== target) {
+                        item.classList.remove('show');
+                        var btn = document.querySelector('[href="#' + item.id + '"]');
+                        if (btn) btn.setAttribute('aria-expanded', 'false');
+                    }
+                });
+            }
+        });
     });
 });
 </script>

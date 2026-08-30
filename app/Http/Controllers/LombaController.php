@@ -5,163 +5,232 @@ namespace App\Http\Controllers;
 
 use App\Models\Lomba;
 use App\Models\Tim;
+use App\Models\Juri;
+use App\Models\Finalis;
+use App\Models\Kriteria;
 use Illuminate\Http\Request;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
 
 class LombaController extends Controller
 {
-    
-    public function index(): View
+    public function index(Request $request): View
     {
-        $lombas = Lomba::withCount('tims')->latest()->paginate(10);
+        $query = Lomba::with(['juri.user', 'finalis.tim']);
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where('nama_lomba', 'LIKE', "%{$search}%")
+                  ->orWhere('kategori', 'LIKE', "%{$search}%");
+        }
+
+        if ($request->filled('status') && $request->status != '') {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('jenis') && $request->jenis != '') {
+            $query->where('jenis', $request->jenis);
+        }
+
+        $lombas = $query->latest()->paginate(10);
+
+        if ($request->ajax()) {
+            return view('lomba.partials.table', compact('lombas'));
+        }
+
         return view('lomba.index', compact('lombas'));
     }
 
     public function create(): View
     {
-        $kategoris = [
-            'Videografi & Sinematografi',
-            'Desain Grafis & Branding',
-            'Seni Pertunjukan & Musik',
-            'Public Speaking & Bahasa',
-            'Bisnis, Inovasi & Gagasan Ilmiah',
-            'Teknologi Informasi & Konten Digital',
-            'Olahraga & Game Kompetitif',
-            'Pengembangan Karier & Profesionalitas',
-            'Lainnya',
-        ];
-        
-        return view('lomba.create', compact('kategoris'));
+        return view('lomba.create');
     }
 
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
             'nama_lomba' => 'required|string|max:255',
-            'kategori' => 'required|string|max:255',
             'deskripsi' => 'nullable|string',
-            'tanggal_mulai' => 'required|date',
-            'tanggal_selesai' => 'required|date|after_or_equal:tanggal_mulai',
-            'tempat' => 'required|string|max:255',
-            'status' => 'required|in:draft,open,closed,selesai',
-            'kuota_tim' => 'required|integer|min:1',
-            'min_anggota' => 'required|integer|min:1|max:20',
-            'max_anggota' => 'required|integer|min:1|max:20|gte:min_anggota',
+            'kategori' => 'nullable|string|max:255',
+            'tanggal_mulai' => 'nullable|date',
+            'tanggal_selesai' => 'nullable|date|after_or_equal:tanggal_mulai',
+            'jenis' => 'required|in:langsung,penyisihan,final',
         ]);
 
-        $lomba = Lomba::create($request->all());
+        $data = $request->all();
+        $data['status'] = 'draft';
+        $data['is_penyisihan_active'] = false;
+
+        Lomba::create($data);
 
         return redirect()->route('lomba.index')
-                         ->with('success', 'Lomba "' . $lomba->nama_lomba . '" berhasil ditambahkan!');
+            ->with('success', 'Lomba berhasil ditambahkan!');
     }
 
     public function show($id): View
-{
-    $lomba = Lomba::with(['tims' => function($query) {
-        $query->withCount('pesertas')->with('pesertas');
-    }])->withCount('tims')->findOrFail($id);
-    $timTerdaftarIds = $lomba->tims->pluck('id_tim')->toArray();
-    $timAvailable = Tim::whereNotIn('id_tim', $timTerdaftarIds)->whereNull('id_lomba') ->get();
-    
-    return view('lomba.show', compact('lomba', 'timAvailable'));
-}
+    {
+        $lomba = Lomba::with(['juri.user', 'finalis.tim', 'kriterias'])->findOrFail($id);
+        return view('lomba.show', compact('lomba'));
+    }
 
     public function edit($id): View
     {
         $lomba = Lomba::findOrFail($id);
-        
-        $kategoris = [
-            'Videografi & Sinematografi',
-            'Desain Grafis & Branding',
-            'Seni Pertunjukan & Musik',
-            'Public Speaking & Bahasa',
-            'Bisnis, Inovasi & Gagasan Ilmiah',
-            'Teknologi Informasi & Konten Digital',
-            'Olahraga & Game Kompetitif',
-            'Pengembangan Karier & Profesionalitas',
-            'Lainnya',
-        ];
-        
-        return view('lomba.edit', compact('lomba', 'kategoris'));
+        return view('lomba.edit', compact('lomba'));
     }
 
     public function update(Request $request, $id): RedirectResponse
     {
+        $lomba = Lomba::findOrFail($id);
+
         $request->validate([
             'nama_lomba' => 'required|string|max:255',
-            'kategori' => 'nullable|string|max:255',
             'deskripsi' => 'nullable|string',
+            'kategori' => 'nullable|string|max:255',
             'tanggal_mulai' => 'nullable|date',
             'tanggal_selesai' => 'nullable|date|after_or_equal:tanggal_mulai',
-            'tempat' => 'nullable|string|max:255',
-            'status' => 'required|in:draft,open,closed,selesai',
-            'kuota_tim' => 'nullable|integer|min:1',
-            'min_anggota' => 'required|integer|min:1|max:20',
-            'max_anggota' => 'required|integer|min:1|max:20|gte:min_anggota',
+            'status' => 'required|in:draft,open,selesai,closed',
+            'jenis' => 'required|in:langsung,penyisihan,final',
         ]);
 
-        $lomba = Lomba::findOrFail($id);
         $lomba->update($request->all());
 
         return redirect()->route('lomba.index')
-                         ->with('success', 'Lomba "' . $lomba->nama_lomba . '" berhasil diupdate!');
+            ->with('success', 'Lomba berhasil diupdate!');
     }
 
     public function destroy($id): RedirectResponse
     {
         $lomba = Lomba::findOrFail($id);
-        $nama = $lomba->nama_lomba;
-        Tim::where('id_lomba', $id)->update(['id_lomba' => null]);    
         $lomba->delete();
 
         return redirect()->route('lomba.index')
-                        ->with('success', 'Lomba "' . $nama . '" berhasil dihapus!');
+            ->with('success', 'Lomba berhasil dihapus!');
     }
 
-    public function tambahTim(Request $request, $id): RedirectResponse
+    // ===== FINALIS =====
+    public function finalisIndex($id_lomba): View
+    {
+        $lomba = Lomba::findOrFail($id_lomba);
+        $tim = Tim::all();
+        $finalis = $lomba->finalis()->with('tim')->get();
+        
+        return view('lomba.finalis', compact('lomba', 'tim', 'finalis'));
+    }
+
+    public function finalisStore(Request $request, $id_lomba): RedirectResponse
     {
         $request->validate([
             'id_tim' => 'required|exists:tb_tim,id_tim',
+            'peringkat' => 'nullable|integer|min:1',
         ]);
 
-        $lomba = Lomba::findOrFail($id);
-        $tim = Tim::findOrFail($request->id_tim);
+        $lomba = Lomba::findOrFail($id_lomba);
 
-        if ($tim->id_lomba) {
-            return back()->with('error', 'Tim "' . $tim->nama_tim . '" sudah terdaftar di lomba lain!');
-        }
-        
-        if ($lomba->kuota_tim && $lomba->tims()->count() >= $lomba->kuota_tim) {
-            return back()->with('error', 'Kuota tim untuk lomba ini sudah penuh!');
+        $exists = Finalis::where('id_lomba', $id_lomba)
+            ->where('id_tim', $request->id_tim)
+            ->exists();
+
+        if ($exists) {
+            return back()->with('error', 'Tim sudah menjadi finalis!');
         }
 
-        try {
-            $tim->id_lomba = $lomba->id_lomba;
-            $tim->save();
-            return back()->with('success', 'Tim "' . $tim->nama_tim . '" berhasil ditambahkan ke lomba!');
-            
-        } 
-        
-        catch (\Exception $e) {
-            return back()->with('error', 'Gagal menambahkan tim: ' . $e->getMessage());
-        }
+        Finalis::create([
+            'id_lomba' => $id_lomba,
+            'id_tim' => $request->id_tim,
+            'peringkat' => $request->peringkat,
+        ]);
+
+        return redirect()->route('lomba.finalis', $id_lomba)
+            ->with('success', 'Finalis berhasil ditambahkan!');
     }
 
-    public function hapusTim($id, $id_tim): RedirectResponse
+    public function finalisDestroy($id_lomba, $id_finalis): RedirectResponse
     {
-        try {
-            $tim = Tim::where('id_lomba', $id)->findOrFail($id_tim);
-            $nama = $tim->nama_tim;
-            $tim->id_lomba = null;
-            $tim->save();
-            
-            return back()->with('success', 'Tim "' . $nama . '" berhasil dihapus dari lomba!');
-            
-        } 
+        $finalis = Finalis::where('id_lomba', $id_lomba)
+            ->where('id_finalis', $id_finalis)
+            ->firstOrFail();
         
-        catch (\Exception $e) {
-            return back()->with('error', 'Gagal menghapus tim: ' . $e->getMessage());
+        $finalis->delete();
+
+        return redirect()->route('lomba.finalis', $id_lomba)
+            ->with('success', 'Finalis berhasil dihapus!');
+    }
+
+    // ===== KRITERIA JURI =====
+    public function kriteriaJuri($id_lomba): View
+    {
+        $user = Auth::user();
+        
+        if (!$user->isJuri()) {
+            abort(403, 'Anda bukan juri!');
         }
+        
+        $juri = Juri::where('user_id', $user->id)->first();
+        $isAssigned = $juri && $juri->lomba()->where('id_lomba', $id_lomba)->exists();
+        
+        if (!$isAssigned) {
+            abort(403, 'Anda tidak ditugaskan ke lomba ini!');
+        }
+
+        $lomba = Lomba::findOrFail($id_lomba);
+        $kriterias = Kriteria::where('id_lomba', $id_lomba)->get();
+
+        return view('juri.kriteria', compact('lomba', 'kriterias', 'juri'));
+    }
+
+    public function kriteriaStore(Request $request, $id_lomba): RedirectResponse
+    {
+        $user = Auth::user();
+        
+        if (!$user->isJuri()) {
+            abort(403, 'Anda bukan juri!');
+        }
+        
+        $juri = Juri::where('user_id', $user->id)->first();
+        $isAssigned = $juri && $juri->lomba()->where('id_lomba', $id_lomba)->exists();
+        
+        if (!$isAssigned) {
+            abort(403, 'Anda tidak ditugaskan ke lomba ini!');
+        }
+
+        $request->validate([
+            'nama_kriteria' => 'required|string|max:255',
+            'deskripsi' => 'nullable|string',
+            'bobot' => 'required|integer|min:0|max:100',
+        ]);
+
+        Kriteria::create([
+            'id_lomba' => $id_lomba,
+            'nama_kriteria' => $request->nama_kriteria,
+            'deskripsi' => $request->deskripsi,
+            'bobot' => $request->bobot,
+            'tipe' => 'skala',
+            'skala_min' => 1,
+            'skala_max' => 100,
+            'is_active' => true,
+        ]);
+
+        return redirect()->route('juri.kriteria', $id_lomba)
+            ->with('success', 'Kriteria berhasil ditambahkan!');
+    }
+
+    public function kriteriaDestroy($id_lomba, $id_kriteria): RedirectResponse
+    {
+        $user = Auth::user();
+        
+        if (!$user->isJuri()) {
+            abort(403, 'Anda bukan juri!');
+        }
+        
+        $kriteria = Kriteria::where('id_kriteria', $id_kriteria)
+            ->where('id_lomba', $id_lomba)
+            ->firstOrFail();
+        
+        $kriteria->delete();
+
+        return redirect()->route('juri.kriteria', $id_lomba)
+            ->with('success', 'Kriteria berhasil dihapus!');
     }
 }

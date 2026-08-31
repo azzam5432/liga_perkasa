@@ -15,11 +15,18 @@ class PanitiaMiddleware
      * @param  Closure(Request): (Response)  $next
      */
     public function handle(Request $request, Closure $next): Response
-    {
-        if (!Auth::check() || !(Auth::user()->isSuperAdmin() || Auth::user()->isPanitia())) {
-            abort(403, 'Akses ditolak! Hanya Panitia yang dapat mengakses halaman ini.');
-        }
-        
+{
+    if (!Auth::check()) {
+        abort(403, 'Akses ditolak! Silakan login terlebih dahulu.');
+    }
+
+    $user = Auth::user();
+    
+    // Super Admin, Panitia, dan Juri boleh akses
+    if ($user->isSuperAdmin() || $user->isPanitia() || $user->isJuri()) {
         return $next($request);
     }
+
+    abort(403, 'Akses ditolak! Hanya Panitia yang dapat mengakses halaman ini.');
+}
 }

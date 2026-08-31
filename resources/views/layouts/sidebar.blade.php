@@ -89,7 +89,7 @@
                     </a>
                 </li>
 
-                {{-- MANAJEMEN LOMBA (KHUSUS PANITIA) --}}
+                {{-- MANAJEMEN LOMBA --}}
                 <li class="nav-item">
                     <a class="nav-link" href="#lombaMenu" data-bs-toggle="collapse" role="button" aria-expanded="{{ request()->routeIs('lomba.*') ? 'true' : 'false' }}">
                         <i class="fas fa-trophy me-2"></i>
@@ -115,46 +115,45 @@
                 </li>
 
                 {{-- JURI MENU --}}
-                @if(Auth::user()->isJuri())
-                    @php
-                        $juri = App\Models\Juri::where('user_id', Auth::user()->id)->first();
-                        $lombaDitugaskan = $juri ? $juri->lomba()->where('tb_juri_lomba.status', 'aktif')->get() : collect();
-                    @endphp
-                    
-                    @if($lombaDitugaskan->count() > 0)
-                    <li class="nav-item">
-                        <a class="nav-link" href="#kriteriaMenu" data-bs-toggle="collapse" role="button" aria-expanded="{{ request()->routeIs('juri.kriteria') ? 'true' : 'false' }}">
-                            <i class="fas fa-list-check me-2"></i>
-                            <span>Kriteria Penilaian</span>
-                            <i class="fas fa-chevron-down ms-auto"></i>
-                        </a>
-                        <div class="collapse {{ request()->routeIs('juri.kriteria') ? 'show' : '' }}" id="kriteriaMenu">
-                            <ul class="nav flex-column ms-3">
-                                @foreach($lombaDitugaskan as $lomba)
-                                <li class="nav-item">
-                                    <a class="nav-link {{ request()->routeIs('juri.kriteria') && request()->route('juri.kriteria', $lomba->id_lomba) ? 'active' : '' }}" 
-                                       href="{{ route('juri.kriteria', $lomba->id_lomba) }}">
-                                        <i class="fas fa-circle me-2" style="font-size: 6px;"></i> {{ Str::limit($lomba->nama_lomba, 20) }}
-                                    </a>
-                                </li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    </li>
-                    @endif
-
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('juri.penilaian') ? 'active' : '' }}" 
-                           href="{{ route('juri.penilaian') }}">
-                            <i class="fas fa-pen me-2"></i>
-                            <span>Penilaian Juri</span>
-                        </a>
-                    </li>
+                @php
+                    $juri = App\Models\Juri::where('user_id', Auth::user()->id)->first();
+                    // ✅ PERBAIKAN: Spesifikkan tabel untuk menghindari ambiguous column
+                    $lombaDitugaskan = $juri ? $juri->lomba()->where('tb_juri_lomba.status', 'aktif')->get() : collect();
+                @endphp
+                
+                @if($lombaDitugaskan->count() > 0)
+                <li class="nav-item">
+                    <a class="nav-link" href="#kriteriaMenu" data-bs-toggle="collapse" role="button" aria-expanded="{{ request()->routeIs('juri.kriteria') ? 'true' : 'false' }}">
+                        <i class="fas fa-list-check me-2"></i>
+                        <span>Kriteria Penilaian</span>
+                        <i class="fas fa-chevron-down ms-auto"></i>
+                    </a>
+                    <div class="collapse {{ request()->routeIs('juri.kriteria') ? 'show' : '' }}" id="kriteriaMenu">
+                        <ul class="nav flex-column ms-3">
+                            @foreach($lombaDitugaskan as $lomba)
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->routeIs('juri.kriteria') && request()->route('juri.kriteria', $lomba->id_lomba) ? 'active' : '' }}" 
+                                   href="{{ route('juri.kriteria', $lomba->id_lomba) }}">
+                                    <i class="fas fa-circle me-2" style="font-size: 6px;"></i> {{ Str::limit($lomba->nama_lomba, 20) }}
+                                </a>
+                            </li>
+                            @endforeach
+                        </ul>
+                    </div>
+                </li>
                 @endif
+
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('juri.penilaian') ? 'active' : '' }}" 
+                       href="{{ route('juri.penilaian') }}">
+                        <i class="fas fa-pen me-2"></i>
+                        <span>Penilaian Juri</span>
+                    </a>
+                </li>
 
             @endif
 
-            {{-- PROFILE MENU (Semua User) --}}
+            {{-- PROFILE MENU --}}
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('profile.*') ? 'active' : '' }}" 
                    href="{{ route('profile.index') }}">
@@ -177,6 +176,7 @@
 </div>
 
 <style>
+    /* CSS SIDEBAR (sama seperti sebelumnya) */
     .sidebar {
         width: 260px;
         min-width: 260px;

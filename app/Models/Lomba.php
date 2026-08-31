@@ -88,4 +88,61 @@ class Lomba extends Model
         ];
         return $badges[$this->status] ?? 'secondary';
     }
+
+    public function getTimPeserta()
+    {
+        return Tim::whereHas('lomba', function($q) {
+            $q->where('id_lomba', $this->id_lomba);
+        })->get();
+    }
+
+    // ✅ TAMBAHKAN: Hitung nilai akhir semua tim
+    public function getRekapNilai()
+    {
+        $tim = $this->getTimPeserta();
+        $hasil = [];
+        
+        foreach ($tim as $t) {
+            $nilaiPerKriteria = Penilaian::getNilaiPerKriteria($t->id_tim, $this->id_lomba);
+            $totalNilai = Penilaian::getTotalNilaiTim($t->id_tim, $this->id_lomba);
+            $rataNilai = Penilaian::getRataRataTim($t->id_tim, $this->id_lomba);
+            $isSelesai = Penilaian::isTimSelesaiDinilai($t->id_tim, $this->id_lomba);
+            
+            $hasil[] = [
+                'tim' => $t,
+                'nilai_per_kriteria' => $nilaiPerKriteria,
+                'total_nilai' => $totalNilai,
+                'rata_rata' => $rataNilai,
+                'is_selesai' => $isSelesai,
+                'jml_penilaian' => Penilaian::where('id_tim', $t->id_tim)
+                    ->whereHas('kriteria', function($q) {
+                        $q->where('id_lomba', $this->id_lomba);
+                    })
+                    ->count(),
+            ];
+        }
+        
+        // Urutkan dari rata-rata tertinggi
+        usort($hasil, function($a, $b) {
+            return $b['rata_rata'] <=> $a['rata_rata'];
+        });
+        
+        return $hasil;
+    }
+
+    public function tentukanFinalisOtomatis()
+    {
+        $rekap = $this->getRekapNilai();
+        $jumlahFinalis = $this->jumlah_finalis ?? 5;
+        
+        // Ambil tim yang sudah selesai dinilai
+        $timSelesai = array_filter($rekap, function($item) {
+            return $item['is_selesai'];
+        });
+        
+        // Ambil sejumlah finalis teratas
+        $finalisTerpilih = array_slice($timSelesai, 0, $jumlahFinalis);
+        
+        return $finalisTerpilih;
+    }
 }

@@ -148,8 +148,7 @@ class JuriLombaController extends Controller
             ]);
         }
 
-        return redirect()->route('juri_lomba.index')
-            ->with('success', 'Penugasan juri berhasil diupdate!');
+        return redirect()->route('juri_lomba.index')->with('success', 'Penugasan juri berhasil diupdate!');
     }
 
     public function destroy(Request $request, $id)
@@ -164,8 +163,7 @@ class JuriLombaController extends Controller
             ]);
         }
 
-        return redirect()->route('juri_lomba.index')
-            ->with('success', 'Penugasan juri berhasil dihapus!');
+        return redirect()->route('juri_lomba.index')->with('success', 'Penugasan juri berhasil dihapus!');
     }
 
     public function getJuriByLomba($id_lomba)

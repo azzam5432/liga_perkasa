@@ -1,5 +1,4 @@
 <?php
-// app/Http/Controllers/LombaController.php
 
 namespace App\Http\Controllers;
 
@@ -21,8 +20,7 @@ class LombaController extends Controller
 
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where('nama_lomba', 'LIKE', "%{$search}%")
-                  ->orWhere('kategori', 'LIKE', "%{$search}%");
+            $query->where('nama_lomba', 'LIKE', "%{$search}%")->orWhere('kategori', 'LIKE', "%{$search}%");
         }
 
         if ($request->filled('status') && $request->status != '') {
@@ -128,9 +126,7 @@ class LombaController extends Controller
 
         $lomba = Lomba::findOrFail($id_lomba);
 
-        $exists = Finalis::where('id_lomba', $id_lomba)
-            ->where('id_tim', $request->id_tim)
-            ->exists();
+        $exists = Finalis::where('id_lomba', $id_lomba)->where('id_tim', $request->id_tim)->exists();
 
         if ($exists) {
             return back()->with('error', 'Tim sudah menjadi finalis!');
@@ -142,15 +138,12 @@ class LombaController extends Controller
             'peringkat' => $request->peringkat,
         ]);
 
-        return redirect()->route('lomba.finalis', $id_lomba)
-            ->with('success', 'Finalis berhasil ditambahkan!');
+        return redirect()->route('lomba.finalis', $id_lomba)->with('success', 'Finalis berhasil ditambahkan!');
     }
 
     public function finalisDestroy($id_lomba, $id_finalis): RedirectResponse
     {
-        $finalis = Finalis::where('id_lomba', $id_lomba)
-            ->where('id_finalis', $id_finalis)
-            ->firstOrFail();
+        $finalis = Finalis::where('id_lomba', $id_lomba)->where('id_finalis', $id_finalis)->firstOrFail();
         
         $finalis->delete();
 
@@ -158,7 +151,6 @@ class LombaController extends Controller
             ->with('success', 'Finalis berhasil dihapus!');
     }
 
-    // ===== KRITERIA JURI =====
     public function kriteriaJuri($id_lomba): View
     {
         $user = Auth::user();
@@ -216,6 +208,45 @@ class LombaController extends Controller
             ->with('success', 'Kriteria berhasil ditambahkan!');
     }
 
+    public function kriteriaUpdate(Request $request, $id_lomba, $id_kriteria): RedirectResponse
+    {
+        $user = Auth::user();
+        
+        if (!$user->isJuri()) {
+            abort(403, 'Anda bukan juri!');
+        }
+        
+        $juri = Juri::where('user_id', $user->id)->first();
+        $isAssigned = $juri && $juri->lomba()->where('id_lomba', $id_lomba)->exists();
+        
+        if (!$isAssigned) {
+            abort(403, 'Anda tidak ditugaskan ke lomba ini!');
+        }
+
+        $kriteria = Kriteria::where('id_kriteria', $id_kriteria)
+            ->where('id_lomba', $id_lomba)
+            ->firstOrFail();
+
+        if ($kriteria->penilaians()->count() > 0) {
+            return back()->with('error', 'Kriteria tidak bisa diubah karena sudah ada penilaian!');
+        }
+
+        $request->validate([
+            'nama_kriteria' => 'required|string|max:255',
+            'deskripsi' => 'nullable|string',
+            'bobot' => 'required|integer|min:0|max:100',
+        ]);
+
+        $kriteria->update([
+            'nama_kriteria' => $request->nama_kriteria,
+            'deskripsi' => $request->deskripsi,
+            'bobot' => $request->bobot,
+        ]);
+
+        return redirect()->route('juri.kriteria', $id_lomba)
+            ->with('success', 'Kriteria berhasil diupdate!');
+    }
+
     public function kriteriaDestroy($id_lomba, $id_kriteria): RedirectResponse
     {
         $user = Auth::user();
@@ -224,9 +255,11 @@ class LombaController extends Controller
             abort(403, 'Anda bukan juri!');
         }
         
-        $kriteria = Kriteria::where('id_kriteria', $id_kriteria)
-            ->where('id_lomba', $id_lomba)
-            ->firstOrFail();
+        $kriteria = Kriteria::where('id_kriteria', $id_kriteria)->where('id_lomba', $id_lomba)->firstOrFail();
+
+        if ($kriteria->penilaians()->count() > 0) {
+            return back()->with('error', 'Kriteria tidak bisa dihapus karena sudah ada penilaian!');
+        }
         
         $kriteria->delete();
 

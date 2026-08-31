@@ -1,4 +1,5 @@
 <?php
+// app/Models/JuriLomba.php
 
 namespace App\Models;
 
@@ -26,5 +27,11 @@ class JuriLomba extends Model
     public function lomba()
     {
         return $this->belongsTo(Lomba::class, 'id_lomba', 'id_lomba');
+    }
+
+    // ✅ TAMBAHKAN SCOPE
+    public function scopeAktif($query)
+    {
+        return $query->where('status', 'aktif');
     }
 }

@@ -111,7 +111,7 @@
         border-collapse: collapse;
         margin-bottom: 0;
         font-size: 14px;
-        min-width: 700px;
+        min-width: 600px;
     }
 
     .table-scroll table thead th {
@@ -150,7 +150,7 @@
         left: 0;
         z-index: 5;
         background: #ffffff;
-        min-width: 180px;
+        min-width: 170px;
     }
 
     .col-sticky-right {
@@ -158,7 +158,7 @@
         right: 0;
         z-index: 5;
         background: #ffffff;
-        min-width: 120px;
+        min-width: 110px;
     }
 
     .table-scroll table thead .col-sticky-left,
@@ -441,7 +441,7 @@
 
         .table-scroll table {
             font-size: 13px;
-            min-width: 600px;
+            min-width: 500px;
         }
         .table-scroll table thead th {
             font-size: 10px;
@@ -451,10 +451,10 @@
             padding: 8px 10px;
         }
         .col-sticky-left {
-            min-width: 150px;
+            min-width: 140px;
         }
         .col-sticky-right {
-            min-width: 100px;
+            min-width: 90px;
         }
 
         .modal-custom .modal-body {
@@ -484,7 +484,7 @@
         }
         .table-scroll table {
             font-size: 12px;
-            min-width: 500px;
+            min-width: 400px;
         }
         .table-scroll table thead th {
             font-size: 9px;
@@ -494,10 +494,10 @@
             padding: 6px 8px;
         }
         .col-sticky-left {
-            min-width: 120px;
+            min-width: 110px;
         }
         .col-sticky-right {
-            min-width: 80px;
+            min-width: 70px;
         }
         .btn-action {
             width: 22px;
@@ -547,7 +547,6 @@
                     <th style="width: 40px; min-width: 40px;">No</th>
                     <th class="col-sticky-left" style="min-width: 170px;">Nama Tim</th>
                     <th style="min-width: 150px;">Ketua</th>
-                    <th style="min-width: 130px;">Prodi</th>
                     <th style="min-width: 110px;">No Telp</th>
                     <th style="min-width: 80px; text-align: center;">Jumlah</th>
                     <th class="col-sticky-right" style="min-width: 110px; text-align: center;">Aksi</th>
@@ -560,7 +559,6 @@
                     $ketua = $pesertas->whereNotNull('ketua_peserta')->first();
                     $first = $pesertas->first();
                     $jumlahPeserta = $item->pesertas_count ?? $pesertas->count();
-                    // Ambil anggota (tanpa ketua)
                     $anggotaList = $pesertas->whereNull('ketua_peserta')->pluck('nama_peserta')->toArray();
                     $anggotaJson = json_encode($anggotaList);
                 @endphp
@@ -570,7 +568,6 @@
                         <span class="fw-semibold" style="font-size: 13px;">{{ $item->nama_tim }}</span>
                     </td>
                     <td style="font-size: 13px;">{{ $ketua->ketua_peserta ?? '-' }}</td>
-                    <td style="font-size: 13px;">{{ $first->prodi ?? '-' }}</td>
                     <td style="font-size: 13px;">{{ $first->no_telp ?? '-' }}</td>
                     <td style="text-align: center;">
                         <span class="badge-count">{{ $jumlahPeserta }}</span>
@@ -580,7 +577,6 @@
                             <button class="btn-action btn-info" title="Detail" onclick="openShowTimModal(
                                 '{{ addslashes($item->nama_tim) }}',
                                 '{{ addslashes($ketua->ketua_peserta ?? '-') }}',
-                                '{{ addslashes($first->prodi ?? '-') }}',
                                 '{{ addslashes($first->no_telp ?? '-') }}',
                                 '{{ $jumlahPeserta }}',
                                 {{ $anggotaJson }}
@@ -591,7 +587,6 @@
                                 '{{ $item->id_tim }}',
                                 '{{ addslashes($item->nama_tim) }}',
                                 '{{ addslashes($ketua->ketua_peserta ?? '-') }}',
-                                '{{ addslashes($first->prodi ?? '-') }}',
                                 '{{ addslashes($first->no_telp ?? '-') }}',
                                 {{ $anggotaJson }}
                             )">
@@ -610,14 +605,11 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="7">
+                    <td colspan="6">
                         <div class="empty-state">
                             <i class="fas fa-users"></i>
                             <h6>Belum ada data tim</h6>
                             <p>Silakan tambahkan tim baru melalui tombol di atas.</p>
-                            <button class="btn-primary-custom" onclick="openTambahTimModal()" style="display: inline-flex; border: none;">
-                                <i class="fas fa-plus me-1"></i> Tambah Tim
-                            </button>
                         </div>
                     </td>
                 </tr>
@@ -666,15 +658,10 @@
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="modal_prodi" class="form-label">Program Studi <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="modal_prodi" name="prodi" required>
+                                <label for="modal_no_telp" class="form-label">No Telepon <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="modal_no_telp" name="no_telp" required>
                             </div>
                         </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="modal_no_telp" class="form-label">No Telepon <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="modal_no_telp" name="no_telp" required>
                     </div>
 
                     <div class="mb-3">
@@ -746,15 +733,10 @@
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="edit_prodi" class="form-label">Program Studi <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="edit_prodi" name="prodi" required>
+                                <label for="edit_no_telp" class="form-label">No Telepon <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="edit_no_telp" name="no_telp" required>
                             </div>
                         </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="edit_no_telp" class="form-label">No Telepon <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="edit_no_telp" name="no_telp" required>
                     </div>
 
                     <div class="mb-3">
@@ -813,15 +795,10 @@
                     </div>
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <label class="text-muted small fw-bold d-block">Program Studi</label>
-                            <p class="fw-semibold" id="showProdi">-</p>
+                            <label class="text-muted small fw-bold d-block">No Telepon</label>
+                            <p class="fw-semibold" id="showNoTelp">-</p>
                         </div>
                     </div>
-                </div>
-
-                <div class="mb-3">
-                    <label class="text-muted small fw-bold d-block">No Telepon</label>
-                    <p class="fw-semibold" id="showNoTelp">-</p>
                 </div>
 
                 <div class="mb-3">
@@ -975,7 +952,6 @@ document.getElementById('btnSimpanTim').addEventListener('click', function() {
     const modalElement = document.getElementById('tambahTimModal');
     const modal = bootstrap.Modal.getInstance(modalElement);
 
-    // Validasi minimal 4 anggota
     const anggotaInputs = document.querySelectorAll('#modal_member_list input[name="anggota[]"]');
     let valid = true;
     anggotaInputs.forEach(input => {
@@ -1032,7 +1008,7 @@ document.getElementById('btnSimpanTim').addEventListener('click', function() {
 });
 
 // ===== MODAL EDIT TIM =====
-function openEditTimModal(id, nama, ketua, prodi, no_telp, anggota) {
+function openEditTimModal(id, nama, ketua, no_telp, anggota) {
     const modalElement = document.getElementById('editTimModal');
     const modal = new bootstrap.Modal(modalElement);
 
@@ -1040,7 +1016,6 @@ function openEditTimModal(id, nama, ketua, prodi, no_telp, anggota) {
     document.getElementById('edit_tim_id').value = id;
     document.getElementById('edit_nama_tim').value = nama || '';
     document.getElementById('edit_ketua').value = ketua || '';
-    document.getElementById('edit_prodi').value = prodi || '';
     document.getElementById('edit_no_telp').value = no_telp || '';
 
     const list = document.getElementById('edit_member_list');
@@ -1154,17 +1129,15 @@ document.getElementById('btnUpdateTim').addEventListener('click', function() {
 });
 
 // ===== MODAL SHOW TIM =====
-function openShowTimModal(nama, ketua, prodi, no_telp, jumlah, anggota) {
+function openShowTimModal(nama, ketua, no_telp, jumlah, anggota) {
     const modalElement = document.getElementById('showTimModal');
     const modal = new bootstrap.Modal(modalElement);
 
     document.getElementById('showNamaTim').textContent = nama || '-';
     document.getElementById('showKetua').textContent = ketua || '-';
-    document.getElementById('showProdi').textContent = prodi || '-';
     document.getElementById('showNoTelp').textContent = no_telp || '-';
     document.getElementById('showJumlahAnggota').textContent = (jumlah || 0) + ' Anggota';
 
-    // Tampilkan anggota dalam bentuk tabel
     const tbody = document.getElementById('showAnggotaTable');
     if (anggota && Array.isArray(anggota) && anggota.length > 0) {
         const list = anggota.filter(a => a && a.trim() !== '');

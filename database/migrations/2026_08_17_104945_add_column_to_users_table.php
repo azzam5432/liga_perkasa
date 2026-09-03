@@ -12,7 +12,6 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            Schema::table('users', function (Blueprint $table) {
                 $table->enum('role', ['super_admin', 'panitia'])->default('panitia');
                 $table->string('no_telp')->nullable();
                 $table->string('jabatan')->nullable();
@@ -22,7 +21,6 @@ return new class extends Migration
                 $table->string('twitter')->nullable();
                 $table->string('linkedin')->nullable();
                 $table->text('bio')->nullable();
-            });
         });
     }
 

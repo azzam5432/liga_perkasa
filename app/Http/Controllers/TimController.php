@@ -13,7 +13,7 @@ class TimController extends Controller
     public function index(): View
     {
         $tim = Tim::with(['pesertas' => function($query) {
-            $query->select('id_tim', 'ketua_peserta', 'prodi', 'no_telp', 'id_peserta', 'nama_peserta');
+            $query->select('id_tim', 'ketua_peserta', 'no_telp', 'id_peserta', 'nama_peserta');
         }])->withCount('pesertas')->select('id_tim', 'nama_tim', 'created_at')->latest()->paginate(10);
         
         return view('panitia.peserta', ['tim' => $tim]);
@@ -29,7 +29,7 @@ class TimController extends Controller
         $request->validate([
             'nama_tim' => 'required|string|max:255',
             'ketua_peserta' => 'required|string|max:255',
-            'prodi' => 'required|string|max:255',
+            // ✅ HAPUS 'prodi' dari validasi
             'no_telp' => 'required|string|max:15',
             'anggota' => 'required|array|min:4|max:19',
             'anggota.*' => 'required|string|max:255',
@@ -39,12 +39,13 @@ class TimController extends Controller
             'nama_tim' => $request->nama_tim,
         ]);
         
-        // Simpan Ketua
+        // Simpan Ketua (tanpa prodi)
         Peserta::create([
             'id_tim' => $tim->id_tim,
             'ketua_peserta' => $request->ketua_peserta,
             'nama_peserta' => $request->ketua_peserta,
-            'prodi' => $request->prodi,
+            // ✅ HAPUS 'prodi'
+            'prodi' => null,
             'no_telp' => $request->no_telp,
         ]);
         
@@ -74,7 +75,7 @@ class TimController extends Controller
     public function show($id): View
     {
         $tim = Tim::with(['pesertas' => function($query) {
-            $query->select('id_tim', 'ketua_peserta', 'nama_peserta', 'prodi', 'no_telp', 'id_peserta');
+            $query->select('id_tim', 'ketua_peserta', 'nama_peserta', 'no_telp', 'id_peserta');
         }])->findOrFail($id);  
         
         return view('panitia.show', compact('tim'));
@@ -83,7 +84,7 @@ class TimController extends Controller
     public function edit($id): View
     {
         $tim = Tim::with(['pesertas' => function($query) {
-            $query->select('id_tim', 'ketua_peserta', 'nama_peserta', 'prodi', 'no_telp', 'id_peserta');
+            $query->select('id_tim', 'ketua_peserta', 'nama_peserta', 'no_telp', 'id_peserta');
         }])->findOrFail($id);
         
         return view('panitia.edit', compact('tim'));
@@ -94,7 +95,7 @@ class TimController extends Controller
         $request->validate([
             'nama_tim' => 'required|string|max:255',
             'ketua_peserta' => 'required|string|max:255',
-            'prodi' => 'required|string|max:255',
+            // ✅ HAPUS 'prodi' dari validasi
             'no_telp' => 'required|string|max:15',
             'edit_anggota' => 'required|array|min:4|max:19',
             'edit_anggota.*' => 'required|string|max:255',
@@ -108,12 +109,12 @@ class TimController extends Controller
         // Hapus semua peserta lama
         Peserta::where('id_tim', $id)->delete();
         
-        // Simpan Ketua baru
+        // Simpan Ketua baru (tanpa prodi)
         Peserta::create([
             'id_tim' => $tim->id_tim,
             'ketua_peserta' => $request->ketua_peserta,
             'nama_peserta' => $request->ketua_peserta,
-            'prodi' => $request->prodi,
+            'prodi' => null,
             'no_telp' => $request->no_telp,
         ]);
 

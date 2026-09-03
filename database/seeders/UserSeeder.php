@@ -19,17 +19,5 @@ class UserSeeder extends Seeder
             'jabatan' => 'Super Administrator',
             'bio' => 'Super Admin of the system',
         ]);
-
-        User::create([
-            'name' => 'Panitia 1',
-            'email' => 'panitia@example.com',
-            'password' => Hash::make('password123'),
-            'role' => 'panitia',
-            'no_telp' => '08123456788',
-            'jabatan' => 'Ketua Panitia',
-            'instagram' => 'https://instagram.com/panitia1',
-            'facebook' => 'https://facebook.com/panitia1',
-            'bio' => 'Saya adalah panitia yang bertanggung jawab',
-        ]);
     }
 }

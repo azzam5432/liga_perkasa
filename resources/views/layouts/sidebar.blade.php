@@ -1,5 +1,3 @@
-{{-- resources/views/layouts/sidebar.blade.php --}}
-
 <div class="sidebar" id="sidebar">
     <div class="sidebar-header">
         <div class="brand-wrapper">
@@ -27,48 +25,25 @@
                         <span>Data Panitia</span>
                     </a>
                 </li>
-
-                {{-- PENILAIAN MENU --}}
+                
                 <li class="nav-item">
-                    <a class="nav-link" href="#penilaianMenu" data-bs-toggle="collapse" role="button" aria-expanded="{{ request()->routeIs('kriteria.*') || request()->routeIs('juri.*') || request()->routeIs('penilaian.*') || request()->routeIs('juri_lomba.*') ? 'true' : 'false' }}">
-                        <i class="fas fa-clipboard-list me-2"></i>
-                        <span>Penilaian</span>
-                        <i class="fas fa-chevron-down ms-auto"></i>
+                    <a class="nav-link {{ request()->routeIs('juri.*') ? 'active' : '' }}" 
+                        href="{{ route('juri.index') }}">
+                        <i class="fas fa-user-tie me-2"></i> Data Juri
                     </a>
-                    <div class="collapse {{ request()->routeIs('kriteria.*') || request()->routeIs('juri.*') || request()->routeIs('penilaian.*') || request()->routeIs('juri_lomba.*') ? 'show' : '' }}" id="penilaianMenu">
-                        <ul class="nav flex-column ms-3">
-                            <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('kriteria.*') ? 'active' : '' }}" 
-                                   href="{{ route('kriteria.index') }}">
-                                    <i class="fas fa-circle me-2" style="font-size: 6px;"></i> Kriteria
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('juri.*') ? 'active' : '' }}" 
-                                   href="{{ route('juri.index') }}">
-                                    <i class="fas fa-circle me-2" style="font-size: 6px;"></i> Data Juri
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('juri_lomba.*') ? 'active' : '' }}" 
-                                   href="{{ route('juri_lomba.index') }}">
-                                    <i class="fas fa-circle me-2" style="font-size: 6px;"></i> Penugasan Juri
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('penilaian.index') ? 'active' : '' }}" 
-                                   href="{{ route('penilaian.index') }}">
-                                    <i class="fas fa-circle me-2" style="font-size: 6px;"></i> Data Penilaian
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('penilaian.rekap') ? 'active' : '' }}" 
-                                   href="{{ route('penilaian.rekap') }}">
-                                    <i class="fas fa-circle me-2" style="font-size: 6px;"></i> Rekap Penilaian
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('juri_lomba.*') ? 'active' : '' }}" 
+                        href="{{ route('juri_lomba.index') }}">
+                        <i class="fas fa-user-tag me-2"></i> Penugasan Juri
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('finalis.*') ? 'active' : '' }}" 
+                    href="{{ route('finalis.index', 1) }}">
+                        <i class="fas fa-trophy me-2"></i>
+                        <span>Finalis</span>
+                    </a>
                 </li>
 
             @elseif(Auth::user()->isPanitia())
@@ -91,69 +66,26 @@
 
                 {{-- MANAJEMEN LOMBA --}}
                 <li class="nav-item">
-                    <a class="nav-link" href="#lombaMenu" data-bs-toggle="collapse" role="button" aria-expanded="{{ request()->routeIs('lomba.*') ? 'true' : 'false' }}">
-                        <i class="fas fa-trophy me-2"></i>
-                        <span>Manajemen Lomba</span>
-                        <i class="fas fa-chevron-down ms-auto"></i>
+                    <a class="nav-link {{ request()->routeIs('lomba.index') ? 'active' : '' }}" 
+                        href="{{ route('lomba.index') }}">
+                        <i class="fas fa-trophy me-2"></i> Daftar Lomba
                     </a>
-                    <div class="collapse {{ request()->routeIs('lomba.*') ? 'show' : '' }}" id="lombaMenu">
-                        <ul class="nav flex-column ms-3">
-                            <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('lomba.index') ? 'active' : '' }}" 
-                                   href="{{ route('lomba.index') }}">
-                                    <i class="fas fa-list me-2"></i> Daftar Lomba
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('lomba.create') ? 'active' : '' }}" 
-                                   href="{{ route('lomba.create') }}">
-                                    <i class="fas fa-plus me-2"></i> Tambah Lomba
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
                 </li>
-
-                {{-- JURI MENU --}}
-                @php
-                    $juri = App\Models\Juri::where('user_id', Auth::user()->id)->first();
-                    // ✅ PERBAIKAN: Spesifikkan tabel untuk menghindari ambiguous column
-                    $lombaDitugaskan = $juri ? $juri->lomba()->where('tb_juri_lomba.status', 'aktif')->get() : collect();
-                @endphp
-                
-                @if($lombaDitugaskan->count() > 0)
                 <li class="nav-item">
-                    <a class="nav-link" href="#kriteriaMenu" data-bs-toggle="collapse" role="button" aria-expanded="{{ request()->routeIs('juri.kriteria') ? 'true' : 'false' }}">
-                        <i class="fas fa-list-check me-2"></i>
-                        <span>Kriteria Penilaian</span>
-                        <i class="fas fa-chevron-down ms-auto"></i>
-                    </a>
-                    <div class="collapse {{ request()->routeIs('juri.kriteria') ? 'show' : '' }}" id="kriteriaMenu">
-                        <ul class="nav flex-column ms-3">
-                            @foreach($lombaDitugaskan as $lomba)
-                            <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('juri.kriteria') && request()->route('juri.kriteria', $lomba->id_lomba) ? 'active' : '' }}" 
-                                   href="{{ route('juri.kriteria', $lomba->id_lomba) }}">
-                                    <i class="fas fa-circle me-2" style="font-size: 6px;"></i> {{ Str::limit($lomba->nama_lomba, 20) }}
-                                </a>
-                            </li>
-                            @endforeach
-                        </ul>
-                    </div>
-                </li>
-                @endif
-
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('juri.penilaian') ? 'active' : '' }}" 
-                       href="{{ route('juri.penilaian') }}">
-                        <i class="fas fa-pen me-2"></i>
-                        <span>Penilaian Juri</span>
+                    <a class="nav-link {{ request()->routeIs('nilai.index') ? 'active' : '' }}" 
+                        href="{{ route('nilai.index') }}">
+                        <i class="fas fa-clipboard-list me-2"></i> penilaian lomba
                     </a>
                 </li>
-
             @endif
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('ranking') ? 'active' : '' }}" 
+                   href="{{ route('ranking') }}">
+                    <i class="fas fa-chart-line me-2"></i>
+                    <span>Ranking</span>
+                </a>
+            </li>
 
-            {{-- PROFILE MENU --}}
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('profile.*') ? 'active' : '' }}" 
                    href="{{ route('profile.index') }}">
@@ -176,7 +108,6 @@
 </div>
 
 <style>
-    /* CSS SIDEBAR (sama seperti sebelumnya) */
     .sidebar {
         width: 260px;
         min-width: 260px;

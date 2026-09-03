@@ -31,15 +31,20 @@ class Kriteria extends Model
         return $this->belongsTo(Lomba::class, 'id_lomba', 'id_lomba');
     }
 
-    // Relasi ke Penilaian
-    public function penilaians()
-    {
-        return $this->hasMany(Penilaian::class, 'id_kriteria', 'id_kriteria');
-    }
+    // ❌ HAPUS ATAU COMMENT - Karena Penilaian sudah dihapus
+    // public function penilaians()
+    // {
+    //     return $this->hasMany(Penilaian::class, 'id_kriteria', 'id_kriteria');
+    // }
 
     // Scope
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
+    }
+
+    public function scopeByLomba($query, $id_lomba)
+    {
+        return $query->where('id_lomba', $id_lomba);
     }
 }

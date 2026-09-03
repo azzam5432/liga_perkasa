@@ -24,13 +24,7 @@ class Juri extends Model
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
-    // Relasi ke Penilaian
-    public function penilaians()
-    {
-        return $this->hasMany(Penilaian::class, 'id_juri', 'id_juri');
-    }
-
-    // ✅ PERBAIKAN: Relasi ke Lomba melalui tabel pivot
+    // Relasi ke Lomba melalui tabel pivot
     public function lomba()
     {
         return $this->belongsToMany(Lomba::class, 'tb_juri_lomba', 'id_juri', 'id_lomba')
@@ -38,20 +32,20 @@ class Juri extends Model
                     ->withTimestamps();
     }
 
-    // ✅ PERBAIKAN: Cek apakah juri ditugaskan ke lomba tertentu
+    // ✅ PERBAIKI: Spesifikkan tabel untuk id_lomba
     public function isAssignedToLomba($id_lomba)
     {
-        // Perbaiki dengan specifying table name
         return $this->lomba()
                     ->where('tb_lomba.id_lomba', $id_lomba)  // ← TAMBAHKAN tb_lomba.
                     ->exists();
     }
 
-    // ✅ PERBAIKAN: Cek apakah juri sudah memberikan penilaian untuk lomba
-    public function hasPenilaianForLomba($id_lomba)
+    // ✅ PERBAIKI: Cek apakah juri aktif di lomba tertentu
+    public function isActiveInLomba($id_lomba)
     {
-        return $this->penilaians()
-                    ->where('id_lomba', $id_lomba)
+        return $this->lomba()
+                    ->where('tb_lomba.id_lomba', $id_lomba)  // ← TAMBAHKAN tb_lomba.
+                    ->where('tb_juri_lomba.status', 'aktif')
                     ->exists();
     }
 

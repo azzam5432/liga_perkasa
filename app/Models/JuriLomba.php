@@ -29,7 +29,7 @@ class JuriLomba extends Model
         return $this->belongsTo(Lomba::class, 'id_lomba', 'id_lomba');
     }
 
-    // ✅ TAMBAHKAN SCOPE
+    // Scope
     public function scopeAktif($query)
     {
         return $query->where('status', 'aktif');

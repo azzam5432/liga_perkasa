@@ -15,6 +15,9 @@ class Finalis extends Model
         'id_tim',
         'peringkat',
         'catatan',
+        'babak',              
+        'nilai_penyisihan',   
+        'nilai_final',  
     ];
 
     public function lomba()

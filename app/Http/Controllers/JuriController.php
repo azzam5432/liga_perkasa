@@ -32,12 +32,13 @@ class JuriController extends Controller
         return view('juri.index', compact('juris', 'users'));
     }
 
-    public function create(): View
+    // ✅ CREATE - Redirect ke index karena pakai modal
+    public function create()
     {
-        $users = User::whereDoesntHave('juri')->where('role', 'panitia')->get();
-        return view('juri.create', compact('users'));
+        return redirect()->route('juri.index');
     }
 
+    // ✅ STORE - Simpan data dari modal
     public function store(Request $request)
     {
         $request->validate([
@@ -61,18 +62,19 @@ class JuriController extends Controller
             ->with('success', 'Juri berhasil ditambahkan!');
     }
 
-    public function show($id): View
+    // ✅ SHOW - Redirect ke index karena pakai modal
+    public function show($id)
     {
-        $juri = Juri::with('user', 'penilaians.tim')->findOrFail($id);
-        return view('juri.show', compact('juri'));
+        return redirect()->route('juri.index');
     }
 
-    public function edit($id): View
+    // ✅ EDIT - Redirect ke index karena pakai modal
+    public function edit($id)
     {
-        $juri = Juri::findOrFail($id);
-        return view('juri.edit', compact('juri'));
+        return redirect()->route('juri.index');
     }
 
+    // ✅ UPDATE - Update data dari modal
     public function update(Request $request, $id)
     {
         $juri = Juri::findOrFail($id);
@@ -96,15 +98,18 @@ class JuriController extends Controller
             ->with('success', 'Data juri berhasil diupdate!');
     }
 
-    public function destroy($id): RedirectResponse
+    // ✅ DESTROY - Hapus data
+    public function destroy($id)
     {
         $juri = Juri::findOrFail($id);
-        
-        if ($juri->penilaians()->count() > 0) {
-            return back()->with('error', 'Juri tidak bisa dihapus karena sudah memberikan penilaian!');
-        }
-        
         $juri->delete();
+
+        if (request()->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Juri berhasil dihapus!'
+            ]);
+        }
 
         return redirect()->route('juri.index')
             ->with('success', 'Juri berhasil dihapus!');

@@ -1,3 +1,4 @@
+{{-- resources/views/panitia/dashboard.blade.php --}}
 @extends('layouts.master')
 
 @section('title', 'Dashboard Panitia')
@@ -138,9 +139,17 @@
         border-radius: 12px;
         font-size: 11px;
         font-weight: 600;
+        margin-top: 8px;
+    }
+
+    .lomba-card .lomba-status.belum {
+        background: #fefcbf;
+        color: #975a16;
+    }
+
+    .lomba-card .lomba-status.sudah {
         background: #c6f6d5;
         color: #22543d;
-        margin-top: 8px;
     }
 
     .lomba-card .btn-penilaian {
@@ -158,6 +167,14 @@
 
     .lomba-card .btn-penilaian:hover {
         background: #2b6cb0;
+    }
+
+    .lomba-card .btn-penilaian.sudah {
+        background: #48bb78;
+    }
+
+    .lomba-card .btn-penilaian.sudah:hover {
+        background: #38a169;
     }
 
     .card-header-custom {
@@ -441,8 +458,8 @@
                 <i class="fas fa-pen"></i>
             </div>
             <div>
-                <div class="stat-number">{{ $totalPenilaian ?? 0 }}</div>
-                <div class="stat-label">Total Penilaian</div>
+                <div class="stat-number">{{ $totalTimSudahDinilai ?? 0 }}</div>
+                <div class="stat-label">Tim Sudah Dinilai</div>
             </div>
         </div>
     </div>
@@ -459,34 +476,50 @@
             <div class="card-body">
                 <div class="row g-3">
                     @foreach($lombaDitugaskan as $lomba)
-                    <div class="col-md-4 col-sm-6">
-                        <div class="lomba-card">
-                            <div class="card-body">
-                                <div class="lomba-title">{{ $lomba->nama_lomba }}</div>
-                                <div class="lomba-meta">
-                                    <i class="fas fa-calendar-alt"></i>
-                                    {{ \Carbon\Carbon::parse($lomba->tanggal_mulai)->format('d/m/Y') }}
-                                    <span class="mx-1">→</span>
-                                    {{ \Carbon\Carbon::parse($lomba->tanggal_selesai)->format('d/m/Y') }}
-                                </div>
-                                <div class="lomba-meta">
-                                    <i class="fas fa-tag"></i> {{ $lomba->kategori ?? 'Umum' }}
-                                </div>
-                                <span class="lomba-status">
-                                    <i class="fas fa-circle" style="font-size: 6px; vertical-align: middle; margin-right: 4px;"></i>
-                                    Aktif
-                                </span>
-                                <div>
-                                    <a href="{{ route('juri.penilaian') }}" class="btn-penilaian">
-                                        <i class="fas fa-pen me-1"></i> Beri Penilaian
-                                    </a>
+                        @php
+                            $sudahDinilai = \App\Models\Nilai::where('id_lomba', $lomba->id_lomba)
+                                ->where('id_juri', $juri->id_juri)
+                                ->count();
+                            $totalTim = \App\Models\Tim::count();
+                        @endphp
+                        <div class="col-md-4 col-sm-6">
+                            <div class="lomba-card">
+                                <div class="card-body">
+                                    <div class="lomba-title">{{ $lomba->nama_lomba }}</div>
+                                    <div class="lomba-meta">
+                                        <i class="fas fa-calendar-alt"></i>
+                                        {{ \Carbon\Carbon::parse($lomba->tanggal_mulai)->format('d/m/Y') }}
+                                        <span class="mx-1">→</span>
+                                        {{ \Carbon\Carbon::parse($lomba->tanggal_selesai)->format('d/m/Y') }}
+                                    </div>
+                                    <div class="lomba-meta">
+                                        <i class="fas fa-tag"></i> {{ $lomba->kategori ?? 'Umum' }}
+                                    </div>
+                                    <span class="lomba-status {{ $sudahDinilai > 0 ? 'sudah' : 'belum' }}">
+                                        <i class="fas fa-circle" style="font-size: 6px; vertical-align: middle; margin-right: 4px;"></i>
+                                        {{ $sudahDinilai > 0 ? $sudahDinilai . '/' . $totalTim . ' Tim Dinilai' : 'Belum Dinilai' }}
+                                    </span>
+                                    <div>
+                                        <a href="{{ route('nilai.create', $lomba->id_lomba) }}" class="btn-penilaian {{ $sudahDinilai > 0 ? 'sudah' : '' }}">
+                                            <i class="fas fa-pen me-1"></i> 
+                                            {{ $sudahDinilai > 0 ? 'Edit Nilai' : 'Beri Nilai' }}
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
                     @endforeach
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+@elseif(isset($juri) && $juri)
+<div class="row">
+    <div class="col-12">
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i>
+            Belum ada lomba yang ditugaskan kepada Anda. Silakan hubungi admin.
         </div>
     </div>
 </div>
@@ -509,7 +542,6 @@
                                 <th style="width: 50px;">No</th>
                                 <th>Nama Tim</th>
                                 <th>Ketua</th>
-                                <th>Prodi</th>
                                 <th>No Telp</th>
                                 <th style="text-align: center;">Jumlah</th>
                             </tr>
@@ -520,7 +552,6 @@
                                 <td>{{ $loop->iteration }}</td>
                                 <td><strong>{{ $item->nama_tim }}</strong></td>
                                 <td>{{ $item->pesertas->whereNotNull('ketua_peserta')->first()->ketua_peserta ?? '-' }}</td>
-                                <td>{{ $item->pesertas->first()->prodi ?? '-' }}</td>
                                 <td>{{ $item->pesertas->first()->no_telp ?? '-' }}</td>
                                 <td style="text-align: center;">
                                     <span class="badge-count">{{ $item->pesertas->count() }}</span>
@@ -528,11 +559,11 @@
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="6">
+                                <td colspan="5">
                                     <div class="empty-state">
                                         <i class="fas fa-users"></i>
                                         <h6>Belum ada data tim</h6>
-                                        <p>Silakan tambahkan tim melalui menu Peserta Lomba.</p>
+                                        <p>Silakan tambahkan tim melalui menu Data Tim.</p>
                                     </div>
                                 </td>
                             </tr>

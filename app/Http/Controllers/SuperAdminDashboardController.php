@@ -8,6 +8,7 @@ use App\Models\Peserta;
 use App\Models\Lomba;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Collection; 
 
 class SuperAdminDashboardController extends Controller
 {
@@ -75,7 +76,7 @@ class SuperAdminDashboardController extends Controller
 
     private function getRecentActivities()
     {
-        $activities = [];
+        $activities = collect();
 
         $timBaru = Tim::with('pesertas')->latest()->take(3)->get()->map(function ($item) {
             return [
@@ -97,9 +98,16 @@ class SuperAdminDashboardController extends Controller
             ];
         });
 
-        $activities = $timBaru->merge($panitiaBaru)->sortByDesc('time')->take(5)->values();
+        // ✅ PERBAIKAN: Gabungkan dengan aman
+        if ($timBaru->isNotEmpty()) {
+            $activities = $activities->merge($timBaru);
+        }
+        
+        if ($panitiaBaru->isNotEmpty()) {
+            $activities = $activities->merge($panitiaBaru);
+        }
 
-        return $activities;
+        return $activities->sortByDesc('time')->take(5)->values();
     }
 
     private function getGrowthPercentage()

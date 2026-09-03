@@ -1,4 +1,5 @@
 <?php
+// app/Http/Controllers/JuriLombaController.php
 
 namespace App\Http\Controllers;
 
@@ -11,12 +12,10 @@ use Illuminate\Http\RedirectResponse;
 
 class JuriLombaController extends Controller
 {
-
     public function index(Request $request)
     {
         $query = JuriLomba::with(['juri.user', 'lomba']);
 
-        // Search
         if ($request->filled('search')) {
             $search = $request->search;
             $query->whereHas('juri.user', function($q) use ($search) {
@@ -26,16 +25,14 @@ class JuriLombaController extends Controller
             });
         }
 
-        // Filter Status
         if ($request->filled('status') && $request->status != '') {
             $query->where('status', $request->status);
         }
 
         $penugasans = $query->latest()->paginate(15);
 
-        // Untuk modal tambah
         $juri = Juri::with('user')->aktif()->get();
-        $lomba = Lomba::where('status', 'open')->get();
+        $lomba = Lomba::all();
 
         if ($request->ajax()) {
             return view('juri_lomba.index', compact('penugasans', 'juri', 'lomba'));
@@ -47,7 +44,7 @@ class JuriLombaController extends Controller
     public function create(): View
     {
         $juri = Juri::with('user')->aktif()->get();
-        $lomba = Lomba::where('status', 'open')->get();
+        $lomba = Lomba::all();
         
         return view('juri_lomba.create', compact('juri', 'lomba'));
     }
@@ -60,7 +57,7 @@ class JuriLombaController extends Controller
             'status' => 'required|in:aktif,nonaktif',
         ]);
 
-        // Cek apakah juri sudah ditugaskan ke lomba ini
+        // ✅ PERBAIKI: Spesifikkan tabel
         $exists = JuriLomba::where('id_juri', $request->id_juri)
             ->where('id_lomba', $request->id_lomba)
             ->exists();
@@ -74,8 +71,6 @@ class JuriLombaController extends Controller
             }
             return back()->with('error', 'Juri sudah ditugaskan ke lomba ini!');
         }
-
-        // Boleh juri yang sama di lomba berbeda, tidak ada validasi tambahan
 
         JuriLomba::create([
             'id_juri' => $request->id_juri,
@@ -94,19 +89,14 @@ class JuriLombaController extends Controller
             ->with('success', 'Juri berhasil ditugaskan ke lomba!');
     }
 
-    public function show($id): View
+    public function show($id)
     {
-        $penugasan = JuriLomba::with(['juri.user', 'lomba'])->findOrFail($id);
-        return view('juri_lomba.show', compact('penugasan'));
+        return redirect()->route('juri_lomba.index');
     }
 
-    public function edit($id): View
+    public function edit($id)
     {
-        $penugasan = JuriLomba::findOrFail($id);
-        $juri = Juri::with('user')->aktif()->get();
-        $lomba = Lomba::where('status', 'open')->get();
-        
-        return view('juri_lomba.edit', compact('penugasan', 'juri', 'lomba'));
+        return redirect()->route('juri_lomba.index');
     }
 
     public function update(Request $request, $id)
@@ -119,7 +109,7 @@ class JuriLombaController extends Controller
             'status' => 'required|in:aktif,nonaktif',
         ]);
 
-        // Cek duplikasi (kecuali dirinya sendiri)
+        // ✅ PERBAIKI: Spesifikkan tabel
         $exists = JuriLomba::where('id_juri', $request->id_juri)
             ->where('id_lomba', $request->id_lomba)
             ->where('id_juri_lomba', '!=', $id)
@@ -166,10 +156,12 @@ class JuriLombaController extends Controller
         return redirect()->route('juri_lomba.index')->with('success', 'Penugasan juri berhasil dihapus!');
     }
 
+    // ✅ PERBAIKI: Method getJuriByLomba
     public function getJuriByLomba($id_lomba)
     {
         $lomba = Lomba::findOrFail($id_lomba);
-        $juriTerpilih = $lomba->juri->pluck('id_juri')->toArray();
+        // ✅ Spesifikkan tabel
+        $juriTerpilih = $lomba->juri()->pluck('tb_juri.id_juri')->toArray();
         
         $juri = Juri::with('user')
             ->aktif()

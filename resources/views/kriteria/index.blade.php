@@ -1,3 +1,4 @@
+{{-- resources/views/kriteria/index.blade.php --}}
 @extends('layouts.master')
 
 @section('title', 'Data Kriteria')
@@ -57,41 +58,32 @@
         border: 1px solid #edf2f7;
     }
 
-    .filter-bar .search-box {
-        flex: 1;
-        min-width: 180px;
-        position: relative;
+    .filter-bar .filter-select {
+        min-width: 200px;
     }
 
-    .filter-bar .search-box input {
+    .filter-bar .filter-select select {
         width: 100%;
-        padding: 8px 14px 8px 38px;
+        padding: 8px 14px;
         border: 1px solid #e2e8f0;
         border-radius: 8px;
         font-size: 14px;
-        transition: all 0.2s ease;
         background: #f7fafc;
         color: #1a2332;
+        transition: all 0.2s ease;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%234a5568' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        padding-right: 36px;
+        cursor: pointer;
     }
 
-    .filter-bar .search-box input:focus {
+    .filter-bar .filter-select select:focus {
         outline: none;
         border-color: #1a365d;
-        background: #ffffff;
+        background-color: #ffffff;
         box-shadow: 0 0 0 3px rgba(26, 54, 93, 0.06);
-    }
-
-    .filter-bar .search-box input::placeholder {
-        color: #a0aec0;
-    }
-
-    .filter-bar .search-box i {
-        position: absolute;
-        left: 12px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #a0aec0;
-        font-size: 14px;
     }
 
     .table-wrapper {
@@ -118,11 +110,11 @@
         background: #f7fafc;
         color: #4a5568;
         font-weight: 600;
-        font-size: 12px;
+        font-size: 11px;
         text-transform: uppercase;
         letter-spacing: 0.4px;
         padding: 10px 14px;
-        border-bottom: 1px solid #edf2f7;
+        border-bottom: 2px solid #edf2f7;
         text-align: left;
         white-space: nowrap;
         position: sticky;
@@ -150,7 +142,7 @@
         left: 0;
         z-index: 5;
         background: #ffffff;
-        min-width: 160px;
+        min-width: 180px;
     }
 
     .col-sticky-right {
@@ -300,6 +292,20 @@
         margin-bottom: 14px;
     }
 
+    .badge-lomba {
+        background: #ebf8ff;
+        color: #2b6cb0;
+        padding: 2px 12px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+    .badge-duplicate {
+        background: #fed7d7;
+        color: #9b2c2c;
+    }
+
     /* ===== MODAL STYLES ===== */
     .modal-custom .modal-content {
         border: none;
@@ -339,7 +345,8 @@
         color: #1a2332;
     }
 
-    .modal-custom .form-control {
+    .modal-custom .form-control,
+    .modal-custom .form-select {
         border: 1px solid #e2e8f0;
         border-radius: 8px;
         padding: 8px 14px;
@@ -347,7 +354,8 @@
         transition: all 0.2s ease;
     }
 
-    .modal-custom .form-control:focus {
+    .modal-custom .form-control:focus,
+    .modal-custom .form-select:focus {
         border-color: #1a365d;
         box-shadow: 0 0 0 3px rgba(26, 54, 93, 0.06);
     }
@@ -404,7 +412,7 @@
             align-items: stretch;
             padding: 10px 12px;
         }
-        .filter-bar .search-box {
+        .filter-bar .filter-select {
             min-width: 100%;
         }
 
@@ -501,9 +509,14 @@
 
 <!-- ===== FILTER BAR ===== -->
 <div class="filter-bar">
-    <div class="search-box">
-        <i class="fas fa-search"></i>
-        <input type="text" id="searchInput" placeholder="Cari kriteria..." onkeyup="filterTable()">
+    <div class="filter-select">
+        <select id="filterLomba" onchange="filterTable()">
+            @foreach($lombaDitugaskan as $l)
+                <option value="{{ $l->id_lomba }}" {{ $id_lomba == $l->id_lomba ? 'selected' : '' }}>
+                    {{ $l->nama_lomba }}
+                </option>
+            @endforeach
+        </select>
     </div>
 </div>
 
@@ -559,7 +572,7 @@
                         <td colspan="5">
                             <div class="empty-state">
                                 <i class="fas fa-list-check"></i>
-                                <h6>Belum ada data kriteria</h6>
+                                <h6>Belum ada kriteria untuk lomba ini</h6>
                                 <p>Silakan tambahkan kriteria baru melalui tombol di atas.</p>
                                 <button class="btn-primary-custom" onclick="openTambahKriteriaModal()" style="display: inline-flex; border: none;">
                                     <i class="fas fa-plus me-1"></i> Tambah Kriteria
@@ -595,6 +608,18 @@
             <div class="modal-body">
                 <form id="formTambahKriteria" action="{{ route('kriteria.store') }}" method="POST">
                     @csrf
+
+                    <div class="mb-3">
+                        <label for="modal_id_lomba" class="form-label">Pilih Lomba <span class="text-danger">*</span></label>
+                        <select class="form-select" id="modal_id_lomba" name="id_lomba" required>
+                            <option value="">-- Pilih Lomba --</option>
+                            @foreach($lombaDitugaskan as $l)
+                                <option value="{{ $l->id_lomba }}" {{ $id_lomba == $l->id_lomba ? 'selected' : '' }}>
+                                    {{ $l->nama_lomba }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
 
                     <div class="mb-3">
                         <label for="modal_nama_kriteria" class="form-label">Nama Kriteria <span class="text-danger">*</span></label>
@@ -655,6 +680,7 @@
                     </div>
 
                     <input type="hidden" id="edit_kriteria_id" name="kriteria_id" value="">
+                    <input type="hidden" id="edit_id_lomba" name="id_lomba" value="">
                 </form>
             </div>
             <div class="modal-footer">
@@ -733,9 +759,9 @@
 let searchTimeout = null;
 let currentPage = 1;
 
-// ===== SEARCH VIA AJAX =====
+// ===== FILTER =====
 function filterTable() {
-    const search = document.getElementById('searchInput').value;
+    const id_lomba = document.getElementById('filterLomba').value;
 
     if (searchTimeout) {
         clearTimeout(searchTimeout);
@@ -743,12 +769,12 @@ function filterTable() {
 
     searchTimeout = setTimeout(function() {
         currentPage = 1;
-        fetchData(search, currentPage);
+        fetchData(id_lomba, currentPage);
     }, 300);
 }
 
 // ===== FETCH DATA VIA AJAX =====
-function fetchData(search, page) {
+function fetchData(id_lomba, page) {
     const tableBody = document.querySelector('#kriteriaTable tbody');
     const paginationWrapper = document.querySelector('.pagination-wrapper');
 
@@ -766,7 +792,7 @@ function fetchData(search, page) {
     }
 
     let url = new URL(window.location.href);
-    url.searchParams.set('search', search);
+    url.searchParams.set('id_lomba', id_lomba);
     url.searchParams.set('page', page);
 
     fetch(url, {
@@ -788,17 +814,10 @@ function fetchData(search, page) {
 
         if (paginationWrapper && newPagination) {
             paginationWrapper.innerHTML = newPagination.innerHTML;
-        } else if (paginationWrapper && !newPagination) {
-            const totalRows = tableBody ? tableBody.querySelectorAll('tr:not(.empty-state)').length : 0;
-            paginationWrapper.innerHTML = `
-                <span class="info-text">
-                    Menampilkan <strong>1</strong> sampai <strong>${totalRows}</strong> dari <strong>${totalRows}</strong> kriteria
-                </span>
-            `;
         }
 
         const newUrl = new URL(window.location.href);
-        newUrl.searchParams.set('search', search);
+        newUrl.searchParams.set('id_lomba', id_lomba);
         newUrl.searchParams.set('page', page);
         window.history.pushState({}, '', newUrl);
 
@@ -827,10 +846,10 @@ function attachPaginationListeners() {
             const href = this.getAttribute('href');
             if (href) {
                 const url = new URL(href, window.location.origin);
-                const search = document.getElementById('searchInput').value;
+                const id_lomba = document.getElementById('filterLomba').value;
                 const page = url.searchParams.get('page') || 1;
                 currentPage = parseInt(page);
-                fetchData(search, currentPage);
+                fetchData(id_lomba, currentPage);
             }
         });
     });
@@ -922,6 +941,12 @@ function openEditKriteriaModal(id, nama, deskripsi, bobot) {
     document.getElementById('edit_deskripsi').value = deskripsi || '';
     document.getElementById('edit_bobot').value = bobot || 0;
     
+    // Ambil id_lomba dari filter yang sedang aktif
+    const filterLomba = document.getElementById('filterLomba');
+    if (filterLomba) {
+        document.getElementById('edit_id_lomba').value = filterLomba.value;
+    }
+    
     modal.show();
 }
 
@@ -934,6 +959,9 @@ document.getElementById('btnUpdateKriteria').addEventListener('click', function(
 
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span> Mengupdate...';
+
+    // Tambahkan id_lomba ke form data
+    formData.append('id_lomba', document.getElementById('edit_id_lomba').value);
 
     fetch(form.action, {
         method: 'POST',
@@ -1024,13 +1052,16 @@ document.addEventListener('DOMContentLoaded', function() {
     attachPaginationListeners();
 
     const urlParams = new URLSearchParams(window.location.search);
-    const searchParam = urlParams.get('search');
+    const lombaParam = urlParams.get('id_lomba');
     
-    if (searchParam) {
-        document.getElementById('searchInput').value = searchParam;
+    if (lombaParam) {
+        const filterLomba = document.getElementById('filterLomba');
+        if (filterLomba) {
+            filterLomba.value = lombaParam;
+        }
         const page = urlParams.get('page') || 1;
         currentPage = parseInt(page);
-        fetchData(searchParam, currentPage);
+        fetchData(lombaParam, currentPage);
     }
 });
 </script>

@@ -1,4 +1,5 @@
 <?php
+// app/Http/Controllers/LombaController.php
 
 namespace App\Http\Controllers;
 
@@ -20,7 +21,10 @@ class LombaController extends Controller
 
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where('nama_lomba', 'LIKE', "%{$search}%")->orWhere('kategori', 'LIKE', "%{$search}%");
+            $query->where(function($q) use ($search) {
+                $q->where('nama_lomba', 'LIKE', "%{$search}%")
+                ->orWhere('kategori', 'LIKE', "%{$search}%");
+            });
         }
 
         if ($request->filled('status') && $request->status != '') {
@@ -40,12 +44,13 @@ class LombaController extends Controller
         return view('lomba.index', compact('lombas'));
     }
 
-    public function create(): View
+    // ✅ CREATE - Redirect ke index (karena pakai modal)
+    public function create()
     {
-        return view('lomba.create');
+        return redirect()->route('lomba.index');
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request)
     {
         $request->validate([
             'nama_lomba' => 'required|string|max:255',
@@ -53,32 +58,46 @@ class LombaController extends Controller
             'kategori' => 'nullable|string|max:255',
             'tanggal_mulai' => 'nullable|date',
             'tanggal_selesai' => 'nullable|date|after_or_equal:tanggal_mulai',
-            'jenis' => 'required|in:langsung,penyisihan,final',
+            'jenis' => 'required|in:langsung,penyisihan',
+            'bobot' => 'required|numeric|min:0|max:100',
+            'jumlah_finalis' => 'nullable|integer|min:0',
         ]);
 
         $data = $request->all();
         $data['status'] = 'draft';
-        $data['is_penyisihan_active'] = false;
+        $data['is_final_active'] = false;
+
+        // Jika jenis bukan penyisihan, set jumlah_finalis ke 0
+        if ($request->jenis !== 'penyisihan') {
+            $data['jumlah_finalis'] = 0;
+        }
 
         Lomba::create($data);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Lomba berhasil ditambahkan!'
+            ]);
+        }
 
         return redirect()->route('lomba.index')
             ->with('success', 'Lomba berhasil ditambahkan!');
     }
 
-    public function show($id): View
-    {
-        $lomba = Lomba::with(['juri.user', 'finalis.tim', 'kriterias'])->findOrFail($id);
-        return view('lomba.show', compact('lomba'));
-    }
-
-    public function edit($id): View
+    // ✅ EDIT - Ambil data untuk modal edit
+    public function edit($id)
     {
         $lomba = Lomba::findOrFail($id);
+        
+        if (request()->ajax()) {
+            return response()->json($lomba);
+        }
+        
         return view('lomba.edit', compact('lomba'));
     }
 
-    public function update(Request $request, $id): RedirectResponse
+    public function update(Request $request, $id)
     {
         $lomba = Lomba::findOrFail($id);
 
@@ -90,18 +109,45 @@ class LombaController extends Controller
             'tanggal_selesai' => 'nullable|date|after_or_equal:tanggal_mulai',
             'status' => 'required|in:draft,open,selesai,closed',
             'jenis' => 'required|in:langsung,penyisihan,final',
+            'bobot' => 'required|numeric|min:0|max:100',
+            'jumlah_finalis' => 'nullable|integer|min:0',
         ]);
 
-        $lomba->update($request->all());
+        $data = $request->all();
+        
+        // ❌ HAPUS INI
+        // $data['is_penyisihan_active'] = false;
+        
+        // Jika jenis bukan penyisihan, set jumlah_finalis ke 0
+        if ($request->jenis !== 'penyisihan') {
+            $data['jumlah_finalis'] = 0;
+        }
+
+        $lomba->update($data);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Lomba berhasil diupdate!'
+            ]);
+        }
 
         return redirect()->route('lomba.index')
             ->with('success', 'Lomba berhasil diupdate!');
     }
 
-    public function destroy($id): RedirectResponse
+    // ✅ DESTROY - Hapus lomba
+    public function destroy($id)
     {
         $lomba = Lomba::findOrFail($id);
         $lomba->delete();
+
+        if (request()->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Lomba berhasil dihapus!'
+            ]);
+        }
 
         return redirect()->route('lomba.index')
             ->with('success', 'Lomba berhasil dihapus!');
@@ -117,40 +163,46 @@ class LombaController extends Controller
         return view('lomba.finalis', compact('lomba', 'tim', 'finalis'));
     }
 
-    public function finalisStore(Request $request, $id_lomba): RedirectResponse
+    public function tentukanFinalisOtomatis($id_lomba): RedirectResponse
     {
-        $request->validate([
-            'id_tim' => 'required|exists:tb_tim,id_tim',
-            'peringkat' => 'nullable|integer|min:1',
-        ]);
-
         $lomba = Lomba::findOrFail($id_lomba);
+        
+        // Ambil nilai penyisihan per tim
+        $nilaiPerTim = Nilai::where('id_lomba', $id_lomba)
+            ->where('babak', 'penyisihan')
+            ->select('id_tim', 'nilai')
+            ->get()
+            ->groupBy('id_tim')
+            ->map(function($items) {
+                return $items->sum('nilai');
+            })
+            ->sortDesc()
+            ->take($lomba->jumlah_finalis);
 
-        $exists = Finalis::where('id_lomba', $id_lomba)->where('id_tim', $request->id_tim)->exists();
+        // Hapus finalis lama
+        $lomba->finalis()->delete();
 
-        if ($exists) {
-            return back()->with('error', 'Tim sudah menjadi finalis!');
+        // Simpan finalis baru
+        $peringkat = 1;
+        foreach ($nilaiPerTim as $id_tim => $totalNilai) {
+            Finalis::create([
+                'id_lomba' => $lomba->id_lomba,
+                'id_tim' => $id_tim,
+                'peringkat' => $peringkat,
+                'babak' => 'final',
+                'nilai_penyisihan' => $totalNilai,
+                'catatan' => 'Finalis otomatis dari penyisihan',
+            ]);
+            $peringkat++;
         }
 
-        Finalis::create([
-            'id_lomba' => $id_lomba,
-            'id_tim' => $request->id_tim,
-            'peringkat' => $request->peringkat,
-        ]);
-
-        return redirect()->route('lomba.finalis', $id_lomba)->with('success', 'Finalis berhasil ditambahkan!');
+        return redirect()->route('lomba.show', $id_lomba)
+            ->with('success', 'Finalis otomatis berhasil ditentukan!');
     }
 
-    public function finalisDestroy($id_lomba, $id_finalis): RedirectResponse
-    {
-        $finalis = Finalis::where('id_lomba', $id_lomba)->where('id_finalis', $id_finalis)->firstOrFail();
-        
-        $finalis->delete();
+    
 
-        return redirect()->route('lomba.finalis', $id_lomba)
-            ->with('success', 'Finalis berhasil dihapus!');
-    }
-
+    // ===== KRITERIA JURI =====
     public function kriteriaJuri($id_lomba): View
     {
         $user = Auth::user();
@@ -227,10 +279,6 @@ class LombaController extends Controller
             ->where('id_lomba', $id_lomba)
             ->firstOrFail();
 
-        if ($kriteria->penilaians()->count() > 0) {
-            return back()->with('error', 'Kriteria tidak bisa diubah karena sudah ada penilaian!');
-        }
-
         $request->validate([
             'nama_kriteria' => 'required|string|max:255',
             'deskripsi' => 'nullable|string',
@@ -257,10 +305,6 @@ class LombaController extends Controller
         
         $kriteria = Kriteria::where('id_kriteria', $id_kriteria)->where('id_lomba', $id_lomba)->firstOrFail();
 
-        if ($kriteria->penilaians()->count() > 0) {
-            return back()->with('error', 'Kriteria tidak bisa dihapus karena sudah ada penilaian!');
-        }
-        
         $kriteria->delete();
 
         return redirect()->route('juri.kriteria', $id_lomba)

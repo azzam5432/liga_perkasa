@@ -323,97 +323,6 @@
         margin-bottom: 14px;
     }
 
-    @media (max-width: 768px) {
-        .page-header {
-            flex-direction: column;
-            align-items: flex-start;
-        }
-        .page-header .btn-primary-custom {
-            align-self: flex-start;
-            font-size: 13px;
-            padding: 6px 16px;
-        }
-        .page-header h4 {
-            font-size: 18px;
-        }
-
-        .filter-bar {
-            flex-direction: column;
-            align-items: stretch;
-            padding: 10px 12px;
-        }
-        .filter-bar .search-box {
-            min-width: 100%;
-        }
-
-        .table-scroll table {
-            min-width: 500px;
-        }
-        .table-scroll table thead th {
-            font-size: 10px;
-            padding: 8px 10px;
-        }
-        .table-scroll table tbody td {
-            padding: 8px 10px;
-            font-size: 13px;
-        }
-        .col-sticky-left {
-            min-width: 130px;
-        }
-        .col-sticky-right {
-            min-width: 80px;
-        }
-        .juri-avatar {
-            width: 28px;
-            height: 28px;
-        }
-        .juri-avatar-initial {
-            width: 28px;
-            height: 28px;
-            font-size: 11px;
-        }
-    }
-
-    @media (max-width: 480px) {
-        .page-header h4 {
-            font-size: 16px;
-        }
-        .page-header .btn-primary-custom {
-            font-size: 12px;
-            padding: 5px 14px;
-        }
-        .table-scroll table {
-            min-width: 430px;
-        }
-        .table-scroll table thead th {
-            font-size: 9px;
-            padding: 6px 8px;
-        }
-        .table-scroll table tbody td {
-            padding: 6px 8px;
-            font-size: 12px;
-        }
-        .col-sticky-left {
-            min-width: 100px;
-        }
-        .col-sticky-right {
-            min-width: 70px;
-        }
-        .juri-avatar {
-            width: 24px;
-            height: 24px;
-        }
-        .juri-avatar-initial {
-            width: 24px;
-            height: 24px;
-            font-size: 10px;
-        }
-        .btn-action {
-            width: 22px;
-            height: 22px;
-            font-size: 10px;
-        }
-    }
     /* ===== MODAL STYLES ===== */
     .modal-custom .modal-content {
         border: none;
@@ -502,6 +411,55 @@
     }
 
     @media (max-width: 768px) {
+        .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .page-header .btn-primary-custom {
+            align-self: flex-start;
+            font-size: 13px;
+            padding: 6px 16px;
+        }
+        .page-header h4 {
+            font-size: 18px;
+        }
+
+        .filter-bar {
+            flex-direction: column;
+            align-items: stretch;
+            padding: 10px 12px;
+        }
+        .filter-bar .search-box {
+            min-width: 100%;
+        }
+
+        .table-scroll table {
+            min-width: 500px;
+        }
+        .table-scroll table thead th {
+            font-size: 10px;
+            padding: 8px 10px;
+        }
+        .table-scroll table tbody td {
+            padding: 8px 10px;
+            font-size: 13px;
+        }
+        .col-sticky-left {
+            min-width: 130px;
+        }
+        .col-sticky-right {
+            min-width: 80px;
+        }
+        .juri-avatar {
+            width: 28px;
+            height: 28px;
+        }
+        .juri-avatar-initial {
+            width: 28px;
+            height: 28px;
+            font-size: 11px;
+        }
+
         .modal-custom .modal-body {
             padding: 16px;
             max-height: 60vh;
@@ -516,6 +474,47 @@
         }
         .modal-custom .modal-footer .btn {
             width: 100%;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .page-header h4 {
+            font-size: 16px;
+        }
+        .page-header .btn-primary-custom {
+            font-size: 12px;
+            padding: 5px 14px;
+        }
+        .table-scroll table {
+            min-width: 430px;
+        }
+        .table-scroll table thead th {
+            font-size: 9px;
+            padding: 6px 8px;
+        }
+        .table-scroll table tbody td {
+            padding: 6px 8px;
+            font-size: 12px;
+        }
+        .col-sticky-left {
+            min-width: 100px;
+        }
+        .col-sticky-right {
+            min-width: 70px;
+        }
+        .juri-avatar {
+            width: 24px;
+            height: 24px;
+        }
+        .juri-avatar-initial {
+            width: 24px;
+            height: 24px;
+            font-size: 10px;
+        }
+        .btn-action {
+            width: 22px;
+            height: 22px;
+            font-size: 10px;
         }
     }
 </style>
@@ -587,12 +586,12 @@
                         <td style="font-size: 13px;">{{ $item->spesialisasi ?? '-' }}</td>
                         <td class="col-sticky-right text-center">
                             <div class="d-flex gap-1 justify-content-center">
+                                {{-- ✅ PERBAIKI: Hapus totalPenilaian --}}
                                 <button class="btn-action btn-info" title="Detail" onclick="openShowJuriModal(
                                     {{ $item->id_juri }},
                                     '{{ addslashes($item->user->name) }}',
                                     '{{ addslashes($item->user->email) }}',
                                     '{{ addslashes($item->spesialisasi) }}',
-                                    {{ $item->penilaians->count() }},
                                     '{{ $item->created_at ? $item->created_at->format('d F Y H:i') : '' }}',
                                     '{{ $item->updated_at ? $item->updated_at->format('d F Y H:i') : '' }}',
                                     '{{ $item->user->foto_profil ? asset('uploads/profil/' . $item->user->foto_profil) : '' }}'
@@ -622,9 +621,10 @@
                                 <i class="fas fa-user-tie"></i>
                                 <h6>Belum ada data juri</h6>
                                 <p>Silakan tambahkan juri baru melalui tombol di atas.</p>
-                                <a href="{{ route('juri.create') }}" class="btn-primary-custom" style="display: inline-flex; border: none;">
+                                {{-- ✅ PERBAIKI: Ganti link dengan tombol modal --}}
+                                <button class="btn-primary-custom" onclick="openTambahJuriModal()" style="display: inline-flex; border: none;">
                                     <i class="fas fa-plus me-1"></i> Tambah Juri
-                                </a>
+                                </button>
                             </div>
                         </td>
                     </tr>
@@ -659,7 +659,7 @@
 
                     <div class="mb-3">
                         <label for="modal_user_id" class="form-label">Pilih Panitia <span class="text-danger">*</span></label>
-                        <select class="form-control" id="modal_user_id" name="user_id" required>
+                        <select class="form-select" id="modal_user_id" name="user_id" required>
                             <option value="">-- Pilih Panitia --</option>
                             @foreach($users ?? [] as $user)
                                 <option value="{{ $user->id }}">{{ $user->name }} - {{ $user->email }}</option>
@@ -752,12 +752,6 @@
                         <div class="mb-3">
                             <label class="text-muted small fw-bold d-block">Bidang Penjurian</label>
                             <p class="fw-semibold" id="showJuriSpesialisasi">-</p>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label class="text-muted small fw-bold d-block">Total Penilaian</label>
-                            <p class="fw-semibold" id="showJuriTotalPenilaian">0</p>
                         </div>
                     </div>
                 </div>
@@ -899,12 +893,32 @@ function attachPaginationListeners() {
 }
 
 // ===== MODAL TAMBAH JURI =====
+function openTambahJuriModal() {
+    const modal = new bootstrap.Modal(document.getElementById('tambahJuriModal'));
+    modal.show();
+}
+
 document.getElementById('btnSimpanJuri').addEventListener('click', function() {
     const form = document.getElementById('formTambahJuri');
     const formData = new FormData(form);
     const btn = this;
     const modalElement = document.getElementById('tambahJuriModal');
     const modal = bootstrap.Modal.getInstance(modalElement);
+
+    // Validasi
+    const user_id = document.getElementById('modal_user_id').value;
+    const spesialisasi = document.getElementById('modal_spesialisasi').value.trim();
+
+    if (!user_id) {
+        alert('Silakan pilih panitia terlebih dahulu!');
+        return;
+    }
+
+    if (!spesialisasi) {
+        alert('Bidang penjurian wajib diisi!');
+        document.getElementById('modal_spesialisasi').focus();
+        return;
+    }
 
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span> Menyimpan...';
@@ -939,11 +953,6 @@ document.getElementById('btnSimpanJuri').addEventListener('click', function() {
     });
 });
 
-function openTambahJuriModal() {
-    const modal = new bootstrap.Modal(document.getElementById('tambahJuriModal'));
-    modal.show();
-}
-
 // ===== MODAL EDIT JURI =====
 function openEditJuriModal(id, name, email, spesialisasi) {
     const modalElement = document.getElementById('editJuriModal');
@@ -951,8 +960,6 @@ function openEditJuriModal(id, name, email, spesialisasi) {
     
     document.getElementById('formEditJuri').action = '/juri/' + id;
     document.getElementById('edit_juri_id').value = id;
-    
-    // Isi data
     document.getElementById('edit_juri_name').textContent = name || '-';
     document.getElementById('edit_juri_email').textContent = email || '-';
     document.getElementById('edit_spesialisasi').value = spesialisasi || '';
@@ -966,6 +973,14 @@ document.getElementById('btnUpdateJuri').addEventListener('click', function() {
     const btn = this;
     const modalElement = document.getElementById('editJuriModal');
     const modal = bootstrap.Modal.getInstance(modalElement);
+
+    const spesialisasi = document.getElementById('edit_spesialisasi').value.trim();
+
+    if (!spesialisasi) {
+        alert('Bidang penjurian wajib diisi!');
+        document.getElementById('edit_spesialisasi').focus();
+        return;
+    }
 
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span> Mengupdate...';
@@ -1000,14 +1015,13 @@ document.getElementById('btnUpdateJuri').addEventListener('click', function() {
 });
 
 // ===== MODAL SHOW JURI =====
-function openShowJuriModal(id, name, email, spesialisasi, totalPenilaian, created_at, updated_at, foto) {
+function openShowJuriModal(id, name, email, spesialisasi, created_at, updated_at, foto) {
     const modalElement = document.getElementById('showJuriModal');
     const modal = new bootstrap.Modal(modalElement);
     
     document.getElementById('showJuriName').textContent = name || '-';
     document.getElementById('showJuriEmail').textContent = email || '-';
     document.getElementById('showJuriSpesialisasi').textContent = spesialisasi || '-';
-    document.getElementById('showJuriTotalPenilaian').textContent = totalPenilaian || 0;
     document.getElementById('showJuriCreatedAt').textContent = created_at || '-';
     document.getElementById('showJuriUpdatedAt').textContent = updated_at || '-';
     
@@ -1076,13 +1090,6 @@ document.addEventListener('DOMContentLoaded', function() {
         currentPage = parseInt(page);
         fetchData(searchParam, currentPage);
     }
-
-    // Tombol Tambah Juri buka modal
-    document.querySelector('.btn-primary-custom[href="{{ route('juri.create') }}"]')?.addEventListener('click', function(e) {
-        e.preventDefault();
-        const modal = new bootstrap.Modal(document.getElementById('tambahJuriModal'));
-        modal.show();
-    });
 });
 </script>
 @endsection

@@ -1,4 +1,4 @@
-@extends('layouts.master')
+@extends('layouts.public')
 
 @section('title', 'Ranking Lomba')
 
@@ -359,7 +359,13 @@
                             @endif
                         </td>
                         <td class="fw-semibold">{{ $item['tim']->nama_tim }}</td>
-                        <td>{{ $item['total_nilai'] }}</td>
+                        <td>
+                            @if(is_float($item['total_nilai']) && floor($item['total_nilai']) != $item['total_nilai'])
+                                {{ number_format($item['total_nilai'], 1, ',', '.') }}
+                            @else
+                                {{ number_format($item['total_nilai'], 0, ',', '.') }}
+                            @endif
+                        </td>
                         <td>{{ $item['jml_menang'] }}</td>
                         <td style="text-align: center;">
                             <button class="btn-action btn-info" title="Detail" onclick="openShowRankingModal(
@@ -472,23 +478,23 @@ function filterTable() {
 function openShowRankingModal(namaTim, totalNilai, jumlahMenang, detail, timData) {
     const modalElement = document.getElementById('showRankingModal');
     const modal = new bootstrap.Modal(modalElement);
-    
+
     document.getElementById('showNamaTim').textContent = namaTim || '-';
-    document.getElementById('showTotalNilai').textContent = totalNilai || 0;
+    document.getElementById('showTotalNilai').textContent = parseFloat(totalNilai).toFixed(1).replace('.', ',');
     document.getElementById('showJumlahMenang').textContent = jumlahMenang || 0;
-    
+
     const ketuaContainer = document.getElementById('showKetuaTim');
     const dosenContainer = document.getElementById('showDosenPembimbing');
     const kakakContainer = document.getElementById('showKakakPembimbing');
     const anggotaContainer = document.getElementById('showAnggotaTim');
     const detailContainer = document.getElementById('showDetailLomba');
-    
+
     if (timData && timData.pesertas) {
         const ketua = timData.pesertas.find(p => p.ketua_peserta);
         const anggota = timData.pesertas.filter(p => !p.ketua_peserta);
-        
+
         ketuaContainer.innerHTML = ketua ? `<ul class="info-list"><li>${ketua.ketua_peserta || '-'}</li></ul>` : '<ul class="info-list"><li>-</li></ul>';
-        
+
         if (anggota.length > 0) {
             anggotaContainer.innerHTML = '<ul class="info-list">' + anggota.map(function(member) {
                 return `<li>${member.nama_peserta || '-'}</li>`;
@@ -500,7 +506,7 @@ function openShowRankingModal(namaTim, totalNilai, jumlahMenang, detail, timData
         ketuaContainer.innerHTML = '<ul class="info-list"><li>-</li></ul>';
         anggotaContainer.innerHTML = '<ul class="info-list"><li>-</li></ul>';
     }
-    
+
     if (timData && timData.dosen_pembimbing) {
         const dosen = timData.dosen_pembimbing;
         dosenContainer.innerHTML = dosen.length > 0 ? '<ul class="info-list">' + dosen.map(function(d) {
@@ -509,7 +515,7 @@ function openShowRankingModal(namaTim, totalNilai, jumlahMenang, detail, timData
     } else {
         dosenContainer.innerHTML = '<ul class="info-list"><li>-</li></ul>';
     }
-    
+
     if (timData && timData.kakak_pembimbing) {
         const kakak = timData.kakak_pembimbing;
         kakakContainer.innerHTML = kakak.length > 0 ? '<ul class="info-list">' + kakak.map(function(k) {
@@ -518,7 +524,7 @@ function openShowRankingModal(namaTim, totalNilai, jumlahMenang, detail, timData
     } else {
         kakakContainer.innerHTML = '<ul class="info-list"><li>-</li></ul>';
     }
-    
+
     if (detail && Array.isArray(detail) && detail.length > 0) {
         let html = '';
         detail.forEach(function(item) {
@@ -536,7 +542,7 @@ function openShowRankingModal(namaTim, totalNilai, jumlahMenang, detail, timData
     } else {
         detailContainer.innerHTML = '<div class="text-center text-muted py-3">Tidak ada data</div>';
     }
-    
+
     modal.show();
 }
 </script>

@@ -141,9 +141,9 @@ class NilaiController extends Controller
         }
 
         $bobot = (float) $lomba->bobot;
-        $poinJuara1 = $bobot * 3;
-        $poinJuara2 = $bobot * 2;
-        $poinJuara3 = $bobot * 1;
+        $poinJuara1 = round($bobot * 3, 2);
+        $poinJuara2 = round($bobot * 2, 2);
+        $poinJuara3 = round($bobot * 1, 2);
 
         Nilai::create([
             'id_tim' => $request->juara_1,

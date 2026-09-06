@@ -9,12 +9,14 @@ use App\Http\Controllers\PanitiaController;
 use App\Http\Controllers\SuperAdminDashboardController;
 use App\Http\Controllers\JuriLombaController;
 use App\Http\Controllers\FinalisController;
-use App\Http\Controllers\NilaiController;
+use App\Http\Controllers\NilaiController;   
 use Illuminate\Support\Facades\Route;
 
 Route::get('/login', [LoginController::class, 'show'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
+Route::get('/ranking', [FinalisController::class, 'ranking'])->name('ranking');
 
 Route::middleware(['auth', 'panitia'])->group(function () {
     
@@ -46,10 +48,6 @@ Route::middleware(['auth', 'super_admin'])->group(function () {
     
     Route::resource('juri_lomba', JuriLombaController::class);
     Route::get('/get-juri-by-lomba/{id_lomba}', [JuriLombaController::class, 'getJuriByLomba'])->name('get.juri.by.lomba');
-});
-
-Route::middleware(['auth'])->group(function () {
-    Route::get('/ranking', [FinalisController::class, 'ranking'])->name('ranking');
 });
 
 Route::get('/', function () {

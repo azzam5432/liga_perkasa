@@ -190,6 +190,14 @@
         <a href="{{ route('lomba.index') }}" class="btn-secondary-custom">
             <i class="fas fa-arrow-left"></i> Kembali
         </a>
+        
+        {{-- ✅ TOMBOL NILAI FINAL (JIKA FINAL SUDAH AKTIF) --}}
+        @if($lomba->is_final_active)
+            <a href="{{ route('nilai.create', $lomba->id_lomba) }}" class="btn-primary-custom">
+                <i class="fas fa-pen"></i> Nilai Final
+            </a>
+        @endif
+        
         @if($lomba->finalis()->count() > 0 && !$lomba->is_final_active)
             <form action="{{ route('finalis.aktifkan-final', $lomba->id_lomba) }}" method="POST" class="d-inline">
                 @csrf

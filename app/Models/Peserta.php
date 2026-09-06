@@ -1,4 +1,5 @@
 <?php
+// app/Models/Peserta.php
 
 namespace App\Models;
 
@@ -15,6 +16,8 @@ class Peserta extends Model
         'nama_peserta',
         'prodi',
         'no_telp',
+        'dosen_pembimbing',
+        'kakak_pembimbing',
     ];
 
     public function tim()

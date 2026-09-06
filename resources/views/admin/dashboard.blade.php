@@ -4,194 +4,196 @@
 
 @section('content')
 <style>
-    .stat-card {
-        border: 1px solid #e2e8f0;
-        border-radius: 12px;
-        padding: 18px 20px;
-        transition: all 0.3s ease;
+    .welcome-bar {
         background: #ffffff;
+        border-radius: 16px;
+        padding: 24px;
+        margin-bottom: 24px;
+        color: #1a2332;
+        border: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .welcome-bar .welcome-text h4 {
+        font-weight: 700;
+        margin: 0;
+        font-size: 22px;
+    }
+
+    .welcome-bar .welcome-text p {
+        margin: 4px 0 0;
+        opacity: 0.85;
+        font-size: 14px;
+        color: #718096;
+    }
+
+    .welcome-badges {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .welcome-badges .badge {
+        background: #f7fafc;
+        color: #4a5568;
+        padding: 8px 16px;
+        font-weight: 500;
+        font-size: 12px;
+        border-radius: 20px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 14px;
+        padding: 16px;
+        border: 1px solid #e2e8f0;
+        transition: all 0.3s ease;
+        height: 100%;
     }
 
     .stat-card:hover {
         transform: translateY(-4px);
-        box-shadow: 0 8px 25px rgba(0,0,0,0.08);
-        border-color: #1a365d;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        border-color: #cbd5e0;
     }
 
-    .stat-card .stat-icon {
-        width: 44px;
-        height: 44px;
+    .stat-icon {
+        width: 40px;
+        height: 40px;
         border-radius: 10px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 18px;
-        color: #1a365d;
-        background: #ebf4ff;
+        font-size: 16px;
         margin-bottom: 10px;
     }
 
-    .stat-card .stat-number {
-        font-size: 28px;
-        font-weight: 700;
+    .stat-icon-blue { background: #ebf8ff; color: #2b6cb0; }
+    .stat-icon-green { background: #c6f6d5; color: #22543d; }
+    .stat-icon-purple { background: #f3e8ff; color: #6b46c1; }
+    .stat-icon-orange { background: #feebc8; color: #c05621; }
+
+    .stat-number {
+        font-size: 26px;
+        font-weight: 800;
         color: #1a2332;
-        margin-bottom: 2px;
+        line-height: 1.2;
     }
 
-    .stat-card .stat-label {
+    .stat-label {
         color: #718096;
-        font-size: 13px;
-        font-weight: 500;
-    }
-
-    .stat-card .stat-growth {
         font-size: 12px;
-        font-weight: 600;
-        margin-top: 6px;
-        display: inline-block;
-        padding: 2px 10px;
-        border-radius: 20px;
-    }
-
-    .stat-growth.positive {
-        background: #c6f6d5;
-        color: #22543d;
-    }
-
-    .stat-growth.negative {
-        background: #fed7d7;
-        color: #9b2c2c;
-    }
-
-    .stat-growth.neutral {
-        background: #e2e8f0;
-        color: #4a5568;
+        font-weight: 500;
+        margin-top: 2px;
     }
 
     .dashboard-card {
+        background: white;
+        border-radius: 14px;
         border: 1px solid #e2e8f0;
-        border-radius: 12px;
-        transition: all 0.3s ease;
-        background: #ffffff;
-        height: 100%;
+        overflow: hidden;
     }
 
-    .dashboard-card:hover {
-        box-shadow: 0 8px 25px rgba(0,0,0,0.06);
-    }
-
-    .dashboard-card .card-header-custom {
-        background: transparent;
-        border-bottom: 1px solid #e2e8f0;
-        padding: 14px 20px;
+    .card-header-custom {
+        padding: 16px 20px;
         font-weight: 600;
+        font-size: 14px;
         color: #1a2332;
-        font-size: 15px;
+        border-bottom: 1px solid #edf2f7;
+        background: #fafafa;
     }
 
     .activity-item {
         display: flex;
-        align-items: center;
-        padding: 10px 0;
+        gap: 12px;
+        padding: 12px 0;
         border-bottom: 1px solid #f7fafc;
-        transition: all 0.2s ease;
     }
 
-    .activity-item:last-child {
-        border-bottom: none;
-    }
-
-    .activity-item:hover {
-        background: #f7fafc;
-        padding-left: 8px;
-        border-radius: 6px;
-    }
+    .activity-item:last-child { border-bottom: none; }
 
     .activity-icon {
         width: 36px;
         height: 36px;
-        border-radius: 8px;
+        border-radius: 10px;
         display: flex;
         align-items: center;
         justify-content: center;
-        color: white;
-        margin-right: 12px;
         flex-shrink: 0;
         font-size: 14px;
     }
 
-    .activity-content {
-        flex: 1;
-    }
+    .activity-content { flex: 1; }
 
-    .activity-content .activity-user {
+    .activity-user {
         font-weight: 600;
-        color: #1a2332;
-        font-size: 14px;
-    }
-
-    .activity-content .activity-action {
-        color: #718096;
         font-size: 13px;
+        color: #1a2332;
     }
 
-    .activity-content .activity-time {
-        color: #a0aec0;
+    .activity-action {
+        color: #718096;
         font-size: 12px;
+    }
+
+    .activity-time {
+        color: #a0aec0;
+        font-size: 11px;
+        margin-top: 4px;
     }
 
     .chart-container {
         position: relative;
-        height: 220px;
-        padding: 6px 0;
+        height: 260px;
     }
 
     .tim-item {
         display: flex;
         align-items: center;
-        padding: 8px 0;
+        padding: 10px 0;
         border-bottom: 1px solid #f7fafc;
+        gap: 12px;
     }
 
-    .tim-item:last-child {
-        border-bottom: none;
-    }
+    .tim-item:last-child { border-bottom: none; }
 
-    .tim-item .tim-avatar {
-        width: 40px;
-        height: 40px;
+    .tim-avatar {
+        width: 42px;
+        height: 42px;
         border-radius: 50%;
-        background: #ebf4ff;
-        color: #1a365d;
         display: flex;
         align-items: center;
         justify-content: center;
         font-weight: 700;
-        font-size: 16px;
-        margin-right: 12px;
+        font-size: 15px;
+        background: #ebf4ff;
+        color: #2b6cb0;
         flex-shrink: 0;
     }
 
-    .tim-item .tim-info {
-        flex: 1;
-    }
+    .tim-info { flex: 1; }
 
-    .tim-item .tim-info .tim-name {
+    .tim-name {
         font-weight: 600;
-        color: #1a2332;
         font-size: 14px;
+        color: #1a2332;
     }
 
-    .tim-item .tim-info .tim-detail {
+    .tim-detail {
         font-size: 12px;
         color: #718096;
     }
 
-    .tim-item .tim-badge {
-        padding: 2px 12px;
-        border-radius: 20px;
+    .tim-badge {
         font-size: 11px;
         font-weight: 600;
+        padding: 4px 12px;
+        border-radius: 20px;
         background: #c6f6d5;
         color: #22543d;
     }
@@ -199,134 +201,108 @@
     .panitia-item {
         display: flex;
         align-items: center;
-        padding: 8px 0;
+        padding: 10px 0;
         border-bottom: 1px solid #f7fafc;
-        transition: all 0.2s ease;
+        gap: 12px;
     }
 
-    .panitia-item:last-child {
-        border-bottom: none;
-    }
-
-    .panitia-item:hover {
-        background: #f7fafc;
-        padding-left: 8px;
-        border-radius: 6px;
-    }
+    .panitia-item:last-child { border-bottom: none; }
 
     .panitia-avatar {
-        width: 36px;
-        height: 36px;
+        width: 40px;
+        height: 40px;
         border-radius: 50%;
         object-fit: cover;
-        margin-right: 12px;
         border: 2px solid #e2e8f0;
         flex-shrink: 0;
     }
 
     .panitia-avatar-initial {
-        width: 36px;
-        height: 36px;
+        width: 40px;
+        height: 40px;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 14px;
         font-weight: 700;
-        color: white;
-        margin-right: 12px;
-        flex-shrink: 0;
-        border: 2px solid #e2e8f0;
-    }
-
-    .panitia-item .panitia-info {
-        flex: 1;
-    }
-
-    .panitia-item .panitia-info .panitia-name {
-        font-weight: 600;
-        color: #1a2332;
         font-size: 14px;
+        color: white;
+        border: 2px solid #e2e8f0;
+        flex-shrink: 0;
     }
 
-    .panitia-item .panitia-info .panitia-jabatan {
+    .panitia-info { flex: 1; }
+
+    .panitia-name {
+        font-weight: 600;
+        font-size: 14px;
+        color: #1a2332;
+    }
+
+    .panitia-jabatan {
         font-size: 12px;
         color: #718096;
     }
 
     .badge-role {
-        padding: 2px 12px;
-        border-radius: 20px;
         font-size: 10px;
         font-weight: 600;
-        flex-shrink: 0;
-        background: #ebf4ff;
-        color: #1a365d;
+        padding: 4px 10px;
+        border-radius: 20px;
     }
 
     .badge-role-superadmin {
-        background: #9f7aea;
-        color: white;
+        background: #f3e8ff;
+        color: #6b46c1;
     }
 
     .badge-role-panitia {
-        background: #48bb78;
-        color: white;
+        background: #c6f6d5;
+        color: #22543d;
     }
 
-    .welcome-bar {
-        padding: 12px 0 20px 0;
-        border-bottom: 1px solid #e2e8f0;
-        margin-bottom: 20px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        flex-wrap: wrap;
-        gap: 10px;
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: #a0aec0;
     }
 
-    .welcome-bar .welcome-text h4 {
-        font-weight: 700;
-        color: #1a2332;
-        margin: 0;
-        font-size: 20px;
-    }
-
-    .welcome-bar .welcome-text p {
-        color: #718096;
-        margin: 0;
-        font-size: 14px;
-    }
-
-    .welcome-bar .welcome-badges {
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-    }
-
-    .welcome-bar .welcome-badges .badge {
-        padding: 6px 14px;
-        font-weight: 500;
-        font-size: 12px;
-        border: 1px solid #e2e8f0;
-        background: #ffffff;
-        color: #4a5568;
-    }
-
-    .welcome-bar .welcome-badges .badge i {
-        margin-right: 6px;
+    .empty-state i {
+        font-size: 40px;
+        margin-bottom: 12px;
+        display: block;
     }
 
     @media (max-width: 768px) {
-        .stat-card .stat-number {
-            font-size: 22px;
-        }
         .welcome-bar {
-            flex-direction: column;
-            align-items: flex-start;
+            padding: 18px;
         }
         .welcome-bar .welcome-text h4 {
             font-size: 18px;
+        }
+        .stat-number {
+            font-size: 22px;
+        }
+        .chart-container {
+            height: 200px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .stat-card {
+            padding: 12px;
+        }
+        .stat-icon {
+            width: 36px;
+            height: 36px;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        .stat-number {
+            font-size: 20px;
+        }
+        .stat-label {
+            font-size: 11px;
         }
     }
 </style>
@@ -337,77 +313,53 @@
         <p>Super Admin — {{ now()->format('l, d F Y') }}</p>
     </div>
     <div class="welcome-badges">
-        <span class="badge">
-            <i class="fas fa-circle text-success" style="font-size: 8px;"></i> Sistem Online
-        </span>
-        <span class="badge">
-            <i class="fas fa-clock"></i> {{ now()->format('H:i') }} WIB
-        </span>
+        <span class="badge"><i class="fas fa-circle text-success me-1" style="font-size: 8px;"></i> Sistem Online</span>
+        <span class="badge"><i class="fas fa-clock me-1"></i> {{ now()->format('H:i') }} WIB</span>
     </div>
 </div>
 
-<div class="row">
-    <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12 mb-4">
-        <div class="card stat-card">
-            <div class="stat-icon">
-                <i class="fas fa-users"></i>
-            </div>
+<div class="row g-3 row-cols-2 row-cols-md-2 row-cols-lg-2 row-cols-xl-4">
+    <div class="col">
+        <div class="stat-card">
+            <div class="stat-icon stat-icon-blue"><i class="fas fa-users"></i></div>
             <div class="stat-number">{{ $totalPanitia }}</div>
             <div class="stat-label">Total Panitia</div>
-            <div class="stat-growth positive">
-                <i class="fas fa-arrow-up me-1"></i> 12%
-            </div>
         </div>
     </div>
 
-    <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12 mb-4">
-        <div class="card stat-card">
-            <div class="stat-icon">
-                <i class="fas fa-user-shield"></i>
-            </div>
+    <div class="col">
+        <div class="stat-card">
+            <div class="stat-icon stat-icon-purple"><i class="fas fa-user-shield"></i></div>
             <div class="stat-number">{{ $totalSuperAdmin }}</div>
             <div class="stat-label">Super Admin</div>
-            <div class="stat-growth neutral">
-                <i class="fas fa-minus me-1"></i> Stabil
-            </div>
         </div>
     </div>
 
-    <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12 mb-4">
-        <div class="card stat-card">
-            <div class="stat-icon">
-                <i class="fas fa-users"></i>
-            </div>
+    <div class="col">
+        <div class="stat-card">
+            <div class="stat-icon stat-icon-green"><i class="fas fa-users"></i></div>
             <div class="stat-number">{{ $totalTim }}</div>
             <div class="stat-label">Total Tim</div>
-            <div class="stat-growth positive">
-                <i class="fas fa-arrow-up me-1"></i> {{ $pertumbuhanBulanIni }}%
-            </div>
         </div>
     </div>
 
-    <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12 mb-4">
-        <div class="card stat-card">
-            <div class="stat-icon">
-                <i class="fas fa-trophy"></i>
-            </div>
+    <div class="col">
+        <div class="stat-card">
+            <div class="stat-icon stat-icon-orange"><i class="fas fa-trophy"></i></div>
             <div class="stat-number">{{ $totalLomba }}</div>
             <div class="stat-label">Total Lomba</div>
-            <div class="stat-growth positive">
-                <i class="fas fa-arrow-up me-1"></i> 8%
-            </div>
         </div>
     </div>
 </div>
 
-<div class="row">
-    <div class="col-xl-8 col-lg-7 col-md-12 mb-4">
-        <div class="card dashboard-card">
+<div class="row g-3 mt-1">
+    <div class="col-xl-8 col-lg-7 col-12">
+        <div class="dashboard-card">
             <div class="card-header-custom d-flex justify-content-between align-items-center">
-                <span><i class="fas fa-chart-bar text-dark me-2"></i> Statistik Pendaftaran Tim</span>
-                <span class="badge bg-light text-dark" style="font-weight: 400; font-size: 11px;">6 Bulan Terakhir</span>
+                <span><i class="fas fa-chart-bar me-2 text-primary"></i> Statistik Pendaftaran Tim</span>
+                <span class="badge bg-light text-dark" style="font-size: 11px; font-weight: 400;">6 Bulan</span>
             </div>
-            <div class="card-body">
+            <div class="card-body p-3">
                 <div class="chart-container">
                     <canvas id="pendaftaranChart"></canvas>
                 </div>
@@ -415,16 +367,16 @@
         </div>
     </div>
 
-    <div class="col-xl-4 col-lg-5 col-md-12 mb-4">
-        <div class="card dashboard-card">
+    <div class="col-xl-4 col-lg-5 col-12">
+        <div class="dashboard-card">
             <div class="card-header-custom d-flex justify-content-between align-items-center">
-                <span><i class="fas fa-bell text-dark me-2"></i> Aktivitas Terakhir</span>
-                <span class="badge " style="font-size: 11px;">{{ $aktivitasTerakhir->count() }}</span>
+                <span><i class="fas fa-bell me-2 text-warning"></i> Aktivitas Terakhir</span>
+                <span class="badge bg-primary" style="font-size: 11px;">{{ $aktivitasTerakhir->count() }}</span>
             </div>
-            <div class="card-body p-3" style="max-height: 230px; overflow-y: auto;">
+            <div class="card-body p-3" style="max-height: 300px; overflow-y: auto;">
                 @forelse ($aktivitasTerakhir as $activity)
                 <div class="activity-item">
-                    <div class="activity-icon bg-gradient-{{ $activity['color'] }}" style="background: #ebf4ff; color: #1a365d;">
+                    <div class="activity-icon" style="background: #ebf4ff; color: #2b6cb0;">
                         <i class="fas {{ $activity['icon'] }}"></i>
                     </div>
                     <div class="activity-content">
@@ -432,15 +384,13 @@
                             <span class="activity-user">{{ $activity['user'] }}</span>
                             <span class="activity-action">{{ $activity['action'] }}</span>
                         </div>
-                        <div class="activity-time">
-                            <i class="far fa-clock me-1"></i> {{ $activity['time'] }}
-                        </div>
+                        <div class="activity-time"><i class="far fa-clock me-1"></i> {{ $activity['time'] }}</div>
                     </div>
                 </div>
                 @empty
-                <div class="text-center text-muted py-4">
-                    <i class="fas fa-inbox fa-3x mb-3 d-block"></i>
-                    <p>Belum ada aktivitas</p>
+                <div class="empty-state">
+                    <i class="fas fa-inbox"></i>
+                    <p class="mb-0">Belum ada aktivitas</p>
                 </div>
                 @endforelse
             </div>
@@ -448,19 +398,17 @@
     </div>
 </div>
 
-<div class="row">
-    <div class="col-xl-6 col-lg-6 col-md-12 mb-4">
-        <div class="card dashboard-card">
+<div class="row g-3 mt-1">
+    <div class="col-xl-6 col-lg-6 col-12">
+        <div class="dashboard-card">
             <div class="card-header-custom d-flex justify-content-between align-items-center">
-                <span><i class="fas fa-users text-dark me-2"></i> Tim Terbaru</span>
+                <span><i class="fas fa-users me-2 text-success"></i> Tim Terbaru</span>
                 <a href="{{ route('panitia.index') }}" class="btn btn-sm btn-outline-primary" style="font-size: 12px; padding: 4px 12px;">Lihat Semua</a>
             </div>
-            <div class="card-body p-3" style="max-height: 260px; overflow-y: auto;">
+            <div class="card-body p-3" style="max-height: 280px; overflow-y: auto;">
                 @forelse ($timTerbaru as $tim)
                 <div class="tim-item">
-                    <div class="tim-avatar">
-                        {{ strtoupper(substr($tim->nama_tim, 0, 2)) }}
-                    </div>
+                    <div class="tim-avatar">{{ strtoupper(substr($tim->nama_tim, 0, 2)) }}</div>
                     <div class="tim-info">
                         <div class="tim-name">{{ $tim->nama_tim }}</div>
                         <div class="tim-detail">
@@ -472,49 +420,41 @@
                     <span class="tim-badge">Active</span>
                 </div>
                 @empty
-                <div class="text-center text-muted py-4">
-                    <i class="fas fa-users fa-3x mb-3 d-block"></i>
-                    <p>Belum ada tim terdaftar</p>
+                <div class="empty-state">
+                    <i class="fas fa-users"></i>
+                    <p class="mb-0">Belum ada tim terdaftar</p>
                 </div>
                 @endforelse
             </div>
         </div>
     </div>
 
-    <div class="col-xl-6 col-lg-6 col-md-12 mb-4">
-        <div class="card dashboard-card">
+    <div class="col-xl-6 col-lg-6 col-12">
+        <div class="dashboard-card">
             <div class="card-header-custom d-flex justify-content-between align-items-center">
-                <span><i class="fas fa-user-plus text-dark me-2"></i> Panitia Terbaru</span>
+                <span><i class="fas fa-user-plus me-2 text-info"></i> Panitia Terbaru</span>
                 <a href="{{ route('admin.index') }}" class="btn btn-sm btn-outline-primary" style="font-size: 12px; padding: 4px 12px;">Lihat Semua</a>
             </div>
-            <div class="card-body p-3" style="max-height: 260px; overflow-y: auto;">
+            <div class="card-body p-3" style="max-height: 280px; overflow-y: auto;">
                 @forelse ($panitiaTerbaru as $panitia)
                 <div class="panitia-item">
                     @if($panitia->foto_profil && file_exists(public_path('uploads/profil/' . $panitia->foto_profil)))
-                        <img src="{{ asset('uploads/profil/' . $panitia->foto_profil) }}" 
-                             alt="{{ $panitia->name }}" 
-                             class="panitia-avatar">
+                        <img src="{{ asset('uploads/profil/' . $panitia->foto_profil) }}" alt="{{ $panitia->name }}" class="panitia-avatar">
                     @else
-                        <div class="panitia-avatar-initial" 
-                             style="background: {{ $panitia->avatar_color ?? '#667eea' }};">
+                        <div class="panitia-avatar-initial" style="background: {{ $panitia->avatar_color ?? '#667eea' }};">
                             {{ $panitia->initials ?? strtoupper(substr($panitia->name, 0, 2)) }}
                         </div>
                     @endif
-                    
                     <div class="panitia-info">
                         <div class="panitia-name">{{ $panitia->name }}</div>
-                        <div class="panitia-jabatan">
-                            <i class="fas fa-briefcase me-1"></i> {{ $panitia->jabatan ?? 'Tanpa Jabatan' }}
-                        </div>
+                        <div class="panitia-jabatan"><i class="fas fa-briefcase me-1"></i> {{ $panitia->jabatan ?? 'Tanpa Jabatan' }}</div>
                     </div>
-                    <span class="badge-role badge-role-panitia">
-                        Panitia
-                    </span>
+                    <span class="badge-role badge-role-panitia">Panitia</span>
                 </div>
                 @empty
-                <div class="text-center text-muted py-4">
-                    <i class="fas fa-user-plus fa-3x mb-3 d-block"></i>
-                    <p>Belum ada panitia terdaftar</p>
+                <div class="empty-state">
+                    <i class="fas fa-user-plus"></i>
+                    <p class="mb-0">Belum ada panitia terdaftar</p>
                 </div>
                 @endforelse
             </div>
@@ -555,9 +495,7 @@ document.addEventListener('DOMContentLoaded', function() {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: {
-                    display: false
-                },
+                legend: { display: false },
                 tooltip: {
                     backgroundColor: 'rgba(255, 255, 255, 0.95)',
                     titleColor: '#1a2332',
@@ -576,28 +514,15 @@ document.addEventListener('DOMContentLoaded', function() {
             scales: {
                 y: {
                     beginAtZero: true,
-                    ticks: {
-                        stepSize: 1,
-                        font: { size: 11 }
-                    },
-                    grid: {
-                        color: 'rgba(0, 0, 0, 0.04)',
-                        drawBorder: false
-                    }
+                    ticks: { stepSize: 1, font: { size: 11 } },
+                    grid: { color: 'rgba(0, 0, 0, 0.04)', drawBorder: false }
                 },
                 x: {
-                    grid: {
-                        display: false
-                    },
-                    ticks: {
-                        font: { size: 11 }
-                    }
+                    grid: { display: false },
+                    ticks: { font: { size: 11 } }
                 }
             },
-            interaction: {
-                intersect: false,
-                mode: 'index'
-            }
+            interaction: { intersect: false, mode: 'index' }
         }
     });
 });

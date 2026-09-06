@@ -2,7 +2,6 @@
 @section('title', 'Data Panitia')
 @section('content')
 <style>
-/* ===== CSS ===== */
 .page-header {
     display: flex;
     justify-content: space-between;
@@ -138,7 +137,6 @@
     border-collapse: collapse;
     margin-bottom: 0;
     font-size: 14px;
-    min-width: 600px;
 }
 
 .table-scroll table thead th {
@@ -397,7 +395,6 @@
     margin-bottom: 14px;
 }
 
-/* ===== MODAL STYLES ===== */
 .modal-custom .modal-content {
     border: none;
     border-radius: 12px;
@@ -482,31 +479,86 @@
     cursor: not-allowed;
 }
 
-/* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
     .page-header {
-        flex-direction: column;
-        align-items: flex-start;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
     }
     .page-header .btn-primary-custom {
-        align-self: flex-start;
-        font-size: 13px;
-        padding: 6px 16px;
+        margin-left: 0;
+        font-size: 12px;
+        padding: 6px 14px;
     }
     .page-header h4 {
-        font-size: 18px;
+        font-size: 16px;
+        margin: 0;
     }
 
     .filter-bar {
-        flex-direction: column;
-        align-items: stretch;
+        flex-direction: row;
+        align-items: center;
         padding: 10px 12px;
+        gap: 8px;
     }
     .filter-bar .search-box {
-        min-width: 100%;
+        flex: 1;
+        min-width: 0;
     }
     .filter-bar .filter-select {
-        min-width: 100%;
+        min-width: 110px;
+    }
+
+    .table-scroll table thead th:nth-child(1),
+    .table-scroll table thead th:nth-child(2),
+    .table-scroll table thead th:last-child {
+        display: table-cell;
+    }
+
+    .table-scroll table thead th:nth-child(3),
+    .table-scroll table thead th:nth-child(4),
+    .table-scroll table thead th:nth-child(5),
+    .table-scroll table thead th:nth-child(6),
+    .table-scroll table thead th:nth-child(7) {
+        display: none;
+    }
+
+    .table-scroll table tbody td:nth-child(1),
+    .table-scroll table tbody td:nth-child(2),
+    .table-scroll table tbody td:last-child {
+        display: table-cell;
+    }
+
+    .table-scroll table tbody td:nth-child(3),
+    .table-scroll table tbody td:nth-child(4),
+    .table-scroll table tbody td:nth-child(5),
+    .table-scroll table tbody td:nth-child(6),
+    .table-scroll table tbody td:nth-child(7) {
+        display: none;
+    }
+
+    .table-scroll table {
+        display: table;
+        width: 100%;
+    }
+    .table-scroll table tbody {
+        display: table-row-group;
+    }
+    .table-scroll table tbody tr {
+        display: table-row;
+    }
+    .table-scroll table tbody tr td:last-child {
+        text-align: center;
+    }
+
+    .table-scroll table thead {
+        display: table-header-group;
+    }
+    .table-scroll table thead tr {
+        display: table-row;
+    }
+    .table-scroll table thead th:last-child {
+        text-align: center;
     }
 
     .modal-custom .modal-body {
@@ -518,26 +570,26 @@
     }
     .modal-custom .modal-footer {
         padding: 12px 16px;
-        flex-direction: column;
+        flex-direction: row;
         gap: 8px;
+        justify-content: flex-end;
     }
     .modal-custom .modal-footer .btn {
-        width: 100%;
+        width: auto;
     }
 }
 
 @media (max-width: 480px) {
     .page-header h4 {
-        font-size: 16px;
+        font-size: 14px;
     }
     .page-header .btn-primary-custom {
-        font-size: 12px;
-        padding: 5px 14px;
+        font-size: 11px;
+        padding: 5px 12px;
     }
 }
 </style>
 
-<!-- ===== HEADER ===== -->
 <div class="page-header">
     <h4>Data Panitia</h4>
     <button class="btn-primary-custom" data-bs-toggle="modal" data-bs-target="#tambahPanitiaModal">
@@ -545,7 +597,6 @@
     </button>
 </div>
 
-<!-- ===== ALERT ===== -->
 @if (session('success'))
     <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm rounded-3 mb-4">
         <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
@@ -559,7 +610,6 @@
     </div>
 @endif
 
-<!-- ===== FILTER BAR ===== -->
 <div class="filter-bar">
     <div class="search-box">
         <i class="fas fa-search"></i>
@@ -574,7 +624,6 @@
     </div>
 </div>
 
-<!-- ===== TABLE ===== -->
 <div class="table-wrapper">
     <div class="table-scroll">
         <table id="panitiaTable">
@@ -658,8 +707,6 @@
                                     '{{ addslashes($item->twitter) }}',
                                     '{{ addslashes($item->linkedin) }}',
                                     '{{ addslashes($item->bio) }}',
-                                    '{{ $item->created_at ? $item->created_at->format('d F Y H:i') : '' }}',
-                                    '{{ $item->updated_at ? $item->updated_at->format('d F Y H:i') : '' }}',
                                     '{{ $item->foto_profil ? asset('uploads/profil/' . $item->foto_profil) : '' }}'
                                 )">
                                     <i class="fas fa-eye"></i>
@@ -717,7 +764,6 @@
     @endif
 </div>
 
-<!-- ===== MODAL EDIT PANITIA ===== -->
 <div class="modal fade modal-custom" id="editPanitiaModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
@@ -806,7 +852,6 @@
     </div>
 </div>
 
-<!-- ===== MODAL SHOW/DETAIL PANITIA ===== -->
 <div class="modal fade modal-custom" id="showPanitiaModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
@@ -858,20 +903,6 @@
                     <label class="text-muted small fw-bold d-block">Bio</label>
                     <p id="showBio" class="text-muted" style="font-style: italic;">-</p>
                 </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label class="text-muted small fw-bold d-block">Dibuat</label>
-                            <p class="fw-semibold" id="showCreatedAt">-</p>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label class="text-muted small fw-bold d-block">Diupdate</label>
-                            <p class="fw-semibold" id="showUpdatedAt">-</p>
-                        </div>
-                    </div>
-                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn-secondary-custom" data-bs-dismiss="modal">
@@ -885,7 +916,6 @@
     </div>
 </div>
 
-<!-- ===== MODAL TAMBAH PANITIA ===== -->
 <div class="modal fade modal-custom" id="tambahPanitiaModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
@@ -991,32 +1021,23 @@
     </div>
 </div>
 
-<!-- ===== JAVASCRIPT ===== -->
 <script>
-// ===== VARIABLES =====
 let searchTimeout = null;
 let currentPage = 1;
 
-// ===== SEARCH & FILTER =====
 function filterTable() {
     const search = document.getElementById('searchInput').value;
     const role = document.getElementById('filterRole').value;
-
-    if (searchTimeout) {
-        clearTimeout(searchTimeout);
-    }
-
+    if (searchTimeout) clearTimeout(searchTimeout);
     searchTimeout = setTimeout(function() {
         currentPage = 1;
         fetchData(search, role, currentPage);
     }, 300);
 }
 
-// ===== FETCH DATA VIA AJAX =====
 function fetchData(search, role, page) {
     const tableBody = document.querySelector('#panitiaTable tbody');
     const paginationWrapper = document.querySelector('.pagination-wrapper');
-
     if (tableBody) {
         tableBody.innerHTML = `
             <tr>
@@ -1029,39 +1050,26 @@ function fetchData(search, role, page) {
             </tr>
         `;
     }
-
     let url = new URL(window.location.href);
     url.searchParams.set('search', search);
     url.searchParams.set('role', role);
     url.searchParams.set('page', page);
-
     fetch(url, {
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-        }
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
     })
     .then(response => response.text())
     .then(html => {
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, 'text/html');
-
         const newTableBody = doc.querySelector('#panitiaTable tbody');
         const newPagination = doc.querySelector('.pagination-wrapper');
-
-        if (tableBody && newTableBody) {
-            tableBody.innerHTML = newTableBody.innerHTML;
-        }
-
-        if (paginationWrapper && newPagination) {
-            paginationWrapper.innerHTML = newPagination.innerHTML;
-        }
-
+        if (tableBody && newTableBody) tableBody.innerHTML = newTableBody.innerHTML;
+        if (paginationWrapper && newPagination) paginationWrapper.innerHTML = newPagination.innerHTML;
         const newUrl = new URL(window.location.href);
         newUrl.searchParams.set('search', search);
         newUrl.searchParams.set('role', role);
         newUrl.searchParams.set('page', page);
         window.history.pushState({}, '', newUrl);
-
         attachPaginationListeners();
     })
     .catch(error => {
@@ -1079,7 +1087,6 @@ function fetchData(search, role, page) {
     });
 }
 
-// ===== ATTACH PAGINATION LISTENERS =====
 function attachPaginationListeners() {
     document.querySelectorAll('.pagination-wrapper .page-link').forEach(function(link) {
         link.addEventListener('click', function(e) {
@@ -1090,7 +1097,6 @@ function attachPaginationListeners() {
                 const search = document.getElementById('searchInput').value;
                 const role = document.getElementById('filterRole').value;
                 const page = url.searchParams.get('page') || 1;
-
                 currentPage = parseInt(page);
                 fetchData(search, role, currentPage);
             }
@@ -1098,14 +1104,11 @@ function attachPaginationListeners() {
     });
 }
 
-// ===== MODAL EDIT =====
 function openEditModal(id, name, email, no_telp, jabatan, instagram, facebook, twitter, linkedin, bio) {
     const modalElement = document.getElementById('editPanitiaModal');
     const modal = new bootstrap.Modal(modalElement);
-
     document.getElementById('formEditPanitia').action = '/admin/' + id;
     document.getElementById('edit_panitia_id').value = id;
-
     document.getElementById('edit_name').value = name || '';
     document.getElementById('edit_email').value = email || '';
     document.getElementById('edit_no_telp').value = no_telp || '';
@@ -1115,23 +1118,17 @@ function openEditModal(id, name, email, no_telp, jabatan, instagram, facebook, t
     document.getElementById('edit_twitter').value = twitter || '';
     document.getElementById('edit_linkedin').value = linkedin || '';
     document.getElementById('edit_bio').value = bio || '';
-
     modal.show();
 }
 
-// ===== MODAL SHOW =====
-function openShowModal(id, name, email, no_telp, jabatan, role, instagram, facebook, twitter, linkedin, bio, created_at, updated_at, foto) {
+function openShowModal(id, name, email, no_telp, jabatan, role, instagram, facebook, twitter, linkedin, bio, foto) {
     const modalElement = document.getElementById('showPanitiaModal');
     const modal = new bootstrap.Modal(modalElement);
-
     document.getElementById('showName').textContent = name || '-';
     document.getElementById('showEmail').textContent = email || '-';
     document.getElementById('showNoTelp').textContent = no_telp || '-';
     document.getElementById('showJabatan').textContent = jabatan || '-';
     document.getElementById('showBio').textContent = bio || 'Tidak ada bio';
-    document.getElementById('showCreatedAt').textContent = created_at || '-';
-    document.getElementById('showUpdatedAt').textContent = updated_at || '-';
-
     const roleBadge = document.getElementById('showRole');
     if (role === 'super_admin') {
         roleBadge.textContent = 'Super Admin';
@@ -1140,7 +1137,6 @@ function openShowModal(id, name, email, no_telp, jabatan, role, instagram, faceb
         roleBadge.textContent = 'Panitia';
         roleBadge.className = 'badge-role badge-role-panitia';
     }
-
     const avatarContainer = document.getElementById('showAvatar');
     if (foto && foto !== 'null' && foto !== '') {
         avatarContainer.innerHTML = '<img src="' + foto + '" alt="Avatar" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid #e2e8f0;">';
@@ -1150,7 +1146,6 @@ function openShowModal(id, name, email, no_telp, jabatan, role, instagram, faceb
         const colorIndex = name ? name.length % colors.length : 0;
         avatarContainer.innerHTML = '<div style="width: 80px; height: 80px; border-radius: 50%; background: ' + colors[colorIndex] + '; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 700; color: white; margin: 0 auto; border: 3px solid #e2e8f0;">' + initials + '</div>';
     }
-
     const socialContainer = document.getElementById('showSocial');
     let socialHtml = '';
     if (instagram) socialHtml += '<a href="' + instagram + '" target="_blank" class="social-instagram" style="display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; color: white; font-size: 14px; text-decoration: none;"><i class="fab fa-instagram"></i></a>';
@@ -1159,18 +1154,15 @@ function openShowModal(id, name, email, no_telp, jabatan, role, instagram, faceb
     if (linkedin) socialHtml += '<a href="' + linkedin + '" target="_blank" class="social-linkedin" style="display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; color: white; font-size: 14px; text-decoration: none;"><i class="fab fa-linkedin-in"></i></a>';
     if (!socialHtml) socialHtml = '<span class="text-muted">-</span>';
     socialContainer.innerHTML = socialHtml;
-
     document.getElementById('btnEditFromShow').onclick = function() {
         modal.hide();
         setTimeout(function() {
             openEditModal(id, name, email, no_telp, jabatan, instagram, facebook, twitter, linkedin, bio);
         }, 300);
     };
-
     modal.show();
 }
 
-// ===== SHOW NOTIFICATION =====
 function showNotification(type, message) {
     const alertDiv = document.createElement('div');
     alertDiv.className = 'alert alert-' + type + ' alert-dismissible fade show border-0 shadow-sm rounded-3 mb-4';
@@ -1179,29 +1171,22 @@ function showNotification(type, message) {
         ${message}
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     `;
-
     const container = document.querySelector('.page-header').parentNode;
     container.insertBefore(alertDiv, document.querySelector('.page-header').nextSibling);
-
     setTimeout(() => {
         alertDiv.remove();
     }, 5000);
 }
 
-// ===== EVENT LISTENERS =====
 document.addEventListener('DOMContentLoaded', function() {
     const modalEdit = document.getElementById('editPanitiaModal');
     const modalTambah = document.getElementById('tambahPanitiaModal');
-
-    // ===== UPDATE PANITIA =====
     document.getElementById('btnUpdatePanitia').addEventListener('click', function() {
         const form = document.getElementById('formEditPanitia');
         const formData = new FormData(form);
         const btn = this;
-
         btn.disabled = true;
         btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span> Mengupdate...';
-
         fetch(form.action, {
             method: 'POST',
             body: formData,
@@ -1231,16 +1216,12 @@ document.addEventListener('DOMContentLoaded', function() {
             btn.innerHTML = '<i class="fas fa-save me-1"></i> Update';
         });
     });
-
-    // ===== SIMPAN PANITIA =====
     document.getElementById('btnSimpanPanitia').addEventListener('click', function() {
         const form = document.getElementById('formTambahPanitia');
         const formData = new FormData(form);
         const btn = this;
-
         btn.disabled = true;
         btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span> Menyimpan...';
-
         fetch(form.action, {
             method: 'POST',
             body: formData,
@@ -1271,8 +1252,6 @@ document.addEventListener('DOMContentLoaded', function() {
             btn.innerHTML = '<i class="fas fa-save me-1"></i> Simpan';
         });
     });
-
-    // ===== RESET FORM SAAT MODAL DITUTUP =====
     document.querySelectorAll('.modal').forEach(function(modal) {
         modal.addEventListener('hidden.bs.modal', function() {
             const form = this.querySelector('form');
@@ -1284,22 +1263,12 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
-
-    // ===== ATTACH PAGINATION LISTENERS INITIAL =====
     attachPaginationListeners();
-
-    // ===== RESTORE SEARCH/FILTER FROM URL =====
     const urlParams = new URLSearchParams(window.location.search);
     const searchParam = urlParams.get('search');
     const roleParam = urlParams.get('role');
-
-    if (searchParam) {
-        document.getElementById('searchInput').value = searchParam;
-    }
-    if (roleParam) {
-        document.getElementById('filterRole').value = roleParam;
-    }
-
+    if (searchParam) document.getElementById('searchInput').value = searchParam;
+    if (roleParam) document.getElementById('filterRole').value = roleParam;
     if (searchParam || roleParam) {
         const page = urlParams.get('page') || 1;
         currentPage = parseInt(page);

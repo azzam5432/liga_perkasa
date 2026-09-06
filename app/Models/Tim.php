@@ -26,6 +26,17 @@ class Tim extends Model
         return $this->hasMany(Nilai::class, 'id_tim', 'id_tim');
     }
 
+    // ✅ TAMBAHKAN RELASI INI
+    public function dosenPembimbing()
+    {
+        return $this->hasMany(DosenPembimbing::class, 'id_tim', 'id_tim');
+    }
+
+    public function kakakPembimbing()
+    {
+        return $this->hasMany(KakakPembimbing::class, 'id_tim', 'id_tim');
+    }
+
     public function getTotalNilaiAttribute()
     {
         return $this->nilai()->sum('nilai') ?? 0;

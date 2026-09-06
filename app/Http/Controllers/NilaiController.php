@@ -1,5 +1,4 @@
 <?php
-// app/Http/Controllers/NilaiController.php
 
 namespace App\Http\Controllers;
 
@@ -15,9 +14,6 @@ use Illuminate\Support\Facades\Auth;
 
 class NilaiController extends Controller
 {
-    // ==========================================
-    // DASHBOARD JURI - DAFTAR LOMBA
-    // ==========================================
     public function index(): View
     {
         $user = Auth::user();
@@ -27,7 +23,6 @@ class NilaiController extends Controller
             abort(403, 'Anda bukan juri!');
         }
 
-        // Lomba yang ditugaskan ke juri ini
         $lombas = $juri->lomba()
             ->with(['finalis.tim', 'nilai'])
             ->get();
@@ -35,9 +30,6 @@ class NilaiController extends Controller
         return view('nilai.index', compact('juri', 'lombas'));
     }
 
-    // ==========================================
-    // FORM PENILAIAN (Penyisihan / Final)
-    // ==========================================
     public function create($id_lomba): View
     {
         $user = Auth::user();
@@ -57,38 +49,30 @@ class NilaiController extends Controller
 
         $lomba = Lomba::findOrFail($id_lomba);
         
-        // ✅ Tentukan babak
         $babak = $lomba->is_final_active ? 'final' : 'penyisihan';
         
-        // ✅ Ambil tim sesuai babak
         if ($lomba->is_final_active) {
-            // Final: ambil finalis yang sudah ditentukan otomatis
             $timFinalis = $lomba->finalis()->with('tim')->orderBy('peringkat')->get();
             $tim = $timFinalis->pluck('tim');
             
-            // Jika belum ada finalis, buat otomatis dari nilai penyisihan
             if ($tim->isEmpty()) {
                 $tim = $this->tentukanFinalisOtomatis($lomba);
             }
         } else {
-            // Penyisihan: tampilkan semua tim
             $tim = Tim::all();
         }
         
-        // ✅ Ambil nilai yang sudah ada dari juri ini
         $nilaiExisting = Nilai::where('id_lomba', $id_lomba)
             ->where('id_juri', $juri->id_juri)
             ->where('babak', $babak)
             ->get()
             ->keyBy('id_tim');
             
-        // ✅ CEK: Apakah sudah ada juri lain yang menilai?
         $sudahDinilai = Nilai::where('id_lomba', $id_lomba)
             ->where('id_juri', '!=', $juri->id_juri)
             ->where('babak', $babak)
             ->exists();
             
-        // ✅ Ambil juri yang sudah menilai (untuk info)
         $juriYangMenilai = null;
         if ($sudahDinilai) {
             $juriYangMenilai = Nilai::where('id_lomba', $id_lomba)
@@ -108,9 +92,6 @@ class NilaiController extends Controller
         ));
     }
 
-    // ==========================================
-    // SIMPAN PENILAIAN (Pilih 1 Tim Menang)
-    // ==========================================
     public function store(Request $request): RedirectResponse
     {
         $user = Auth::user();
@@ -122,12 +103,13 @@ class NilaiController extends Controller
 
         $request->validate([
             'id_lomba' => 'required|exists:tb_lomba,id_lomba',
-            'id_tim' => 'required|exists:tb_tim,id_tim',
+            'juara_1' => 'required|exists:tb_tim,id_tim',
+            'juara_2' => 'required|exists:tb_tim,id_tim',
+            'juara_3' => 'required|exists:tb_tim,id_tim',
         ]);
 
         $id_lomba = $request->id_lomba;
         $lomba = Lomba::findOrFail($id_lomba);
-        $id_tim = $request->id_tim;
 
         $isAssigned = $juri->lomba()
             ->where('tb_lomba.id_lomba', $id_lomba)
@@ -137,10 +119,14 @@ class NilaiController extends Controller
             return back()->with('error', 'Anda tidak ditugaskan ke lomba ini!');
         }
 
-        // ✅ Tentukan babak (penyisihan atau final)
+        if ($request->juara_1 == $request->juara_2 || 
+            $request->juara_1 == $request->juara_3 || 
+            $request->juara_2 == $request->juara_3) {
+            return back()->with('error', 'Juara 1, 2, dan 3 harus tim yang berbeda!');
+        }
+
         $babak = $lomba->is_final_active ? 'final' : 'penyisihan';
 
-        // ✅ CEK: Apakah lomba sudah dinilai oleh juri lain di babak yang sama?
         $sudahDinilai = Nilai::where('id_lomba', $id_lomba)
             ->where('babak', $babak)
             ->exists();
@@ -154,35 +140,51 @@ class NilaiController extends Controller
             return redirect()->route('dashboard')->with('error', "Lomba ini sudah dinilai oleh {$juriYangMenilai} di babak {$babak}!");
         }
 
-        // ✅ Simpan nilai = bobot lomba
+        $bobot = (float) $lomba->bobot;
+        $poinJuara1 = $bobot * 3;
+        $poinJuara2 = $bobot * 2;
+        $poinJuara3 = $bobot * 1;
+
         Nilai::create([
-            'id_tim' => $id_tim,
+            'id_tim' => $request->juara_1,
             'id_lomba' => $id_lomba,
             'id_juri' => $juri->id_juri,
-            'nilai' => $lomba->bobot,
+            'nilai' => $poinJuara1,
             'babak' => $babak,
         ]);
 
-        // ✅ OTOMATIS TENTUKAN FINALIS SETELAH PENYISIHAN
+        Nilai::create([
+            'id_tim' => $request->juara_2,
+            'id_lomba' => $id_lomba,
+            'id_juri' => $juri->id_juri,
+            'nilai' => $poinJuara2,
+            'babak' => $babak,
+        ]);
+
+        Nilai::create([
+            'id_tim' => $request->juara_3,
+            'id_lomba' => $id_lomba,
+            'id_juri' => $juri->id_juri,
+            'nilai' => $poinJuara3,
+            'babak' => $babak,
+        ]);
+
         if ($babak == 'penyisihan' && $lomba->jenis == 'penyisihan') {
             $this->tentukanFinalisOtomatis($lomba);
         }
 
-        // ✅ Update data finalis jika perlu
-        $this->updateFinalis($lomba, $id_tim, $babak);
+        $this->updateFinalis($lomba, $request->juara_1, $babak, $poinJuara1);
+        $this->updateFinalis($lomba, $request->juara_2, $babak, $poinJuara2);
+        $this->updateFinalis($lomba, $request->juara_3, $babak, $poinJuara3);
 
-        $namaTim = Tim::find($id_tim)->nama_tim ?? 'Tim';
+        $namaJuara1 = Tim::find($request->juara_1)->nama_tim ?? 'Tim';
 
         return redirect()->route('dashboard')
-            ->with('success', "Penilaian berhasil! Tim {$namaTim} mendapat {$lomba->bobot} poin di babak {$babak}.");
+            ->with('success', "Penilaian berhasil! {$namaJuara1} menjadi juara 1 di babak {$babak}.");
     }
 
-    // ==========================================
-    // TENTUKAN FINALIS OTOMATIS
-    // ==========================================
     private function tentukanFinalisOtomatis(Lomba $lomba)
     {
-        // Ambil nilai penyisihan per tim
         $nilaiPerTim = Nilai::where('id_lomba', $lomba->id_lomba)
             ->where('babak', 'penyisihan')
             ->select('id_tim', 'nilai')
@@ -194,10 +196,8 @@ class NilaiController extends Controller
             ->sortDesc()
             ->take($lomba->jumlah_finalis);
 
-        // Hapus finalis lama
         $lomba->finalis()->delete();
 
-        // Simpan finalis baru
         $peringkat = 1;
         foreach ($nilaiPerTim as $id_tim => $totalNilai) {
             Finalis::create([
@@ -214,58 +214,33 @@ class NilaiController extends Controller
         return $lomba->finalis()->with('tim')->orderBy('peringkat')->get()->pluck('tim');
     }
 
-    // ==========================================
-    // UPDATE DATA FINALIS
-    // ==========================================
-    private function updateFinalis(Lomba $lomba, $id_tim, $babak)
+    private function updateFinalis(Lomba $lomba, $id_tim, $babak, $poin)
     {
         if ($babak == 'penyisihan') {
-            // Update atau buat finalis dengan nilai penyisihan
             $finalis = Finalis::where('id_lomba', $lomba->id_lomba)
                 ->where('id_tim', $id_tim)
                 ->first();
                 
             if ($finalis) {
-                $finalis->update(['nilai_penyisihan' => $lomba->bobot]);
+                $finalis->update(['nilai_penyisihan' => $poin]);
             } else {
                 Finalis::create([
                     'id_lomba' => $lomba->id_lomba,
                     'id_tim' => $id_tim,
-                    'nilai_penyisihan' => $lomba->bobot,
+                    'nilai_penyisihan' => $poin,
                     'babak' => 'penyisihan',
                 ]);
             }
         }
 
         if ($babak == 'final') {
-            // Update nilai final di finalis
             $finalis = Finalis::where('id_lomba', $lomba->id_lomba)
                 ->where('id_tim', $id_tim)
                 ->first();
                 
             if ($finalis) {
-                $finalis->update(['nilai_final' => $lomba->bobot]);
+                $finalis->update(['nilai_final' => $poin]);
             }
         }
-    }
-
-    // ==========================================
-    // CEK STATUS PENILAIAN
-    // ==========================================
-    public function cekStatus($id_lomba)
-    {
-        $lomba = Lomba::findOrFail($id_lomba);
-        
-        $sudahDinilai = Nilai::where('id_lomba', $id_lomba)->exists();
-        $jumlahFinalis = $lomba->finalis()->count();
-        $bobot = $lomba->bobot;
-        
-        return response()->json([
-            'sudah_dinilai' => $sudahDinilai,
-            'jumlah_finalis' => $jumlahFinalis,
-            'bobot' => $bobot,
-            'jenis' => $lomba->jenis,
-            'is_final_active' => $lomba->is_final_active,
-        ]);
     }
 }

@@ -36,7 +36,14 @@ Route::middleware(['auth'])->group(function () {
     
     Route::resource('panitia', TimController::class);
     
-    Route::resource('lomba', LombaController::class);
+    // GANTI Route::resource dengan ini agar lebih jelas dan tidak bentrok
+    Route::get('/lomba', [LombaController::class, 'index'])->name('lomba.index');
+    Route::get('/lomba/create', [LombaController::class, 'create'])->name('lomba.create');
+    Route::post('/lomba', [LombaController::class, 'store'])->name('lomba.store');
+    Route::get('/lomba/{id}', [LombaController::class, 'show'])->name('lomba.show');
+    Route::get('/lomba/{id}/edit', [LombaController::class, 'edit'])->name('lomba.edit');
+    Route::put('/lomba/{id}', [LombaController::class, 'update'])->name('lomba.update');
+    Route::delete('/lomba/{id}', [LombaController::class, 'destroy'])->name('lomba.destroy');
     
     Route::get('/finalis/{id_lomba}', [FinalisController::class, 'index'])->name('finalis.index');
     Route::post('/finalis/{id_lomba}', [FinalisController::class, 'store'])->name('finalis.store');

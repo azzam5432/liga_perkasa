@@ -110,18 +110,18 @@
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 0;
-    font-size: 14px;
+    font-size: 15px; /* Sedikit lebih besar dari 14px */
     min-width: 500px;
 }
 
 .table-scroll table thead th {
     background: #f7fafc;
     color: #4a5568;
-    font-weight: 600;
-    font-size: 11px;
+    font-weight: 700;
+    font-size: 12px; /* Sedikit lebih besar */
     text-transform: uppercase;
     letter-spacing: 0.4px;
-    padding: 10px 14px;
+    padding: 12px 14px; /* Padding sedikit lebih besar */
     border-bottom: 2px solid #edf2f7;
     text-align: left;
     white-space: nowrap;
@@ -131,7 +131,7 @@
 }
 
 .table-scroll table tbody td {
-    padding: 10px 14px;
+    padding: 12px 14px; /* Padding sedikit lebih besar */
     vertical-align: middle;
     color: #2d3748;
     border-bottom: 1px solid #f7fafc;
@@ -181,36 +181,32 @@
     box-shadow: -2px 0 8px rgba(0,0,0,0.03);
 }
 
+/* HAPUS WARNA BADGE, GANTI JADI TEKS BIASA */
 .badge-juri {
-    background: #ebf8ff;
-    color: #2b6cb0;
-    padding: 3px 12px;
-    border-radius: 12px;
-    font-size: 11px;
+    background: transparent;
+    color: #4a5568;
+    padding: 0;
+    border-radius: 0;
+    font-size: 14px; /* Lebih besar */
     font-weight: 600;
     display: inline-block;
     margin: 2px;
 }
 
 .badge-status {
-    padding: 2px 12px;
-    border-radius: 12px;
-    font-size: 11px;
+    padding: 0;
+    border-radius: 0;
+    font-size: 14px; /* Lebih besar */
     font-weight: 600;
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
+    display: inline;
     white-space: nowrap;
+    background: transparent !important;
+    color: #2d3748 !important; /* Warna teks netral */
 }
 
-.badge-status-draft { background: #e2e8f0; color: #4a5568; }
-.badge-status-open { background: #c6f6d5; color: #22543d; }
-.badge-status-selesai { background: #ebf8ff; color: #2b6cb0; }
-.badge-status-closed { background: #fed7d7; color: #9b2c2c; }
-
 .btn-action {
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
     border-radius: 6px;
     display: inline-flex;
     align-items: center;
@@ -219,7 +215,7 @@
     background: transparent;
     color: #a0aec0;
     transition: all 0.2s ease;
-    font-size: 12px;
+    font-size: 13px;
     text-decoration: none;
     cursor: pointer;
 }
@@ -255,11 +251,11 @@
 
 .btn-action.btn-success {
     color: #22543d;
-    background: #c6f6d5;
+    background: transparent; /* Hilangkan background hijau */
 }
 
 .btn-action.btn-success:hover {
-    background: #9ae6b4;
+    background: #e2e8f0;
 }
 
 .pagination-wrapper {
@@ -273,7 +269,7 @@
 }
 
 .pagination-wrapper .info-text {
-    font-size: 12px;
+    font-size: 13px;
     color: #a0aec0;
 }
 
@@ -291,7 +287,7 @@
     border-radius: 6px;
     color: #4a5568;
     font-weight: 500;
-    font-size: 12px;
+    font-size: 13px;
     padding: 4px 10px;
     transition: all 0.2s ease;
     background: transparent;
@@ -332,7 +328,7 @@
 
 .empty-state p {
     color: #a0aec0;
-    font-size: 13px;
+    font-size: 14px;
     margin-bottom: 14px;
 }
 
@@ -366,7 +362,7 @@
 
 .modal-custom .form-label {
     font-weight: 600;
-    font-size: 13px;
+    font-size: 14px;
     color: #1a2332;
 }
 
@@ -374,7 +370,7 @@
 .modal-custom .form-select {
     border: 1px solid #e2e8f0;
     border-radius: 8px;
-    padding: 8px 14px;
+    padding: 10px 14px;
     font-size: 14px;
     transition: all 0.2s ease;
 }
@@ -454,6 +450,7 @@
     color: #718096;
 }
 
+/* RESPONSIVE - JANGAN DIUBAH */
 @media (max-width: 768px) {
     .page-header {
         flex-direction: row;
@@ -604,28 +601,23 @@
                     <tr>
                         <td>{{ $loop->iteration }}</td>
                         <td class="col-sticky-left">
-                            <span class="fw-semibold" style="font-size: 13px;">{{ $item->nama_lomba }}</span>
+                            <span class="fw-semibold" style="font-size: 15px;">{{ $item->nama_lomba }}</span>
                         </td>
                         <td>
                             @if($item->jenis)
-                                <span class="badge bg-info">{{ $item->jenis }}</span>
+                                <span style="font-size: 15px;">{{ $item->jenis }}</span>
                             @else
-                                <span class="text-muted">-</span>
+                                <span class="text-muted" style="font-size: 15px;">-</span>
                             @endif
                         </td>
                         <td>
                             @if($item->status)
-                                <span class="badge-status 
-                                    {{ $item->status == 'open' ? 'badge-status-open' : 
-                                       ($item->status == 'selesai' ? 'badge-status-selesai' : 
-                                       ($item->status == 'closed' ? 'badge-status-closed' : 'badge-status-draft')) }}">
-                                    {{ $item->status }}
-                                </span>
+                                <span class="badge-status" style="font-size: 15px;">{{ $item->status }}</span>
                             @else
-                                <span class="text-muted">-</span>
+                                <span class="text-muted" style="font-size: 15px;">-</span>
                             @endif
                         </td>
-                        <td style="font-size: 13px;">
+                        <td style="font-size: 15px;">
                             @if($item->juri->count() > 0)
                                 @foreach($item->juri->take(3) as $juri)
                                     <span class="badge-juri">
@@ -633,7 +625,7 @@
                                     </span>
                                 @endforeach
                                 @if($item->juri->count() > 3)
-                                    <span class="badge-juri">+{{ $item->juri->count() - 3 }} lagi</span>
+                                    <span class="badge-juri" style="color: #4a5568;">+{{ $item->juri->count() - 3 }} lagi</span>
                                 @endif
                             @else
                                 <span class="text-muted">-</span>
@@ -683,6 +675,7 @@
     @endif
 </div>
 
+<!-- Modal Tambah Lomba (TANPA TANGGAL) -->
 <div class="modal fade modal-custom" id="tambahLombaModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
@@ -745,21 +738,6 @@
                             </div>
                         </div>
                     </div>
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="modal_tanggal_mulai" class="form-label">Tanggal Mulai</label>
-                                <input type="date" class="form-control" id="modal_tanggal_mulai" name="tanggal_mulai">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="modal_tanggal_selesai" class="form-label">Tanggal Selesai</label>
-                                <input type="date" class="form-control" id="modal_tanggal_selesai" name="tanggal_selesai">
-                            </div>
-                        </div>
-                    </div>
                 </form>
             </div>
             <div class="modal-footer">
@@ -774,6 +752,7 @@
     </div>
 </div>
 
+<!-- Modal Edit Lomba (TANPA TANGGAL) -->
 <div class="modal fade modal-custom" id="editLombaModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
@@ -840,21 +819,6 @@
                         </div>
                     </div>
 
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="edit_tanggal_mulai" class="form-label">Tanggal Mulai</label>
-                                <input type="date" class="form-control" id="edit_tanggal_mulai" name="tanggal_mulai">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="edit_tanggal_selesai" class="form-label">Tanggal Selesai</label>
-                                <input type="date" class="form-control" id="edit_tanggal_selesai" name="tanggal_selesai">
-                            </div>
-                        </div>
-                    </div>
-
                     <input type="hidden" id="edit_lomba_id" name="lomba_id" value="">
                 </form>
             </div>
@@ -870,6 +834,7 @@
     </div>
 </div>
 
+<!-- Modal Show Lomba (TANPA KRITERIA) -->
 <div class="modal fade modal-custom" id="showLombaModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
@@ -1009,8 +974,6 @@ function openEditLombaModal(id) {
         document.getElementById('edit_deskripsi').value = data.deskripsi || '';
         document.getElementById('edit_bobot').value = data.bobot || 0;
         document.getElementById('edit_jumlah_finalis').value = data.jumlah_finalis || 5;
-        document.getElementById('edit_tanggal_mulai').value = data.tanggal_mulai || '';
-        document.getElementById('edit_tanggal_selesai').value = data.tanggal_selesai || '';
         
         const jenis = data.jenis || 'langsung';
         document.getElementById('edit_jenis').value = jenis;
@@ -1148,21 +1111,6 @@ function openShowLombaModal(id) {
             `;
         }
 
-        if (lomba.tanggal_mulai || lomba.tanggal_selesai) {
-            html += `
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label class="text-muted small fw-bold d-block">Tanggal Mulai</label>
-                        <p class="fw-semibold">${lomba.tanggal_mulai || '-'}</p>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="text-muted small fw-bold d-block">Tanggal Selesai</label>
-                        <p class="fw-semibold">${lomba.tanggal_selesai || '-'}</p>
-                    </div>
-                </div>
-            `;
-        }
-
         if (lomba.bobot !== undefined && lomba.bobot !== null) {
             html += `
                 <div class="mb-3">
@@ -1187,22 +1135,16 @@ function openShowLombaModal(id) {
 
         html += `
             <div class="row mt-3">
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <div class="text-center p-2 bg-light rounded">
                         <div class="fw-bold" style="font-size: 20px; color: #1a365d;">${data.juri_count || 0}</div>
                         <small class="text-muted">Jumlah Juri</small>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <div class="text-center p-2 bg-light rounded">
                         <div class="fw-bold" style="font-size: 20px; color: #1a365d;">${data.finalis_count || 0}</div>
                         <small class="text-muted">Jumlah Finalis</small>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="text-center p-2 bg-light rounded">
-                        <div class="fw-bold" style="font-size: 20px; color: #1a365d;">${data.kriteria_count || 0}</div>
-                        <small class="text-muted">Jumlah Kriteria</small>
                     </div>
                 </div>
             </div>

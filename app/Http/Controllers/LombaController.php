@@ -84,14 +84,12 @@ class LombaController extends Controller
                 return $juri->user->name ?? 'Juri';
             });
             
-            $kriteriaCount = Kriteria::where('id_lomba', $id)->count();
-            
+            // HAPUS KriteriaCount
             return response()->json([
                 'lomba' => $lomba,
                 'juri_list' => $juriList,
                 'juri_count' => $lomba->juri->count(),
                 'finalis_count' => $lomba->finalis->count(),
-                'kriteria_count' => $kriteriaCount,
             ]);
         }
         

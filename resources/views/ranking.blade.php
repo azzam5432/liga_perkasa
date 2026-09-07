@@ -1,4 +1,4 @@
-@extends('layouts.public')
+@extends(Auth::check() ? 'layouts.master' : 'layouts.public')
 
 @section('title', 'Ranking Lomba')
 
@@ -459,21 +459,29 @@
 
 <script>
 function filterTable() {
-    const searchInput = document.getElementById('searchInput').value.toLowerCase();
+    const searchInput = document.getElementById('searchInput').value.toLowerCase().trim();
     const rows = document.querySelectorAll('#rankingTable tbody tr');
 
     rows.forEach(row => {
         if (row.querySelector('.empty-state')) return;
 
-        const nama = row.querySelector('td:nth-child(2) .fw-semibold')?.textContent.toLowerCase() || '';
+        const rowText = row.textContent.toLowerCase();
 
         let show = true;
-        if (searchInput && !nama.includes(searchInput)) {
+        if (searchInput && !rowText.includes(searchInput)) {
             show = false;
         }
         row.style.display = show ? '' : 'none';
     });
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    
+    if (searchInput) {
+        searchInput.addEventListener('input', filterTable);
+    }
+});
 
 function openShowRankingModal(namaTim, totalNilai, jumlahMenang, detail, timData) {
     const modalElement = document.getElementById('showRankingModal');

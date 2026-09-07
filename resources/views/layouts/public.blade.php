@@ -24,6 +24,9 @@
             background: #1a365d;
             padding: 14px 24px;
             color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         
         .public-navbar .brand {
@@ -35,6 +38,21 @@
         
         .public-navbar .brand span {
             color: #ff9900;
+        }
+        
+        .public-navbar .btn-login {
+            background: #ff9900;
+            color: white;
+            padding: 6px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+        
+        .public-navbar .btn-login:hover {
+            background: #e68a00;
         }
         
         .public-content {
@@ -51,9 +69,12 @@
 </head>
 <body>
     <nav class="public-navbar">
-        <div class="container">
+        <div class="container d-flex justify-content-between align-items-center">
             <a href="{{ route('ranking') }}" class="brand">
                 <i class="fas fa-trophy me-2"></i> Liga <span>Perkasa</span>
+            </a>
+            <a href="{{ route('login') }}" class="btn-login">
+                <i class="fas fa-sign-in-alt me-1"></i> Login
             </a>
         </div>
     </nav>

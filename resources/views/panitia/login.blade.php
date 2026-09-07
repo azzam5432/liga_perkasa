@@ -117,6 +117,36 @@
             box-shadow: 0 5px 20px rgba(255, 153, 0, 0.4);
         }
         
+        .btn-back-ranking {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 10px 18px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            z-index: 10;
+            backdrop-filter: blur(10px);
+        }
+        
+        .btn-back-ranking:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn-back-ranking-mobile {
+            display: none;
+        }
+        
         @media (max-width: 768px) {
             .split-screen {
                 flex-direction: column;
@@ -126,7 +156,8 @@
             
             .left-panel {
                 padding: 30px 20px;
-                min-height: 30vh;
+                min-height: 25vh;
+                position: relative;
             }
             
             .left-panel .illustration h1 {
@@ -139,11 +170,35 @@
             
             .right-panel {
                 padding: 30px 20px;
-                min-height: 70vh;
+                min-height: 75vh;
             }
             
             .right-panel .login-wrapper {
                 max-width: 100%;
+            }
+            
+            .btn-back-ranking {
+                display: none;
+            }
+            
+            .btn-back-ranking-mobile {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                background: #f0f2f5;
+                color: #1a2332;
+                border: 1px solid #e2e8f0;
+                padding: 8px 16px;
+                border-radius: 8px;
+                font-size: 13px;
+                font-weight: 600;
+                text-decoration: none;
+                margin-bottom: 20px;
+                transition: all 0.3s ease;
+            }
+            
+            .btn-back-ranking-mobile:hover {
+                background: #e2e8f0;
             }
         }
         
@@ -157,6 +212,9 @@
 <body>
     <div class="split-screen">
         <div class="left-panel">
+            <a href="{{ route('ranking') }}" class="btn-back-ranking">
+                <i class="fas fa-arrow-left me-1"></i> Kembali ke Ranking
+            </a>
             <div class="illustration">
                 
                 <h1>Selamat Datang</h1>
@@ -165,6 +223,9 @@
         </div>      
         <div class="right-panel">
             <div class="login-wrapper">
+                <a href="{{ route('ranking') }}" class="btn-back-ranking-mobile">
+                    <i class="fas fa-arrow-left me-1"></i> Kembali ke Ranking
+                </a>
                 <div class="logo">
                     <div class="bg-warning bg-gradient rounded-circle d-inline-flex p-3 mb-3" style="width: 70px; height: 70px;">
                         <i class="fas fa-user-lock text-white display-6 m-auto"></i>
@@ -246,12 +307,9 @@
                         @enderror
                     </div>
                     
-                    <div class="mb-3 d-flex justify-content-between align-items-center">
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" id="remember" name="remember">
-                            <label class="form-check-label" for="remember">Ingat saya</label>
-                        </div>
-                        <a href="#" class="text-decoration-none small">Lupa password?</a>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="remember" name="remember">
+                        <label class="form-check-label" for="remember">Ingat saya</label>
                     </div>
                     
                     <button type="submit" class="btn btn-primary-custom btn-lg w-100 text-white fw-semibold">

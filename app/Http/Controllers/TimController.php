@@ -22,7 +22,7 @@ class TimController extends Controller
             $query->where('nama_tim', 'LIKE', "%{$search}%");
         }
 
-        $tim = $query->latest()->paginate(10);
+        $tim = $query->orderBy('nama_tim', 'asc')->paginate(10);
 
         return view('panitia.peserta', compact('tim'));
     }

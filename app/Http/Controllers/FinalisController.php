@@ -15,19 +15,81 @@ class FinalisController extends Controller
     public function index($id_lomba): View
     {
         $lomba = Lomba::with(['finalis.tim'])->findOrFail($id_lomba);
-        
+
+        $nilaiPerTim = Nilai::where('id_lomba', $id_lomba)
+            ->where('babak', 'penyisihan')
+            ->select('id_tim', 'nilai')
+            ->get()
+            ->groupBy('id_tim')
+            ->map(function($items) {
+                return $items->sum('nilai');
+            })
+            ->sortDesc();
+
         $finalis = $lomba->finalis()->with('tim')->orderBy('peringkat')->get();
 
-        return view('finalis.index', compact('lomba', 'finalis'));
+        $timFinalisIds = $finalis->pluck('id_tim')->toArray();
+        $timTersedia = Tim::whereNotIn('id_tim', $timFinalisIds)->get();
+
+        $sudahAdaPenilaian = Nilai::where('id_lomba', $id_lomba)
+            ->where('babak', 'penyisihan')
+            ->exists();
+
+        return view('finalis.index', compact('lomba', 'finalis', 'nilaiPerTim', 'timTersedia', 'sudahAdaPenilaian'));
     }
 
-    // ✅ Aktifkan babak final
+    public function store(Request $request, $id_lomba): RedirectResponse
+    {
+        $request->validate([
+            'id_tim' => 'required|exists:tb_tim,id_tim',
+            'peringkat' => 'nullable|integer|min:1',
+        ]);
+
+        $lomba = Lomba::findOrFail($id_lomba);
+
+        $currentCount = $lomba->finalis()->count();
+        if ($currentCount >= $lomba->jumlah_finalis) {
+            return back()->with('error', 'Kuota finalis sudah penuh!');
+        }
+
+        $exists = Finalis::where('id_lomba', $id_lomba)
+            ->where('id_tim', $request->id_tim)
+            ->exists();
+
+        if ($exists) {
+            return back()->with('error', 'Tim sudah menjadi finalis!');
+        }
+
+        Finalis::create([
+            'id_lomba' => $id_lomba,
+            'id_tim' => $request->id_tim,
+            'peringkat' => $request->peringkat ?? ($currentCount + 1),
+            'babak' => 'final',
+            'catatan' => 'Finalis manual',
+        ]);
+
+        return redirect()->route('finalis.index', $id_lomba)
+            ->with('success', 'Finalis berhasil ditambahkan!');
+    }
+
+    public function destroy($id_lomba, $id_finalis): RedirectResponse
+    {
+        $finalis = Finalis::where('id_lomba', $id_lomba)
+            ->where('id_finalis', $id_finalis)
+            ->firstOrFail();
+
+        $finalis->delete();
+
+        return redirect()->route('finalis.index', $id_lomba)
+            ->with('success', 'Finalis berhasil dihapus!');
+    }
+
     public function aktifkanFinal($id_lomba): RedirectResponse
     {
         $lomba = Lomba::findOrFail($id_lomba);
-        
+
         if ($lomba->finalis()->count() == 0) {
-            return back()->with('error', 'Belum ada finalis! Sistem belum menentukan finalis otomatis.');
+            return back()->with('error', 'Belum ada finalis! Tambahkan finalis terlebih dahulu.');
         }
 
         $lomba->update([
@@ -38,62 +100,41 @@ class FinalisController extends Controller
             ->with('success', 'Babak final berhasil diaktifkan!');
     }
 
-    // ✅ Lihat rekap per lomba
-    public function rekap($id_lomba): View
+    public function ranking()
     {
-        $lomba = Lomba::with(['finalis.tim'])->findOrFail($id_lomba);
-        
-        $rekap = [];
-        foreach ($lomba->finalis()->with('tim')->orderBy('peringkat')->get() as $finalis) {
-            $rekap[] = [
-                'tim' => $finalis->tim,
-                'nilai_penyisihan' => $finalis->nilai_penyisihan,
-                'nilai_final' => $finalis->nilai_final,
-                'total_nilai' => $finalis->nilai_penyisihan + $finalis->nilai_final,
-            ];
-        }
-        
-        return view('finalis.rekap', compact('lomba', 'rekap'));
-    }
-
-    // ✅ RANKING PUBLIK (Semua role bisa akses)
-    public function ranking(): View
-    {
+        $lombas = Lomba::all();
         $tim = Tim::all();
-        
+
         $rekapTim = [];
         foreach ($tim as $t) {
             $totalNilai = 0;
             $jmlMenang = 0;
-            $detailLomba = [];
-            
-            // Ambil semua nilai tim ini
-            $nilaiList = Nilai::where('id_tim', $t->id_tim)->get();
-            
-            foreach ($nilaiList as $nilai) {
-                $totalNilai += $nilai->nilai;
-                $jmlMenang++;
-                
-                $lomba = Lomba::find($nilai->id_lomba);
-                if ($lomba) {
-                    $detailLomba[] = [
-                        'lomba' => $lomba->nama_lomba,
-                        'nilai' => $nilai->nilai,
-                        'bobot' => $lomba->bobot,
-                        'babak' => $nilai->babak,
+            $detail = [];
+
+            foreach ($lombas as $l) {
+                $nilai = Nilai::where('id_tim', $t->id_tim)
+                    ->where('id_lomba', $l->id_lomba)
+                    ->sum('nilai');
+
+                if ($nilai > 0) {
+                    $totalNilai += $nilai;
+                    $jmlMenang++;
+                    $detail[] = [
+                        'lomba' => $l->nama_lomba,
+                        'nilai' => $nilai,
+                        'babak' => $l->is_final_active ? 'final' : 'penyisihan',
                     ];
                 }
             }
-            
+
             $rekapTim[] = [
                 'tim' => $t,
                 'total_nilai' => $totalNilai,
                 'jml_menang' => $jmlMenang,
-                'detail' => $detailLomba,
+                'detail' => $detail,
             ];
         }
 
-        // Urutkan dari total tertinggi
         usort($rekapTim, function($a, $b) {
             return $b['total_nilai'] <=> $a['total_nilai'];
         });

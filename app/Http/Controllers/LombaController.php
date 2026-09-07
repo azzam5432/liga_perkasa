@@ -34,7 +34,9 @@ class LombaController extends Controller
             $query->where('jenis', $request->jenis);
         }
 
-        $lombas = $query->latest()->paginate(10);
+        $lombas = $query->orderByRaw("CASE WHEN jenis = 'penyisihan' THEN 0 ELSE 1 END")
+            ->orderBy('nama_lomba', 'asc')
+            ->paginate(10);
 
         return view('lomba.index', compact('lombas'));
     }

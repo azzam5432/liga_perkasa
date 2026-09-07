@@ -253,7 +253,7 @@
                             <div class="empty-state">
                                 <i class="fas fa-clipboard-list"></i>
                                 <h6>Belum ada lomba yang ditugaskan</h6>
-                                <p>Silakan hubungi panitia untuk penugasan lomba.</p>
+                                <p>Silakan hubungi Admin untuk penugasan lomba.</p>
                             </div>
                         </td>
                     </tr>

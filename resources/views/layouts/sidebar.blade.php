@@ -62,8 +62,8 @@
             @endif
 
             <li class="nav-item">
-                <a class="nav-link {{ request()->routeIs('ranking') ? 'active' : '' }}" 
-                   href="{{ route('ranking') }}">
+                <a class="nav-link {{ request()->routeIs('dashboard.ranking') ? 'active' : '' }}" 
+                href="{{ route('dashboard.ranking') }}">
                     <i class="fas fa-chart-line me-2"></i>
                     <span>Ranking</span>
                 </a>

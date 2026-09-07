@@ -10,6 +10,7 @@ use App\Http\Controllers\SuperAdminDashboardController;
 use App\Http\Controllers\JuriLombaController;
 use App\Http\Controllers\FinalisController;
 use App\Http\Controllers\NilaiController;
+use App\Http\Controllers\PenghargaanController; 
 use Illuminate\Support\Facades\Route;
 
 Route::get('/login', [LoginController::class, 'show'])->name('login');
@@ -45,6 +46,12 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/nilai', [NilaiController::class, 'index'])->name('nilai.index');
     Route::get('/nilai/create/{id_lomba}', [NilaiController::class, 'create'])->name('nilai.create');
     Route::post('/nilai', [NilaiController::class, 'store'])->name('nilai.store');
+
+    Route::get('/dashboard/penghargaan', [PenghargaanController::class, 'index'])->name('penghargaan.index');
+    Route::post('/dashboard/penghargaan', [PenghargaanController::class, 'store'])->name('penghargaan.store');
+    Route::put('/dashboard/penghargaan/{id}', [PenghargaanController::class, 'update'])->name('penghargaan.update');
+    Route::post('/dashboard/penghargaan/{id}/assign-tim', [PenghargaanController::class, 'assignTim'])->name('penghargaan.assignTim');
+    Route::delete('/dashboard/penghargaan/{id}', [PenghargaanController::class, 'destroy'])->name('penghargaan.destroy');
 });
 
 Route::middleware(['auth', 'super_admin'])->group(function () {

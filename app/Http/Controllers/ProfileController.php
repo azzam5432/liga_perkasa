@@ -8,7 +8,8 @@ use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use App\Models\Tim;
 use App\Models\Peserta;
-use App\Models\lomba;
+use App\Models\Lomba;
+use App\Models\Nilai;
 
 class ProfileController extends Controller
 {
@@ -16,11 +17,13 @@ class ProfileController extends Controller
     {
         $user = Auth::user();
 
+        $totalLomba = Lomba::count();
         $totalTim = Tim::count();
         $totalPeserta = Peserta::count();
-        $totalLomba = Lomba::count();
+        $totalNilai = Nilai::count();
 
-        return view('profile.index', compact('user','totalTim', 'totalPeserta', 'totalLomba'));
+        // Pastikan kamu return view yang benar, yaitu profile.index
+        return view('profile.index', compact('user', 'totalLomba', 'totalTim', 'totalPeserta', 'totalNilai'));
     }
 
     public function edit()
@@ -82,6 +85,10 @@ class ProfileController extends Controller
             'password' => Hash::make($request->new_password),
         ]);
 
-        return redirect()->route('profile.index')->with('success', 'Password berhasil diupdate!');
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('login')->with('success', 'Password berhasil diganti. Silakan login ulang.');
     }
 }

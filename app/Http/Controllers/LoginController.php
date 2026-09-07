@@ -24,7 +24,7 @@ class LoginController extends Controller
 
             $user = Auth::user();
             
-            // Arahkan langsung tanpa menggunakan intended()
+            // Arahkan berdasarkan role
             if ($user->isSuperAdmin()) {
                 return redirect()->route('admin.dashboard');
             }
@@ -33,8 +33,8 @@ class LoginController extends Controller
                 return redirect()->route('dashboard');
             }
 
-            // Jika role lain (misal Juri)
-            return redirect()->intended('/');
+            // Jika role lain (misal Juri atau user biasa)
+            return redirect()->route('dashboard');
         }
 
         return back()->withErrors([

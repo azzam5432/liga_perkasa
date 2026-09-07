@@ -16,17 +16,24 @@
         }
         
         body {
-            background: #f0f2f5;
+            /* BACKGROUND GAMBAR MENYELURUH */
+            background: linear-gradient(rgba(10, 20, 40, 0.85), rgba(10, 20, 40, 0.95)), url('/icon/liga.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
             min-height: 100vh;
+            margin: 0;
         }
         
         .public-navbar {
-            background: #1a365d;
+            background: rgba(26, 54, 93, 0.9); /* Semi transparan */
             padding: 14px 24px;
             color: white;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
         }
         
         .public-navbar .brand {
@@ -62,8 +69,10 @@
         .public-footer {
             text-align: center;
             padding: 20px;
-            color: #718096;
+            color: rgba(255, 255, 255, 0.7);
             font-size: 13px;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(5px);
         }
     </style>
 </head>

@@ -6,6 +6,7 @@ use App\Models\Lomba;
 use App\Models\Tim;
 use App\Models\Finalis;
 use App\Models\Nilai;
+use App\Models\Penghargaan;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -104,6 +105,14 @@ class FinalisController extends Controller
     {
         $lombas = Lomba::all();
         $tim = Tim::all();
+        $penghargaan = Penghargaan::with('tim')->get()->keyBy('kategori');
+
+        $kategoriList = [
+            'essay_terbaik' => 'Essay Terbaik',
+            'video_perkenalan' => 'Video Perkenalan Terbaik',
+            'kompak_aktif' => 'Kelompok Paling Kompak & Aktif Positif',
+            'simpatik' => 'Kelompok Paling Simpatik',
+        ];
 
         $rekapTim = [];
         foreach ($tim as $t) {
@@ -127,11 +136,24 @@ class FinalisController extends Controller
                 }
             }
 
+            $penghargaanTim = [];
+            foreach ($penghargaan as $p) {
+                if ($p->id_tim == $t->id_tim) {
+                    $totalNilai += $p->bobot;
+                    $penghargaanTim[] = [
+                        'kategori' => $p->kategori,
+                        'label' => $kategoriList[$p->kategori] ?? $p->kategori,
+                        'bobot' => $p->bobot,
+                    ];
+                }
+            }
+
             $rekapTim[] = [
                 'tim' => $t,
                 'total_nilai' => $totalNilai,
                 'jml_menang' => $jmlMenang,
                 'detail' => $detail,
+                'penghargaan' => $penghargaanTim,
             ];
         }
 
@@ -139,6 +161,6 @@ class FinalisController extends Controller
             return $b['total_nilai'] <=> $a['total_nilai'];
         });
 
-        return view('ranking', compact('rekapTim'));
+        return view('ranking', compact('rekapTim', 'penghargaan'));
     }
 }

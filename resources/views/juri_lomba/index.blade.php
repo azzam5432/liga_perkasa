@@ -654,9 +654,6 @@
                                 <i class="fas fa-user-tag"></i>
                                 <h6>Belum ada penugasan juri</h6>
                                 <p>Silakan tambahkan penugasan baru melalui tombol di atas.</p>
-                                <button class="btn-primary-custom" onclick="openTambahPenugasanModal()" style="display: inline-flex; border: none;">
-                                    <i class="fas fa-plus me-1"></i> Tambah Penugasan
-                                </button>
                             </div>
                         </td>
                     </tr>

@@ -19,17 +19,17 @@
     font-weight: 700;
     color: #1a2332;
     margin: 0;
-    font-size: 20px;
+    font-size: 22px; /* Diperbesar dari 20px */
 }
 
 .page-header .btn-primary-custom {
     background: #1a365d;
     border: none;
     color: #ffffff;
-    padding: 8px 20px;
+    padding: 10px 24px; /* Padding sedikit lebih besar */
     border-radius: 8px;
     font-weight: 600;
-    font-size: 14px;
+    font-size: 15px; /* Diperbesar dari 14px */
     transition: all 0.2s ease;
     display: inline-flex;
     align-items: center;
@@ -61,17 +61,17 @@
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 0;
-    font-size: 14px;
+    font-size: 15px; /* Diperbesar dari 14px */
 }
 
 .table-scroll table thead th {
     background: #f7fafc;
     color: #4a5568;
     font-weight: 600;
-    font-size: 11px;
+    font-size: 13px; /* Diperbesar dari 11px */
     text-transform: uppercase;
     letter-spacing: 0.4px;
-    padding: 10px 14px;
+    padding: 12px 14px;
     border-bottom: 2px solid #edf2f7;
     text-align: left;
     white-space: nowrap;
@@ -81,7 +81,7 @@
 }
 
 .table-scroll table tbody td {
-    padding: 10px 14px;
+    padding: 12px 14px; /* Padding sedikit lebih besar */
     vertical-align: middle;
     color: #2d3748;
     border-bottom: 1px solid #f7fafc;
@@ -133,24 +133,24 @@
 .badge-bobot {
     background: #ebf8ff;
     color: #2b6cb0;
-    padding: 2px 10px;
+    padding: 4px 12px; /* Padding lebih besar */
     border-radius: 12px;
-    font-size: 11px;
+    font-size: 14px; /* Diperbesar dari 11px */
     font-weight: 600;
 }
 
 .badge-tim {
     background: #c6f6d5;
     color: #22543d;
-    padding: 2px 10px;
+    padding: 4px 12px; /* Padding lebih besar */
     border-radius: 12px;
-    font-size: 11px;
+    font-size: 14px; /* Diperbesar dari 11px */
     font-weight: 600;
 }
 
 .btn-action {
-    width: 28px;
-    height: 28px;
+    width: 34px; /* Lebih besar dari 28px */
+    height: 34px; /* Lebih besar dari 28px */
     border-radius: 6px;
     display: inline-flex;
     align-items: center;
@@ -159,7 +159,7 @@
     background: transparent;
     color: #a0aec0;
     transition: all 0.2s ease;
-    font-size: 12px;
+    font-size: 14px; /* Diperbesar dari 12px */
     text-decoration: none;
     cursor: pointer;
 }
@@ -199,7 +199,7 @@
 }
 
 .empty-state i {
-    font-size: 40px;
+    font-size: 48px; /* Diperbesar dari 40px */
     color: #e2e8f0;
     margin-bottom: 12px;
     display: block;
@@ -209,12 +209,12 @@
     color: #1a2332;
     font-weight: 600;
     margin-bottom: 4px;
-    font-size: 16px;
+    font-size: 18px; /* Diperbesar dari 16px */
 }
 
 .empty-state p {
     color: #a0aec0;
-    font-size: 13px;
+    font-size: 14px; /* Diperbesar dari 13px */
     margin-bottom: 14px;
 }
 
@@ -232,7 +232,7 @@
 .modal-custom .modal-header .modal-title {
     font-weight: 700;
     color: #1a2332;
-    font-size: 18px;
+    font-size: 20px; /* Diperbesar dari 18px */
 }
 
 .modal-custom .modal-body {
@@ -248,7 +248,7 @@
 
 .modal-custom .form-label {
     font-weight: 600;
-    font-size: 13px;
+    font-size: 14px; /* Diperbesar dari 13px */
     color: #1a2332;
 }
 
@@ -256,8 +256,8 @@
 .modal-custom .form-select {
     border: 1px solid #e2e8f0;
     border-radius: 8px;
-    padding: 8px 14px;
-    font-size: 14px;
+    padding: 10px 14px; /* Padding lebih besar */
+    font-size: 15px; /* Diperbesar dari 14px */
     transition: all 0.2s ease;
 }
 
@@ -271,9 +271,10 @@
     background: #edf2f7;
     border: none;
     color: #4a5568;
-    padding: 8px 20px;
+    padding: 10px 22px; /* Padding lebih besar */
     border-radius: 8px;
     font-weight: 600;
+    font-size: 15px; /* Diperbesar dari 14px */
     transition: all 0.2s ease;
 }
 
@@ -285,9 +286,10 @@
     background: #1a365d;
     border: none;
     color: #ffffff;
-    padding: 8px 24px;
+    padding: 10px 26px; /* Padding lebih besar */
     border-radius: 8px;
     font-weight: 600;
+    font-size: 15px; /* Diperbesar dari 14px */
     transition: all 0.2s ease;
 }
 
@@ -295,6 +297,7 @@
     background: #2b6cb0;
 }
 
+/* RESPONSIVE - TIDAK DIUBAH */
 @media (max-width: 768px) {
     .page-header {
         flex-direction: row;

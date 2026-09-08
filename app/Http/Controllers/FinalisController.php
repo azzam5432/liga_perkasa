@@ -102,65 +102,32 @@ class FinalisController extends Controller
     }
 
     public function ranking()
-    {
-        $lombas = Lomba::all();
-        $tim = Tim::all();
-        $penghargaan = Penghargaan::with('tim')->get()->keyBy('kategori');
-
-        $kategoriList = [
-            'essay_terbaik' => 'Essay Terbaik',
-            'video_perkenalan' => 'Video Perkenalan Terbaik',
-            'kompak_aktif' => 'Kelompok Paling Kompak & Aktif Positif',
-            'simpatik' => 'Kelompok Paling Simpatik',
-        ];
-
-        $rekapTim = [];
-        foreach ($tim as $t) {
-            $totalNilai = 0;
-            $jmlMenang = 0;
-            $detail = [];
-
-            foreach ($lombas as $l) {
-                $nilai = Nilai::where('id_tim', $t->id_tim)
-                    ->where('id_lomba', $l->id_lomba)
-                    ->sum('nilai');
-
-                if ($nilai > 0) {
-                    $totalNilai += $nilai;
-                    $jmlMenang++;
-                    $detail[] = [
-                        'lomba' => $l->nama_lomba,
-                        'nilai' => $nilai,
-                        'babak' => $l->is_final_active ? 'final' : 'penyisihan',
+{
+    $rekapTim = Tim::with(['nilai', 'penghargaan', 'pesertas', 'dosenPembimbing', 'kakakPembimbing'])
+        ->get()
+        ->map(function($tim) {
+            return [
+                'tim' => $tim,
+                'total_nilai' => $tim->nilai->sum('nilai') + $tim->penghargaan->sum('bobot'),
+                'jml_menang' => $tim->nilai->where('status', 'menang')->count(),
+                'detail' => $tim->nilai->map(function($nilai) {
+                    return [
+                        'lomba' => $nilai->lomba->nama_lomba ?? '-',
+                        'babak' => $nilai->babak ?? '-',
+                        'nilai' => $nilai->nilai,
                     ];
-                }
-            }
-
-            $penghargaanTim = [];
-            foreach ($penghargaan as $p) {
-                if ($p->id_tim == $t->id_tim) {
-                    $totalNilai += $p->bobot;
-                    $penghargaanTim[] = [
+                }),
+                'penghargaan' => $tim->penghargaan->map(function($p) {
+                    return [
                         'kategori' => $p->kategori,
-                        'label' => $kategoriList[$p->kategori] ?? $p->kategori,
                         'bobot' => $p->bobot,
                     ];
-                }
-            }
-
-            $rekapTim[] = [
-                'tim' => $t,
-                'total_nilai' => $totalNilai,
-                'jml_menang' => $jmlMenang,
-                'detail' => $detail,
-                'penghargaan' => $penghargaanTim,
+                }),
             ];
-        }
+        })
+        ->sortByDesc('total_nilai')
+        ->values();
 
-        usort($rekapTim, function($a, $b) {
-            return $b['total_nilai'] <=> $a['total_nilai'];
-        });
-
-        return view('ranking', compact('rekapTim', 'penghargaan'));
-    }
+    return view('ranking', compact('rekapTim'));
+}
 }

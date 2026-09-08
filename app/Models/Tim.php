@@ -1,5 +1,4 @@
 <?php
-// app/Models/Tim.php
 
 namespace App\Models;
 
@@ -26,7 +25,6 @@ class Tim extends Model
         return $this->hasMany(Nilai::class, 'id_tim', 'id_tim');
     }
 
-    // ✅ TAMBAHKAN RELASI INI
     public function dosenPembimbing()
     {
         return $this->hasMany(DosenPembimbing::class, 'id_tim', 'id_tim');
@@ -35,6 +33,11 @@ class Tim extends Model
     public function kakakPembimbing()
     {
         return $this->hasMany(KakakPembimbing::class, 'id_tim', 'id_tim');
+    }
+
+    public function penghargaan()
+    {
+        return $this->hasMany(Penghargaan::class, 'id_tim', 'id_tim');
     }
 
     public function getTotalNilaiAttribute()

@@ -10,6 +10,7 @@ use App\Http\Controllers\SuperAdminDashboardController;
 use App\Http\Controllers\JuriLombaController;
 use App\Http\Controllers\FinalisController;
 use App\Http\Controllers\NilaiController;
+use App\Http\Controllers\ExportController;
 use App\Http\Controllers\PenghargaanController; 
 use Illuminate\Support\Facades\Route;
 
@@ -69,4 +70,6 @@ Route::middleware(['auth', 'super_admin'])->group(function () {
     
     Route::resource('juri_lomba', JuriLombaController::class);
     Route::get('/get-juri-by-lomba/{id_lomba}', [JuriLombaController::class, 'getJuriByLomba'])->name('get.juri.by.lomba');
+
+    Route::get('/ranking/export', [ExportController::class, 'exportRanking'])->name('ranking.export');
 });

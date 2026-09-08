@@ -1,5 +1,4 @@
 <?php
-// app/Models/Peserta.php
 
 namespace App\Models;
 

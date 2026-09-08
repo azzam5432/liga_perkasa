@@ -1,5 +1,4 @@
 <?php
-// app/Models/Nilai.php
 
 namespace App\Models;
 

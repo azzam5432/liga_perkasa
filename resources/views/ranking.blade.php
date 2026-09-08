@@ -13,7 +13,6 @@
 /* ===== PUBLIC STYLE ===== */
 @if(!Auth::check())
 .ranking-page {
-    /* Background dihapus dari sini karena sudah di body layout public */
     padding: 0;
     margin: 0;
 }
@@ -31,7 +30,6 @@ body {
     margin: 0 auto;
 }
 
-/* Public Header */
 .public-header {
     text-align: center;
     margin-bottom: 30px;
@@ -59,7 +57,6 @@ body {
     text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
 }
 
-/* Public Search */
 .public-search {
     display: flex;
     gap: 12px;
@@ -110,7 +107,6 @@ body {
     font-size: 15px;
 }
 
-/* Public Table */
 .public-table-wrapper {
     background: rgba(0, 0, 0, 0.5);
     border-radius: 12px;
@@ -180,7 +176,6 @@ body {
     font-weight: 600;
 }
 
-/* Public Empty State */
 .public-empty {
     padding: 60px 16px;
     text-align: center;
@@ -206,7 +201,6 @@ body {
     margin: 0;
 }
 
-/* Tombol Aksi Public */
 .btn-action-public {
     width: 36px;
     height: 36px;
@@ -228,13 +222,12 @@ body {
 }
 @endif
 
-/* ===== AUTH STYLE (Panitia & Admin) ===== */
+/* ===== AUTH STYLE ===== */
 @if(Auth::check())
 .ranking-page {
     background: #f8f9fa;
 }
 
-/* Header */
 .page-header {
     display: flex;
     justify-content: space-between;
@@ -278,7 +271,6 @@ body {
     box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
 }
 
-/* Filter */
 .filter-bar {
     display: flex;
     gap: 12px;
@@ -328,7 +320,6 @@ body {
     font-size: 15px;
 }
 
-/* Table Auth */
 .table-wrapper {
     background: #ffffff;
     border-radius: 8px;
@@ -375,7 +366,6 @@ body {
     background: #f8f9fa;
 }
 
-/* Auth Medal */
 .table-scroll .medal-emoji {
     font-size: 28px;
 }
@@ -404,7 +394,6 @@ body {
     font-size: 15px;
 }
 
-/* Action Button Auth */
 .btn-action {
     width: 36px;
     height: 36px;
@@ -435,7 +424,6 @@ body {
     border-color: #0d6efd;
 }
 
-/* Empty State Auth */
 .empty-state {
     padding: 50px 16px;
     text-align: center;
@@ -462,7 +450,7 @@ body {
 }
 @endif
 
-/* ===== MODAL (Sama untuk semua) ===== */
+/* ===== MODAL ===== */
 .modal-custom .modal-content {
     border: none;
     border-radius: 12px;
@@ -504,36 +492,6 @@ body {
 
 .modal-custom .btn-secondary-custom:hover {
     background: #e9ecef;
-    color: #000000;
-}
-
-.detail-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 0;
-    border-bottom: 1px solid #f1f3f5;
-}
-
-.detail-item:last-child {
-    border-bottom: none;
-}
-
-.detail-item .detail-lomba {
-    font-weight: 700;
-    font-size: 15px;
-    color: #000000;
-}
-
-.detail-item .detail-babak {
-    font-size: 13px;
-    color: #6c757d;
-    font-style: italic;
-}
-
-.detail-item .detail-nilai {
-    font-weight: 700;
-    font-size: 16px;
     color: #000000;
 }
 
@@ -709,20 +667,21 @@ body {
 @if(Auth::check())
 <!-- ===== TAMPILAN PANITIA / ADMIN ===== -->
 <div class="ranking-page">
+    
     <div class="page-header">
         <h4><i class="fas fa-trophy"></i> Ranking Lomba</h4>
-        
-        @if(Auth::user()->isPanitia() || Auth::user()->isSuperAdmin())
-            <a href="{{ route('penghargaan.index') }}" class="btn-award">
-                <i class="fas fa-award"></i> Penghargaan
-            </a>
-        @endif
-    </div>
-
-    <div class="filter-bar">
-        <div class="search-box">
-            <i class="fas fa-search"></i>
-            <input type="text" id="searchInput" placeholder="Cari nama tim...">
+        <div class="d-flex gap-2">
+            @if(Auth::user()->isSuperAdmin())
+                <a href="{{ route('ranking.export') }}" class="btn btn-success">
+                    <i class="fas fa-file-excel me-1"></i> Export Excel
+                </a>
+            @endif
+            
+            @if(Auth::user()->isPanitia() || Auth::user()->isSuperAdmin())
+                <a href="{{ route('penghargaan.index') }}" class="btn-award">
+                    <i class="fas fa-award"></i> Penghargaan
+                </a>
+            @endif
         </div>
     </div>
 
@@ -763,7 +722,8 @@ body {
                                     {{ $item['total_nilai'] }},
                                     {{ $item['jml_menang'] }},
                                     {{ json_encode($item['detail']) }},
-                                    {{ json_encode($item['tim']->load('pesertas', 'dosenPembimbing', 'kakakPembimbing')) }}
+                                    {{ json_encode($item['tim']->load('pesertas', 'dosenPembimbing', 'kakakPembimbing')) }},
+                                    {{ json_encode($item['penghargaan'] ?? []) }}
                                 )">
                                     <i class="fas fa-eye"></i>
                                 </button>
@@ -814,7 +774,7 @@ body {
                             <th style="min-width: 180px;">Nama Tim</th>
                             <th style="min-width: 100px; text-align: center;">Total Nilai</th>
                             <th style="min-width: 100px; text-align: center;">Jumlah Menang</th>
-                            <th style="width: 70px; text-align: center;">Aksi</th> <!-- Kolom Aksi Ditambahkan -->
+                            <th style="width: 70px; text-align: center;">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -842,7 +802,8 @@ body {
                                         {{ $item['total_nilai'] }},
                                         {{ $item['jml_menang'] }},
                                         {{ json_encode($item['detail']) }},
-                                        {{ json_encode($item['tim']->load('pesertas', 'dosenPembimbing', 'kakakPembimbing')) }}
+                                        {{ json_encode($item['tim']->load('pesertas', 'dosenPembimbing', 'kakakPembimbing')) }},
+                                        {{ json_encode($item['penghargaan'] ?? []) }}
                                     )">
                                         <i class="fas fa-eye"></i>
                                     </button>
@@ -867,7 +828,7 @@ body {
 </div>
 @endif
 
-<!-- ===== MODAL (Sama untuk semua) ===== -->
+<!-- ===== MODAL ===== -->
 <div class="modal fade modal-custom" id="detailModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
@@ -878,6 +839,7 @@ body {
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
+                <!-- Header Tim -->
                 <div class="text-center mb-4">
                     <div style="width: 80px; height: 80px; border-radius: 50%; background: #ffc107; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
                         <i class="fas fa-trophy" style="font-size: 36px; color: #000000;"></i>
@@ -885,6 +847,7 @@ body {
                     <h5 class="mt-3 fw-bold" id="modalNamaTim">-</h5>
                 </div>
 
+                <!-- Statistik Utama -->
                 <div class="row mb-4">
                     <div class="col-md-6">
                         <div class="bg-light-custom">
@@ -900,30 +863,60 @@ body {
                     </div>
                 </div>
 
-                <div class="row mb-3">
-                    <div class="col-md-4">
-                        <span class="info-label">Ketua Tim</span>
-                        <div id="modalKetua" style="font-size: 15px; color: #000000;">-</div>
-                    </div>
-                    <div class="col-md-4">
-                        <span class="info-label">Dosen Pembimbing</span>
-                        <div id="modalDosen" style="font-size: 15px; color: #000000;">-</div>
-                    </div>
-                    <div class="col-md-4">
-                        <span class="info-label">Kakak Mentor</span>
-                        <div id="modalKakak" style="font-size: 15px; color: #000000;">-</div>
+                <div class="mb-4 p-3" style="background: #fff8e1; border: 1px solid #ffe082; border-radius: 10px;">
+                    <h6 class="fw-bold mb-2" style="color: #f57f17;">
+                        <i class="fas fa-award me-2"></i> Penghargaan
+                    </h6>
+                    <div id="modalPenghargaan" style="font-size: 15px; color: #000000;">
+                        <span class="text-muted">Tidak ada penghargaan</span>
                     </div>
                 </div>
 
-                <div class="mb-3">
-                    <span class="info-label">Anggota Tim</span>
-                    <div id="modalAnggota" style="font-size: 15px; color: #000000;">-</div>
+                <!-- SECTION: DETAIL LOMBA (Biru) -->
+                <div class="mb-4 p-3" style="background: #e3f2fd; border: 1px solid #90caf9; border-radius: 10px;">
+                    <h6 class="fw-bold mb-2" style="color: #1565c0;">
+                        <i class="fas fa-trophy me-2"></i> Detail Lomba yang Dimenangkan
+                    </h6>
+                    <div id="modalDetailLomba" style="font-size: 15px; color: #000000;">
+                        <span class="text-muted">Tidak ada lomba yang dimenangkan</span>
+                    </div>
+                </div>
+                <!-- SECTION: PEMBIMBING (Abu-abu) -->
+                <div class="mb-4 p-3" style="background: #f5f5f5; border: 1px solid #e0e0e0; border-radius: 10px;">
+                    <h6 class="fw-bold mb-2" style="color: #424242;">
+                        <i class="fas fa-user-tie me-2"></i> Pembimbing dan Mentor
+                    </h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <span class="info-label">Dosen Pembimbing</span>
+                            <div id="modalDosen" style="font-size: 15px; color: #000000;">-</div>
+                        </div>
+                        <div class="col-md-6">
+                            <span class="info-label">Kakak Mentor</span>
+                            <div id="modalKakak" style="font-size: 15px; color: #000000;">-</div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="mt-3">
-                    <span class="info-label">Detail Lomba yang Dimenangkan</span>
-                    <div id="modalDetailLomba" style="font-size: 15px; color: #000000;">-</div>
+                <!-- SECTION: KETUA TIM (Ungu) -->
+                <div class="mb-4 p-3" style="background: #f3e5f5; border: 1px solid #ce93d8; border-radius: 10px;">
+                    <h6 class="fw-bold mb-2" style="color: #6a1b9a;">
+                        <i class="fas fa-crown me-2"></i> Ketua Tim
+                    </h6>
+                    <div id="modalKetua" style="font-size: 15px; color: #000000;">-</div>
                 </div>
+
+                <!-- SECTION: ANGGOTA TIM (Hijau) -->
+                <div class="mb-4 p-3" style="background: #e8f5e9; border: 1px solid #a5d6a7; border-radius: 10px;">
+                    <h6 class="fw-bold mb-2" style="color: #2e7d32;">
+                        <i class="fas fa-users me-2"></i> Anggota Tim
+                    </h6>
+                    <div id="modalAnggota" style="font-size: 15px; color: #000000;">
+                        <span class="text-muted">Tidak ada anggota</span>
+                    </div>
+                </div>
+
+                
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn-secondary-custom" data-bs-dismiss="modal">
@@ -972,14 +965,28 @@ document.addEventListener('DOMContentLoaded', function() {
     @endif
 });
 
-function openModal(namaTim, totalNilai, jumlahMenang, detail, timData) {
+function openModal(namaTim, totalNilai, jumlahMenang, detail, timData, penghargaan) {
     const modal = new bootstrap.Modal(document.getElementById('detailModal'));
     
     document.getElementById('modalNamaTim').textContent = namaTim || '-';
     document.getElementById('modalTotalNilai').textContent = parseFloat(totalNilai).toFixed(1).replace('.', ',');
     document.getElementById('modalJumlahMenang').textContent = jumlahMenang || 0;
 
-    let ketua = '-', anggotaHtml = '-';
+    // ===== PENGHARGAAN =====
+    let penghargaanHtml = '<span class="text-muted">Tidak ada penghargaan</span>';
+    if (penghargaan && Array.isArray(penghargaan) && penghargaan.length > 0) {
+        penghargaanHtml = penghargaan.map(p => `
+            <div class="d-flex align-items-center mb-2">
+                <i class="fas fa-medal me-2" style="color: #f57f17;"></i>
+                <span class="fw-semibold">${p.kategori}</span>
+                <span class="badge bg-warning text-dark ms-2">+${p.bobot} poin</span>
+            </div>
+        `).join('');
+    }
+    document.getElementById('modalPenghargaan').innerHTML = penghargaanHtml;
+
+    // ===== ANGGOTA =====
+    let ketua = '-', anggotaHtml = '<span class="text-muted">Tidak ada anggota</span>';
     if (timData && timData.pesertas) {
         const ketuaData = timData.pesertas.find(p => p.ketua_peserta);
         ketua = ketuaData ? ketuaData.ketua_peserta : '-';
@@ -992,6 +999,7 @@ function openModal(namaTim, totalNilai, jumlahMenang, detail, timData) {
     document.getElementById('modalKetua').innerHTML = ketua;
     document.getElementById('modalAnggota').innerHTML = anggotaHtml;
 
+    // ===== DOSEN & KAKAK =====
     let dosenHtml = '-';
     if (timData && timData.dosen_pembimbing && timData.dosen_pembimbing.length > 0) {
         dosenHtml = '<ul class="info-list">' + timData.dosen_pembimbing.map(d => `<li>${d.nama_dosen}</li>`).join('') + '</ul>';
@@ -1004,7 +1012,8 @@ function openModal(namaTim, totalNilai, jumlahMenang, detail, timData) {
     }
     document.getElementById('modalKakak').innerHTML = kakakHtml;
 
-    let detailHtml = '-';
+    // ===== DETAIL LOMBA =====
+    let detailHtml = '<span class="text-muted">Tidak ada lomba yang dimenangkan</span>';
     if (detail && Array.isArray(detail) && detail.length > 0) {
         detailHtml = detail.map(item => `
             <div class="detail-item">

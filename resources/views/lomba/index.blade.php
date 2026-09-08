@@ -110,7 +110,7 @@
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 0;
-    font-size: 15px; /* Sedikit lebih besar dari 14px */
+    font-size: 15px;
     min-width: 500px;
 }
 
@@ -118,10 +118,10 @@
     background: #f7fafc;
     color: #4a5568;
     font-weight: 700;
-    font-size: 12px; /* Sedikit lebih besar */
+    font-size: 12px;
     text-transform: uppercase;
     letter-spacing: 0.4px;
-    padding: 12px 14px; /* Padding sedikit lebih besar */
+    padding: 12px 14px;
     border-bottom: 2px solid #edf2f7;
     text-align: left;
     white-space: nowrap;
@@ -131,7 +131,7 @@
 }
 
 .table-scroll table tbody td {
-    padding: 12px 14px; /* Padding sedikit lebih besar */
+    padding: 12px 14px;
     vertical-align: middle;
     color: #2d3748;
     border-bottom: 1px solid #f7fafc;
@@ -181,27 +181,15 @@
     box-shadow: -2px 0 8px rgba(0,0,0,0.03);
 }
 
-/* HAPUS WARNA BADGE, GANTI JADI TEKS BIASA */
 .badge-juri {
     background: transparent;
     color: #4a5568;
     padding: 0;
     border-radius: 0;
-    font-size: 14px; /* Lebih besar */
+    font-size: 14px;
     font-weight: 600;
     display: inline-block;
     margin: 2px;
-}
-
-.badge-status {
-    padding: 0;
-    border-radius: 0;
-    font-size: 14px; /* Lebih besar */
-    font-weight: 600;
-    display: inline;
-    white-space: nowrap;
-    background: transparent !important;
-    color: #2d3748 !important; /* Warna teks netral */
 }
 
 .btn-action {
@@ -251,7 +239,7 @@
 
 .btn-action.btn-success {
     color: #22543d;
-    background: transparent; /* Hilangkan background hijau */
+    background: transparent;
 }
 
 .btn-action.btn-success:hover {
@@ -409,11 +397,6 @@
     background: #2b6cb0;
 }
 
-.modal-custom .btn-primary-custom:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
 .jenis-card {
     border: 2px solid #e2e8f0;
     border-radius: 10px;
@@ -485,8 +468,7 @@
     }
 
     .table-scroll table thead th:nth-child(3),
-    .table-scroll table thead th:nth-child(4),
-    .table-scroll table thead th:nth-child(5) {
+    .table-scroll table thead th:nth-child(4) {
         display: none;
     }
 
@@ -497,8 +479,7 @@
     }
 
     .table-scroll table tbody td:nth-child(3),
-    .table-scroll table tbody td:nth-child(4),
-    .table-scroll table tbody td:nth-child(5) {
+    .table-scroll table tbody td:nth-child(4) {
         display: none;
     }
 
@@ -591,7 +572,6 @@
                     <th style="width: 40px; min-width: 40px;">No</th>
                     <th class="col-sticky-left" style="min-width: 170px;">Nama Lomba</th>
                     <th style="min-width: 120px;">Jenis</th>
-                    <th style="min-width: 120px;">Status</th>
                     <th style="min-width: 200px;">Juri</th>
                     <th class="col-sticky-right" style="min-width: 120px; text-align: center;">Aksi</th>
                 </tr>
@@ -606,13 +586,6 @@
                         <td>
                             @if($item->jenis)
                                 <span style="font-size: 15px;">{{ $item->jenis }}</span>
-                            @else
-                                <span class="text-muted" style="font-size: 15px;">-</span>
-                            @endif
-                        </td>
-                        <td>
-                            @if($item->status)
-                                <span class="badge-status" style="font-size: 15px;">{{ $item->status }}</span>
                             @else
                                 <span class="text-muted" style="font-size: 15px;">-</span>
                             @endif
@@ -652,7 +625,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6">
+                        <td colspan="5">
                             <div class="empty-state">
                                 <i class="fas fa-trophy"></i>
                                 <h6>Belum ada data lomba</h6>
@@ -1083,24 +1056,9 @@ function openShowLombaModal(id) {
                     <i class="fas fa-trophy"></i>
                 </div>
                 <h5 class="mt-2 fw-bold">${lomba.nama_lomba || '-'}</h5>
-                ${lomba.kategori ? `<span class="badge bg-secondary">${lomba.kategori}</span>` : ''}
                 ${lomba.jenis ? `<span class="badge bg-info ms-1">${lomba.jenis}</span>` : ''}
             </div>
         `;
-
-        if (lomba.status) {
-            const statusClass = lomba.status === 'open' ? 'badge-status-open' : 
-                               lomba.status === 'draft' ? 'badge-status-draft' :
-                               lomba.status === 'selesai' ? 'badge-status-selesai' : 'badge-status-closed';
-            const statusLabel = lomba.status_label || lomba.status;
-            html += `
-                <div class="mb-3 text-center">
-                    <span class="badge-status ${statusClass}">
-                        <span class="dot"></span> ${statusLabel}
-                    </span>
-                </div>
-            `;
-        }
 
         if (lomba.deskripsi) {
             html += `

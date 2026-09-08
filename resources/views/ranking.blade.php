@@ -57,56 +57,6 @@ body {
     text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
 }
 
-.public-search {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-    align-items: center;
-    background: rgba(0, 0, 0, 0.4);
-    padding: 12px 16px;
-    border-radius: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(6px);
-}
-
-.public-search .search-box {
-    flex: 1;
-    min-width: 200px;
-    position: relative;
-}
-
-.public-search .search-box input {
-    width: 100%;
-    padding: 10px 14px 10px 40px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 8px;
-    font-size: 15px;
-    background: rgba(255, 255, 255, 0.1);
-    color: #ffffff;
-    transition: all 0.3s;
-}
-
-.public-search .search-box input::placeholder {
-    color: rgba(255, 255, 255, 0.6);
-}
-
-.public-search .search-box input:focus {
-    outline: none;
-    border-color: #ffd700;
-    background: rgba(255, 255, 255, 0.2);
-    box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.2);
-}
-
-.public-search .search-box i {
-    position: absolute;
-    left: 14px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: rgba(255, 255, 255, 0.6);
-    font-size: 15px;
-}
-
 .public-table-wrapper {
     background: rgba(0, 0, 0, 0.5);
     border-radius: 12px;
@@ -662,7 +612,6 @@ body {
 }
 </style>
 
-<!-- ===== CONTENT ===== -->
 
 @if(Auth::check())
 <!-- ===== TAMPILAN PANITIA / ADMIN ===== -->
@@ -717,14 +666,14 @@ body {
                             </td>
                             <td style="text-align: center;">{{ $item['jml_menang'] }}</td>
                             <td style="text-align: center;">
-                                <button class="btn-action btn-info" title="Detail" onclick="openModal(
-                                    '{{ addslashes($item['tim']->nama_tim) }}',
-                                    {{ $item['total_nilai'] }},
-                                    {{ $item['jml_menang'] }},
-                                    {{ json_encode($item['detail']) }},
-                                    {{ json_encode($item['tim']->load('pesertas', 'dosenPembimbing', 'kakakPembimbing')) }},
-                                    {{ json_encode($item['penghargaan'] ?? []) }}
-                                )">
+                                <button class="btn-action btn-info btn-detail-tim" 
+                                        data-nama-tim="{{ $item['tim']->nama_tim }}"
+                                        data-total-nilai="{{ $item['total_nilai'] }}"
+                                        data-jml-menang="{{ $item['jml_menang'] }}"
+                                        data-detail='{{ json_encode($item['detail']) }}'
+                                        data-tim='{{ json_encode($item['tim']->load('pesertas', 'dosenPembimbing', 'kakakPembimbing')) }}'
+                                        data-penghargaan='{{ json_encode($item['penghargaan'] ?? []) }}'
+                                        title="Detail">
                                     <i class="fas fa-eye"></i>
                                 </button>
                             </td>
@@ -747,24 +696,13 @@ body {
 </div>
 
 @else
-<!-- ===== TAMPILAN PUBLIC ===== -->
 <div class="ranking-page">
     <div class="public-ranking-wrapper">
-        <!-- Public Header -->
         <div class="public-header">
             <h1><i class="fas fa-trophy"></i> Ranking Lomba Liga Perkasa</h1>
             <p>Berikut adalah daftar peringkat tim berdasarkan total nilai yang telah dikumpulkan.</p>
         </div>
 
-        <!-- Public Search -->
-        <div class="public-search">
-            <div class="search-box">
-                <i class="fas fa-search"></i>
-                <input type="text" id="publicSearchInput" placeholder="Cari nama tim...">
-            </div>
-        </div>
-
-        <!-- Public Table -->
         <div class="public-table-wrapper">
             <div class="table-scroll">
                 <table>
@@ -797,14 +735,14 @@ body {
                                 </td>
                                 <td class="jml-menang" style="text-align: center;">{{ $item['jml_menang'] }}</td>
                                 <td style="text-align: center;">
-                                    <button class="btn-action-public" title="Detail" onclick="openModal(
-                                        '{{ addslashes($item['tim']->nama_tim) }}',
-                                        {{ $item['total_nilai'] }},
-                                        {{ $item['jml_menang'] }},
-                                        {{ json_encode($item['detail']) }},
-                                        {{ json_encode($item['tim']->load('pesertas', 'dosenPembimbing', 'kakakPembimbing')) }},
-                                        {{ json_encode($item['penghargaan'] ?? []) }}
-                                    )">
+                                    <button class="btn-action-public btn-detail-tim-public" 
+                                            data-nama-tim="{{ $item['tim']->nama_tim }}"
+                                            data-total-nilai="{{ $item['total_nilai'] }}"
+                                            data-jml-menang="{{ $item['jml_menang'] }}"
+                                            data-detail='{{ json_encode($item['detail']) }}'
+                                            data-tim='{{ json_encode($item['tim']->load('pesertas', 'dosenPembimbing', 'kakakPembimbing')) }}'
+                                            data-penghargaan='{{ json_encode($item['penghargaan'] ?? []) }}'
+                                            title="Detail">
                                         <i class="fas fa-eye"></i>
                                     </button>
                                 </td>
@@ -929,40 +867,174 @@ body {
 
 <!-- ===== SCRIPT ===== -->
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Search untuk Auth
-    @if(Auth::check())
-    const searchInput = document.getElementById('searchInput');
-    if (searchInput) {
-        searchInput.addEventListener('keyup', function() {
-            const value = this.value.toLowerCase().trim();
-            const rows = document.querySelectorAll('#rankingTable tbody tr');
-            
-            rows.forEach(row => {
-                if (row.querySelector('.empty-state')) return;
-                const text = row.textContent.toLowerCase();
-                row.style.display = text.includes(value) ? '' : 'none';
-            });
-        });
-    }
-    @endif
+// ===== ARRAY UNTUK MENYIMPAN DATA TIM =====
+let timDataArray = {};
 
-    // Search untuk Public
-    @if(!Auth::check())
-    const publicSearch = document.getElementById('publicSearchInput');
-    if (publicSearch) {
-        publicSearch.addEventListener('keyup', function() {
-            const value = this.value.toLowerCase().trim();
-            const rows = document.querySelectorAll('.public-table-wrapper tbody tr');
-            
-            rows.forEach(row => {
-                if (row.querySelector('.public-empty')) return;
-                const text = row.textContent.toLowerCase();
-                row.style.display = text.includes(value) ? '' : 'none';
+// ===== FUNGSI UNTUK MENGAMBIL DATA RANKING =====
+function fetchRanking() {
+    fetch('/ranking/data')
+        .then(response => response.json())
+        .then(data => {
+            // Simpan data ke array global untuk digunakan saat klik
+            data.forEach((item, index) => {
+                timDataArray[item.tim.nama_tim] = item;
             });
-        });
+
+            // Update tabel untuk Auth (jika ada)
+            if (document.querySelector('#rankingTable tbody')) {
+                updateRankingTable(data);
+            }
+            // Update tabel untuk Public (jika ada)
+            if (document.querySelector('.public-table-wrapper tbody')) {
+                updatePublicRankingTable(data);
+            }
+        })
+        .catch(error => console.error('Error fetching ranking:', error));
+}
+
+// ===== UPDATE TABEL UNTUK AUTH (Panitia/Admin) =====
+function updateRankingTable(data) {
+    const tbody = document.querySelector('#rankingTable tbody');
+    if (!tbody) return;
+
+    // Kosongkan tabel
+    tbody.innerHTML = '';
+
+    // Loop data
+    data.forEach((item, index) => {
+        const row = document.createElement('tr');
+
+        // Rank
+        const rankCell = document.createElement('td');
+        rankCell.style.textAlign = 'center';
+        if (index === 0) {
+            rankCell.innerHTML = '<span class="medal-emoji">🥇</span>';
+        } else if (index === 1) {
+            rankCell.innerHTML = '<span class="medal-emoji">🥈</span>';
+        } else if (index === 2) {
+            rankCell.innerHTML = '<span class="medal-emoji">🥉</span>';
+        } else {
+            rankCell.innerHTML = `<span class="rank-number">${index + 1}</span>`;
+        }
+        row.appendChild(rankCell);
+
+        // Nama Tim
+        const nameCell = document.createElement('td');
+        nameCell.className = 'fw-semibold';
+        nameCell.textContent = item.tim.nama_tim;
+        row.appendChild(nameCell);
+
+        // Total Nilai
+        const totalCell = document.createElement('td');
+        totalCell.style.textAlign = 'center';
+        totalCell.textContent = Number(item.total_nilai).toFixed(1).replace('.', ',');
+        row.appendChild(totalCell);
+
+        // Jumlah Menang
+        const menangCell = document.createElement('td');
+        menangCell.style.textAlign = 'center';
+        menangCell.textContent = item.jml_menang;
+        row.appendChild(menangCell);
+
+        // Aksi (Detail) - HANYA NAMA TIM YANG DISIMPAN DI DATA ATTRIBUTE
+        const actionCell = document.createElement('td');
+        actionCell.style.textAlign = 'center';
+        actionCell.innerHTML = `
+            <button class="btn-action btn-info btn-detail-tim" 
+                    data-nama-tim="${item.tim.nama_tim}"
+                    title="Detail">
+                <i class="fas fa-eye"></i>
+            </button>
+        `;
+        row.appendChild(actionCell);
+
+        tbody.appendChild(row);
+    });
+}
+
+// ===== UPDATE TABEL UNTUK PUBLIC =====
+function updatePublicRankingTable(data) {
+    const tbody = document.querySelector('.public-table-wrapper tbody');
+    if (!tbody) return;
+
+    // Kosongkan tabel
+    tbody.innerHTML = '';
+
+    // Loop data
+    data.forEach((item, index) => {
+        const row = document.createElement('tr');
+
+        // Rank
+        const rankCell = document.createElement('td');
+        rankCell.style.textAlign = 'center';
+        if (index === 0) {
+            rankCell.innerHTML = '<span class="medal-emoji">🥇</span>';
+        } else if (index === 1) {
+            rankCell.innerHTML = '<span class="medal-emoji">🥈</span>';
+        } else if (index === 2) {
+            rankCell.innerHTML = '<span class="medal-emoji">🥉</span>';
+        } else {
+            rankCell.innerHTML = `<span class="rank-number">${index + 1}</span>`;
+        }
+        row.appendChild(rankCell);
+
+        // Nama Tim
+        const nameCell = document.createElement('td');
+        nameCell.className = 'tim-name';
+        nameCell.textContent = item.tim.nama_tim;
+        row.appendChild(nameCell);
+
+        // Total Nilai
+        const totalCell = document.createElement('td');
+        totalCell.className = 'total-nilai';
+        totalCell.style.textAlign = 'center';
+        totalCell.textContent = Number(item.total_nilai).toFixed(1).replace('.', ',');
+        row.appendChild(totalCell);
+
+        // Jumlah Menang
+        const menangCell = document.createElement('td');
+        menangCell.className = 'jml-menang';
+        menangCell.style.textAlign = 'center';
+        menangCell.textContent = item.jml_menang;
+        row.appendChild(menangCell);
+
+        // Aksi (Detail) - HANYA NAMA TIM YANG DISIMPAN DI DATA ATTRIBUTE
+        const actionCell = document.createElement('td');
+        actionCell.style.textAlign = 'center';
+        actionCell.innerHTML = `
+            <button class="btn-action-public btn-detail-tim-public" 
+                    data-nama-tim="${item.tim.nama_tim}"
+                    title="Detail">
+                <i class="fas fa-eye"></i>
+            </button>
+        `;
+        row.appendChild(actionCell);
+
+        tbody.appendChild(row);
+    });
+}
+
+// ===== EVENT DELEGATION (AGAR TOMBOL SELALU BERFUNGSI) =====
+document.addEventListener('click', function(event) {
+    // Untuk tombol Auth
+    const btnAuth = event.target.closest('.btn-detail-tim');
+    if (btnAuth) {
+        const namaTim = btnAuth.getAttribute('data-nama-tim');
+        const item = timDataArray[namaTim];
+        if (item) {
+            openModal(item.tim.nama_tim, item.total_nilai, item.jml_menang, item.detail, item.tim, item.penghargaan);
+        }
     }
-    @endif
+
+    // Untuk tombol Public
+    const btnPublic = event.target.closest('.btn-detail-tim-public');
+    if (btnPublic) {
+        const namaTim = btnPublic.getAttribute('data-nama-tim');
+        const item = timDataArray[namaTim];
+        if (item) {
+            openModal(item.tim.nama_tim, item.total_nilai, item.jml_menang, item.detail, item.tim, item.penghargaan);
+        }
+    }
 });
 
 function openModal(namaTim, totalNilai, jumlahMenang, detail, timData, penghargaan) {
@@ -972,7 +1044,6 @@ function openModal(namaTim, totalNilai, jumlahMenang, detail, timData, pengharga
     document.getElementById('modalTotalNilai').textContent = parseFloat(totalNilai).toFixed(1).replace('.', ',');
     document.getElementById('modalJumlahMenang').textContent = jumlahMenang || 0;
 
-    // ===== PENGHARGAAN =====
     let penghargaanHtml = '<span class="text-muted">Tidak ada penghargaan</span>';
     if (penghargaan && Array.isArray(penghargaan) && penghargaan.length > 0) {
         penghargaanHtml = penghargaan.map(p => `
@@ -985,7 +1056,6 @@ function openModal(namaTim, totalNilai, jumlahMenang, detail, timData, pengharga
     }
     document.getElementById('modalPenghargaan').innerHTML = penghargaanHtml;
 
-    // ===== ANGGOTA =====
     let ketua = '-', anggotaHtml = '<span class="text-muted">Tidak ada anggota</span>';
     if (timData && timData.pesertas) {
         const ketuaData = timData.pesertas.find(p => p.ketua_peserta);
@@ -999,7 +1069,6 @@ function openModal(namaTim, totalNilai, jumlahMenang, detail, timData, pengharga
     document.getElementById('modalKetua').innerHTML = ketua;
     document.getElementById('modalAnggota').innerHTML = anggotaHtml;
 
-    // ===== DOSEN & KAKAK =====
     let dosenHtml = '-';
     if (timData && timData.dosen_pembimbing && timData.dosen_pembimbing.length > 0) {
         dosenHtml = '<ul class="info-list">' + timData.dosen_pembimbing.map(d => `<li>${d.nama_dosen}</li>`).join('') + '</ul>';
@@ -1012,7 +1081,6 @@ function openModal(namaTim, totalNilai, jumlahMenang, detail, timData, pengharga
     }
     document.getElementById('modalKakak').innerHTML = kakakHtml;
 
-    // ===== DETAIL LOMBA =====
     let detailHtml = '<span class="text-muted">Tidak ada lomba yang dimenangkan</span>';
     if (detail && Array.isArray(detail) && detail.length > 0) {
         detailHtml = detail.map(item => `
@@ -1029,5 +1097,12 @@ function openModal(namaTim, totalNilai, jumlahMenang, detail, timData, pengharga
 
     modal.show();
 }
+
+setInterval(fetchRanking, 5000);
+
+// Panggil pertama kali saat halaman dimuat
+document.addEventListener('DOMContentLoaded', function() {
+    fetchRanking();
+});
 </script>
 @endsection

@@ -23,6 +23,7 @@ Route::get('/', function () {
 });
 
 Route::get('/ranking', [FinalisController::class, 'ranking'])->name('ranking');
+Route::get('/ranking/data', [FinalisController::class, 'getRankingData'])->name('ranking.data');
 
 Route::middleware(['auth'])->group(function () {
     

@@ -19,7 +19,7 @@ class ExportController extends Controller
             ->get()
             ->map(function($tim) {
                 $totalNilai = $tim->nilai->sum('nilai');
-                $jmlMenang = $tim->nilai->where('status', 'menang')->count();
+                $jmlMenang = $tim->nilai->count();
                 
                 return [
                     'tim' => $tim,

@@ -102,32 +102,75 @@ class FinalisController extends Controller
     }
 
     public function ranking()
-{
-    $rekapTim = Tim::with(['nilai', 'penghargaan', 'pesertas', 'dosenPembimbing', 'kakakPembimbing'])
-        ->get()
-        ->map(function($tim) {
-            return [
-                'tim' => $tim,
-                'total_nilai' => $tim->nilai->sum('nilai') + $tim->penghargaan->sum('bobot'),
-                'jml_menang' => $tim->nilai->where('status', 'menang')->count(),
-                'detail' => $tim->nilai->map(function($nilai) {
-                    return [
-                        'lomba' => $nilai->lomba->nama_lomba ?? '-',
-                        'babak' => $nilai->babak ?? '-',
-                        'nilai' => $nilai->nilai,
-                    ];
-                }),
-                'penghargaan' => $tim->penghargaan->map(function($p) {
-                    return [
-                        'kategori' => $p->kategori,
-                        'bobot' => $p->bobot,
-                    ];
-                }),
-            ];
-        })
-        ->sortByDesc('total_nilai')
-        ->values();
+    {
+        $rekapTim = Tim::with(['nilai', 'penghargaan', 'pesertas', 'dosenPembimbing', 'kakakPembimbing'])
+            ->get()
+            ->map(function($tim) {
+                $totalNilai = $tim->nilai->sum('nilai') + $tim->penghargaan->sum('bobot');
+                
+                return [
+                    'tim' => $tim,
+                    'total_nilai' => $totalNilai,
+                    'jml_menang' => $tim->nilai->where('status', 'menang')->count(),
+                    'detail' => $tim->nilai->map(function($nilai) {
+                        return [
+                            'lomba' => $nilai->lomba->nama_lomba ?? '-',
+                            'babak' => $nilai->babak ?? '-',
+                            'nilai' => $nilai->nilai,
+                        ];
+                    }),
+                    'penghargaan' => $tim->penghargaan->map(function($p) {
+                        return [
+                            'kategori' => $p->kategori,
+                            'bobot' => $p->bobot,
+                        ];
+                    }),
+                ];
+            })
+            ->sortByDesc('total_nilai')
+            ->sortBy(function($item) {
+                return $item['tim']->nama_tim;
+            })
+            ->values();
 
-    return view('ranking', compact('rekapTim'));
-}
+        return view('ranking', compact('rekapTim'));
+    }
+    public function getRankingData()
+    {
+        $rekapTim = Tim::with(['nilai', 'penghargaan', 'pesertas', 'dosenPembimbing', 'kakakPembimbing'])
+            ->get()
+            ->map(function($tim) {
+                $totalNilai = $tim->nilai->sum('nilai') + $tim->penghargaan->sum('bobot');
+                
+                $jmlMenang = $tim->nilai->count();
+                
+                return [
+                    'tim' => $tim,
+                    'total_nilai' => $totalNilai,
+                    'jml_menang' => $jmlMenang,
+                    'detail' => $tim->nilai->map(function($nilai) {
+                        return [
+                            'lomba' => $nilai->lomba->nama_lomba ?? '-',
+                            'babak' => $nilai->babak ?? '-',
+                            'nilai' => $nilai->nilai,
+                        ];
+                    }),
+                    'penghargaan' => $tim->penghargaan->map(function($p) {
+                        return [
+                            'kategori' => $p->kategori,
+                            'bobot' => $p->bobot,
+                        ];
+                    }),
+                ];
+            })
+            ->sort(function($a, $b) {
+                if ($a['total_nilai'] == $b['total_nilai']) {
+                    return strcasecmp($a['tim']->nama_tim, $b['tim']->nama_tim);
+                }
+                return $b['total_nilai'] <=> $a['total_nilai'];
+            })
+            ->values();
+
+        return response()->json($rekapTim);
+    }
 }

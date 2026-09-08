@@ -312,10 +312,6 @@
         <h4>Selamat Datang, {{ Auth::user()->name }}</h4>
         <p>Super Admin — {{ now()->format('l, d F Y') }}</p>
     </div>
-    <div class="welcome-badges">
-        <span class="badge"><i class="fas fa-circle text-success me-1" style="font-size: 8px;"></i> Sistem Online</span>
-        <span class="badge"><i class="fas fa-clock me-1"></i> {{ now()->format('H:i') }} WIB</span>
-    </div>
 </div>
 
 <div class="row g-3 row-cols-2 row-cols-md-2 row-cols-lg-2 row-cols-xl-4">

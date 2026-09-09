@@ -24,6 +24,7 @@ Route::get('/', function () {
 
 Route::get('/ranking', [FinalisController::class, 'ranking'])->name('ranking');
 Route::get('/ranking/data', [FinalisController::class, 'getRankingData'])->name('ranking.data');
+Route::get('/lomba-publik', [LombaController::class, 'publicIndex'])->name('lomba.publik');
 
 Route::middleware(['auth'])->group(function () {
     

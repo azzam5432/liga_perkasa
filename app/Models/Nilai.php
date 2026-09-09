@@ -14,7 +14,8 @@ class Nilai extends Model
         'id_lomba',
         'id_juri',
         'nilai',
-        'babak', 
+        'babak',
+        'juara', // Tambahkan ini
     ];
 
     public function tim()
@@ -31,7 +32,7 @@ class Nilai extends Model
     {
         return $this->belongsTo(Juri::class, 'id_juri', 'id_juri');
     }
-    // Tambahkan scope untuk babak
+
     public function scopePenyisihan($query)
     {
         return $query->where('babak', 'penyisihan');

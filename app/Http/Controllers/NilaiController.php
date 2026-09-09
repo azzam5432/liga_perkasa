@@ -145,29 +145,48 @@ class NilaiController extends Controller
         $poinJuara2 = round($bobot * 2, 2);
         $poinJuara3 = round($bobot * 1, 2);
 
+        // Simpan Juara 1 (Emas)
         Nilai::create([
             'id_tim' => $request->juara_1,
             'id_lomba' => $id_lomba,
             'id_juri' => $juri->id_juri,
             'nilai' => $poinJuara1,
             'babak' => $babak,
+            'juara' => 1, // Tambahkan ini
         ]);
 
+        // Simpan Juara 2 (Perak)
         Nilai::create([
             'id_tim' => $request->juara_2,
             'id_lomba' => $id_lomba,
             'id_juri' => $juri->id_juri,
             'nilai' => $poinJuara2,
             'babak' => $babak,
+            'juara' => 2, // Tambahkan ini
         ]);
 
+        // Simpan Juara 3 (Perunggu)
         Nilai::create([
             'id_tim' => $request->juara_3,
             'id_lomba' => $id_lomba,
             'id_juri' => $juri->id_juri,
             'nilai' => $poinJuara3,
             'babak' => $babak,
+            'juara' => 3, // Tambahkan ini
         ]);
+
+        // Simpan tim lain yang tidak menang (0 poin, juara null)
+        $timLain = Tim::whereNotIn('id_tim', [$request->juara_1, $request->juara_2, $request->juara_3])->get();
+        foreach ($timLain as $tim) {
+            Nilai::create([
+                'id_tim' => $tim->id_tim,
+                'id_lomba' => $id_lomba,
+                'id_juri' => $juri->id_juri,
+                'nilai' => 0,
+                'babak' => $babak,
+                'juara' => null, // Tidak dapat medali
+            ]);
+        }
 
         if ($babak == 'penyisihan' && $lomba->jenis == 'penyisihan') {
             $this->tentukanFinalisOtomatis($lomba);

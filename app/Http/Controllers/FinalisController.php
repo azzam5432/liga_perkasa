@@ -107,16 +107,33 @@ class FinalisController extends Controller
             ->get()
             ->map(function($tim) {
                 $totalNilai = $tim->nilai->sum('nilai') + $tim->penghargaan->sum('bobot');
-                
+
+                $emas = 0;
+                $perak = 0;
+                $perunggu = 0;
+
+                foreach ($tim->nilai as $nilai) {
+                    if ($nilai->juara == 1) {
+                        $emas++;
+                    } elseif ($nilai->juara == 2) {
+                        $perak++;
+                    } elseif ($nilai->juara == 3) {
+                        $perunggu++;
+                    }
+                }
+
                 return [
                     'tim' => $tim,
                     'total_nilai' => $totalNilai,
-                    'jml_menang' => $tim->nilai->where('status', 'menang')->count(),
+                    'emas' => $emas,
+                    'perak' => $perak,
+                    'perunggu' => $perunggu,
                     'detail' => $tim->nilai->map(function($nilai) {
                         return [
                             'lomba' => $nilai->lomba->nama_lomba ?? '-',
                             'babak' => $nilai->babak ?? '-',
                             'nilai' => $nilai->nilai,
+                            'juara' => $nilai->juara ?? null,
                         ];
                     }),
                     'penghargaan' => $tim->penghargaan->map(function($p) {
@@ -127,32 +144,50 @@ class FinalisController extends Controller
                     }),
                 ];
             })
-            ->sortByDesc('total_nilai')
-            ->sortBy(function($item) {
-                return $item['tim']->nama_tim;
+            ->sort(function($a, $b) {
+                if ($a['total_nilai'] == $b['total_nilai']) {
+                    return strcasecmp($a['tim']->nama_tim, $b['tim']->nama_tim);
+                }
+                return $b['total_nilai'] <=> $a['total_nilai'];
             })
             ->values();
 
         return view('ranking', compact('rekapTim'));
     }
+
     public function getRankingData()
     {
         $rekapTim = Tim::with(['nilai', 'penghargaan', 'pesertas', 'dosenPembimbing', 'kakakPembimbing'])
             ->get()
             ->map(function($tim) {
                 $totalNilai = $tim->nilai->sum('nilai') + $tim->penghargaan->sum('bobot');
-                
-                $jmlMenang = $tim->nilai->count();
-                
+
+                $emas = 0;
+                $perak = 0;
+                $perunggu = 0;
+
+                foreach ($tim->nilai as $nilai) {
+                    if ($nilai->juara == 1) {
+                        $emas++;
+                    } elseif ($nilai->juara == 2) {
+                        $perak++;
+                    } elseif ($nilai->juara == 3) {
+                        $perunggu++;
+                    }
+                }
+
                 return [
                     'tim' => $tim,
                     'total_nilai' => $totalNilai,
-                    'jml_menang' => $jmlMenang,
+                    'emas' => $emas,
+                    'perak' => $perak,
+                    'perunggu' => $perunggu,
                     'detail' => $tim->nilai->map(function($nilai) {
                         return [
                             'lomba' => $nilai->lomba->nama_lomba ?? '-',
                             'babak' => $nilai->babak ?? '-',
                             'nilai' => $nilai->nilai,
+                            'juara' => $nilai->juara ?? null,
                         ];
                     }),
                     'penghargaan' => $tim->penghargaan->map(function($p) {

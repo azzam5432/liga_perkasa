@@ -69,31 +69,29 @@ body {
 .public-table-wrapper table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 15px;
+    font-size: 14px;
+    table-layout: fixed;
 }
 
 .public-table-wrapper table thead th {
     background: rgba(255, 215, 0, 0.1);
     color: #ffd700;
     font-weight: 700;
-    font-size: 13px;
+    font-size: 12px;
     text-transform: uppercase;
     letter-spacing: 1px;
-    padding: 14px 18px;
+    padding: 10px 6px;
     border-bottom: 2px solid rgba(255, 215, 0, 0.3);
-    text-align: left;
+    text-align: center;
+    white-space: nowrap;
 }
 
 .public-table-wrapper table tbody td {
-    padding: 14px 18px;
+    padding: 10px 6px;
     vertical-align: middle;
     color: rgba(255, 255, 255, 0.95);
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    font-size: 15px;
-}
-
-.public-table-wrapper table tbody tr:hover {
-    background: rgba(255, 255, 255, 0.1);
+    font-size: 14px;
 }
 
 .public-table-wrapper .medal-emoji {
@@ -102,7 +100,7 @@ body {
 }
 
 .public-table-wrapper .rank-number {
-    font-size: 17px;
+    font-size: 15px;
     font-weight: 700;
     color: rgba(255, 255, 255, 0.7);
 }
@@ -110,20 +108,17 @@ body {
 .public-table-wrapper .tim-name {
     color: #ffffff;
     font-weight: 700;
-    font-size: 16px;
+    font-size: 14px;
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+    white-space: normal !important;
+    word-wrap: break-word;
 }
 
 .public-table-wrapper .total-nilai {
     font-weight: 700;
     color: #ffd700;
-    font-size: 17px;
+    font-size: 14px;
     text-shadow: 0 0 8px rgba(255, 215, 0, 0.3);
-}
-
-.public-table-wrapper .jml-menang {
-    color: rgba(255, 255, 255, 0.9);
-    font-weight: 600;
 }
 
 .public-empty {
@@ -152,8 +147,8 @@ body {
 }
 
 .btn-action-public {
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
     border-radius: 6px;
     display: inline-flex;
     align-items: center;
@@ -162,7 +157,7 @@ body {
     background: rgba(255, 255, 255, 0.1);
     color: #ffffff;
     transition: all 0.2s;
-    font-size: 15px;
+    font-size: 14px;
     cursor: pointer;
 }
 
@@ -221,55 +216,6 @@ body {
     box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
 }
 
-.filter-bar {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-    align-items: center;
-    background: #ffffff;
-    padding: 12px 16px;
-    border-radius: 8px;
-    border: 1px solid #e9ecef;
-}
-
-.search-box {
-    flex: 1;
-    min-width: 200px;
-    position: relative;
-}
-
-.search-box input {
-    width: 100%;
-    padding: 10px 14px 10px 40px;
-    border: 1px solid #dee2e6;
-    border-radius: 6px;
-    font-size: 15px;
-    transition: all 0.2s;
-    background: #f8f9fa;
-    color: #000000;
-}
-
-.search-box input:focus {
-    outline: none;
-    border-color: #ffc107;
-    background: #ffffff;
-    box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.1);
-}
-
-.search-box input::placeholder {
-    color: #adb5bd;
-}
-
-.search-box i {
-    position: absolute;
-    left: 14px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #adb5bd;
-    font-size: 15px;
-}
-
 .table-wrapper {
     background: #ffffff;
     border-radius: 8px;
@@ -278,42 +224,35 @@ body {
 }
 
 .table-scroll {
-    overflow-x: auto;
+    overflow-x: hidden; /* HILANGKAN SCROLL */
 }
 
 .table-scroll table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 15px;
+    font-size: 14px;
+    table-layout: fixed;
 }
 
 .table-scroll table thead th {
     background: #f8f9fa;
     color: #000000;
     font-weight: 700;
-    font-size: 14px;
+    font-size: 12px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    padding: 14px 18px;
+    padding: 10px 6px;
     border-bottom: 2px solid #e9ecef;
-    text-align: left;
+    text-align: center;
     white-space: nowrap;
 }
 
 .table-scroll table tbody td {
-    padding: 14px 18px;
+    padding: 10px 6px;
     vertical-align: middle;
     color: #000000;
     border-bottom: 1px solid #f1f3f5;
-    font-size: 15px;
-}
-
-.table-scroll table tbody tr:last-child td {
-    border-bottom: none;
-}
-
-.table-scroll table tbody tr:hover {
-    background: #f8f9fa;
+    font-size: 14px;
 }
 
 .table-scroll .medal-emoji {
@@ -321,7 +260,7 @@ body {
 }
 
 .table-scroll .rank-number {
-    font-size: 17px;
+    font-size: 15px;
     font-weight: 700;
     color: #000000;
 }
@@ -329,24 +268,14 @@ body {
 .table-scroll .fw-semibold {
     font-weight: 700;
     color: #000000;
-    font-size: 16px;
-}
-
-.table-scroll table tbody td:nth-child(3) {
-    font-weight: 700;
-    color: #000000;
-    font-size: 17px;
-}
-
-.table-scroll table tbody td:nth-child(4) {
-    font-weight: 600;
-    color: #000000;
-    font-size: 15px;
+    font-size: 14px;
+    white-space: normal !important;
+    word-wrap: break-word;
 }
 
 .btn-action {
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
     border-radius: 6px;
     display: inline-flex;
     align-items: center;
@@ -355,7 +284,7 @@ body {
     background: transparent;
     color: #000000;
     transition: all 0.2s;
-    font-size: 15px;
+    font-size: 14px;
     cursor: pointer;
 }
 
@@ -497,121 +426,247 @@ body {
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
     .ranking-page {
-        padding: 12px;
+        padding: 8px;
     }
 
     @if(!Auth::check())
     .ranking-page {
-        padding: 12px;
+        padding: 8px;
     }
     .public-header h1 {
-        font-size: 24px;
-    }
-    .public-header p {
-        font-size: 14px;
-    }
-    .public-table-wrapper table {
-        font-size: 14px;
-    }
-    .public-table-wrapper table thead th {
-        font-size: 12px;
-        padding: 10px 12px;
-    }
-    .public-table-wrapper table tbody td {
-        padding: 10px 12px;
-        font-size: 14px;
-    }
-    .public-table-wrapper .medal-emoji {
         font-size: 22px;
     }
+    .public-header p {
+        font-size: 13px;
+    }
+
+    .public-table-wrapper table,
+    .table-scroll table {
+        font-size: 11px;
+        min-width: 100%;
+        table-layout: fixed;
+    }
+
+    .public-table-wrapper table thead th,
+    .table-scroll table thead th {
+        font-size: 10px;
+        padding: 6px 2px;
+        letter-spacing: 0;
+    }
+
+    .public-table-wrapper table tbody td,
+    .table-scroll table tbody td {
+        padding: 6px 2px;
+        font-size: 11px;
+    }
+
+    .public-table-wrapper .medal-emoji,
+    .table-scroll .medal-emoji {
+        font-size: 20px; /* Emoji tetap besar di mobile */
+    }
+
+    .public-table-wrapper .rank-number,
+    .table-scroll .rank-number {
+        font-size: 11px;
+    }
+
+    .public-table-wrapper .tim-name,
+    .table-scroll .fw-semibold {
+        font-size: 11px;
+        white-space: normal !important;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
+
+    .public-table-wrapper .total-nilai,
+    .table-scroll table tbody td:nth-child(6) {
+        font-size: 11px;
+    }
+
+    /* HILANGKAN AKSI DI MOBILE */
+    .public-table-wrapper table thead th:last-child,
+    .public-table-wrapper table tbody td:last-child,
+    .table-scroll table thead th:last-child,
+    .table-scroll table tbody td:last-child {
+        display: none;
+    }
+
+    /* ATUR LEBAR KOLOM */
+    .public-table-wrapper table thead th:nth-child(1),
+    .public-table-wrapper table tbody td:nth-child(1),
+    .table-scroll table thead th:nth-child(1),
+    .table-scroll table tbody td:nth-child(1) { width: 10%; } /* Rank */
+
+    .public-table-wrapper table thead th:nth-child(2),
+    .public-table-wrapper table tbody td:nth-child(2),
+    .table-scroll table thead th:nth-child(2),
+    .table-scroll table tbody td:nth-child(2) { width: 40%; } /* Nama Tim */
+
+    .public-table-wrapper table thead th:nth-child(3),
+    .public-table-wrapper table tbody td:nth-child(3),
+    .table-scroll table thead th:nth-child(3),
+    .table-scroll table tbody td:nth-child(3) { width: 12%; } /* Emas */
+
+    .public-table-wrapper table thead th:nth-child(4),
+    .public-table-wrapper table tbody td:nth-child(4),
+    .table-scroll table thead th:nth-child(4),
+    .table-scroll table tbody td:nth-child(4) { width: 12%; } /* Perak */
+
+    .public-table-wrapper table thead th:nth-child(5),
+    .public-table-wrapper table tbody td:nth-child(5),
+    .table-scroll table thead th:nth-child(5),
+    .table-scroll table tbody td:nth-child(5) { width: 12%; } /* Perunggu */
+
+    .public-table-wrapper table thead th:nth-child(6),
+    .public-table-wrapper table tbody td:nth-child(6),
+    .table-scroll table thead th:nth-child(6),
+    .table-scroll table tbody td:nth-child(6) { width: 14%; } /* Total Nilai */
     @endif
 
     @if(Auth::check())
     .page-header {
-        flex-direction: column;
-        align-items: flex-start;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
     }
     .page-header h4 {
-        font-size: 20px;
+        font-size: 16px;
     }
     .btn-award {
-        font-size: 14px;
-        padding: 8px 16px;
-        width: 100%;
-        justify-content: center;
-    }
-
-    .filter-bar {
-        padding: 10px 12px;
-    }
-    .search-box {
-        min-width: 0;
-    }
-    .search-box input {
-        font-size: 14px;
-        padding: 8px 12px 8px 36px;
+        font-size: 12px;
+        padding: 6px 12px;
+        width: auto;
     }
 
     .table-scroll table {
-        font-size: 14px;
+        font-size: 11px;
+        min-width: 100%;
+        table-layout: fixed;
     }
     .table-scroll table thead th {
-        font-size: 12px;
-        padding: 10px 12px;
+        font-size: 10px;
+        padding: 6px 2px;
+        letter-spacing: 0;
     }
     .table-scroll table tbody td {
-        padding: 10px 12px;
-        font-size: 14px;
+        padding: 6px 2px;
+        font-size: 11px;
     }
-
     .table-scroll .medal-emoji {
-        font-size: 22px;
+        font-size: 20px; /* Emoji tetap besar di mobile */
     }
     .table-scroll .rank-number {
-        font-size: 15px;
+        font-size: 11px;
     }
+    .table-scroll .fw-semibold {
+        font-size: 11px;
+        white-space: normal !important;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
+
+    /* HILANGKAN AKSI DI MOBILE */
+    .table-scroll table thead th:last-child,
+    .table-scroll table tbody td:last-child {
+        display: none;
+    }
+
+    /* ATUR LEBAR KOLOM */
+    .table-scroll table thead th:nth-child(1),
+    .table-scroll table tbody td:nth-child(1) { width: 10%; } /* Rank */
+    .table-scroll table thead th:nth-child(2),
+    .table-scroll table tbody td:nth-child(2) { width: 40%; } /* Nama Tim */
+    .table-scroll table thead th:nth-child(3),
+    .table-scroll table tbody td:nth-child(3) { width: 12%; } /* Emas */
+    .table-scroll table thead th:nth-child(4),
+    .table-scroll table tbody td:nth-child(4) { width: 12%; } /* Perak */
+    .table-scroll table thead th:nth-child(5),
+    .table-scroll table tbody td:nth-child(5) { width: 12%; } /* Perunggu */
+    .table-scroll table thead th:nth-child(6),
+    .table-scroll table tbody td:nth-child(6) { width: 14%; } /* Total Nilai */
     @endif
 
     .modal-custom .modal-body {
-        padding: 16px;
+        padding: 12px;
     }
     .modal-custom .modal-header .modal-title {
-        font-size: 18px;
+        font-size: 16px;
     }
     .bg-light-custom .value {
-        font-size: 24px;
+        font-size: 20px;
     }
     #modalNamaTim {
-        font-size: 18px;
+        font-size: 16px;
     }
 }
 
 @media (max-width: 480px) {
     @if(Auth::check())
     .page-header h4 {
-        font-size: 17px;
+        font-size: 14px;
     }
+    .btn-award {
+        font-size: 11px;
+        padding: 5px 10px;
+        width: auto;
+    }
+
     .table-scroll table {
-        font-size: 13px;
-    }
-    .table-scroll table tbody td {
-        font-size: 13px;
-        padding: 8px 10px;
+        font-size: 10px;
+        min-width: 100%;
+        table-layout: fixed;
     }
     .table-scroll table thead th {
-        font-size: 11px;
-        padding: 8px 10px;
+        font-size: 9px;
+        padding: 4px 2px;
+    }
+    .table-scroll table tbody td {
+        padding: 4px 2px;
+        font-size: 10px;
     }
     .table-scroll .medal-emoji {
-        font-size: 18px;
+        font-size: 18px; /* Emoji tetap besar di mobile kecil */
     }
     .table-scroll .rank-number {
-        font-size: 13px;
+        font-size: 10px;
+    }
+    .table-scroll .fw-semibold {
+        font-size: 10px;
+        white-space: normal !important;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
+    @endif
+
+    @if(!Auth::check())
+    .public-table-wrapper table {
+        font-size: 10px;
+        min-width: 100%;
+        table-layout: fixed;
+    }
+    .public-table-wrapper table thead th {
+        font-size: 9px;
+        padding: 4px 2px;
+    }
+    .public-table-wrapper table tbody td {
+        padding: 4px 2px;
+        font-size: 10px;
+    }
+    .public-table-wrapper .medal-emoji {
+        font-size: 18px; /* Emoji tetap besar di mobile kecil */
+    }
+    .public-table-wrapper .rank-number {
+        font-size: 10px;
+    }
+    .public-table-wrapper .tim-name {
+        font-size: 10px;
+    }
+    .public-table-wrapper .total-nilai {
+        font-size: 10px;
     }
     @endif
 }
 </style>
-
 
 @if(Auth::check())
 <!-- ===== TAMPILAN PANITIA / ADMIN ===== -->
@@ -639,11 +694,13 @@ body {
             <table id="rankingTable">
                 <thead>
                     <tr>
-                        <th style="width: 60px; text-align: center;">Rank</th>
-                        <th style="min-width: 180px;">Nama Tim</th>
-                        <th style="min-width: 100px; text-align: center;">Total Nilai</th>
-                        <th style="min-width: 100px; text-align: center;">Jumlah Menang</th>
-                        <th style="width: 70px; text-align: center;">Aksi</th>
+                        <th style="text-align: center;">Rank</th>
+                        <th style="text-align: left;">Nama Tim</th>
+                        <th style="text-align: center; font-size: 16px;">🥇 Emas</th>
+                        <th style="text-align: center; font-size: 16px;">🥈 Perak</th>
+                        <th style="text-align: center; font-size: 16px;">🥉 Perunggu</th>
+                        <th style="text-align: center;">Total Nilai</th>
+                        <th style="text-align: center;">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -660,19 +717,24 @@ body {
                                     <span class="rank-number">{{ $index + 1 }}</span>
                                 @endif
                             </td>
-                            <td class="fw-semibold">{{ $item['tim']->nama_tim }}</td>
+                            <td class="fw-semibold" style="white-space: normal !important; word-wrap: break-word;">
+                                {{ $item['tim']->nama_tim }}
+                            </td>
+                            <td style="text-align: center;">
+                                <span class="fw-bold" style="color: #d4af37; font-size: 18px;">{{ $item['emas'] }}</span>
+                            </td>
+                            <td style="text-align: center;">
+                                <span class="fw-bold" style="color: #c0c0c0; font-size: 18px;">{{ $item['perak'] }}</span>
+                            </td>
+                            <td style="text-align: center;">
+                                <span class="fw-bold" style="color: #cd7f32; font-size: 18px;">{{ $item['perunggu'] }}</span>
+                            </td>
                             <td style="text-align: center;">
                                 {{ number_format($item['total_nilai'], 1, ',', '.') }}
                             </td>
-                            <td style="text-align: center;">{{ $item['jml_menang'] }}</td>
                             <td style="text-align: center;">
                                 <button class="btn-action btn-info btn-detail-tim" 
                                         data-nama-tim="{{ $item['tim']->nama_tim }}"
-                                        data-total-nilai="{{ $item['total_nilai'] }}"
-                                        data-jml-menang="{{ $item['jml_menang'] }}"
-                                        data-detail='{{ json_encode($item['detail']) }}'
-                                        data-tim='{{ json_encode($item['tim']->load('pesertas', 'dosenPembimbing', 'kakakPembimbing')) }}'
-                                        data-penghargaan='{{ json_encode($item['penghargaan'] ?? []) }}'
                                         title="Detail">
                                     <i class="fas fa-eye"></i>
                                 </button>
@@ -680,7 +742,7 @@ body {
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5">
+                            <td colspan="7">
                                 <div class="empty-state">
                                     <i class="fas fa-trophy"></i>
                                     <h6>Belum ada data</h6>
@@ -696,6 +758,7 @@ body {
 </div>
 
 @else
+<!-- ===== TAMPILAN PUBLIC ===== -->
 <div class="ranking-page">
     <div class="public-ranking-wrapper">
         <div class="public-header">
@@ -708,11 +771,13 @@ body {
                 <table>
                     <thead>
                         <tr>
-                            <th style="width: 60px; text-align: center;">Rank</th>
-                            <th style="min-width: 180px;">Nama Tim</th>
-                            <th style="min-width: 100px; text-align: center;">Total Nilai</th>
-                            <th style="min-width: 100px; text-align: center;">Jumlah Menang</th>
-                            <th style="width: 70px; text-align: center;">Aksi</th>
+                            <th style="text-align: center;">Rank</th>
+                            <th style="text-align: left;">Nama Tim</th>
+                            <th style="text-align: center; font-size: 16px;">🥇</th>
+                            <th style="text-align: center; font-size: 16px;">🥈</th>
+                            <th style="text-align: center; font-size: 16px;">🥉</th>
+                            <th style="text-align: center;">Total Nilai</th>
+                            <th style="text-align: center;">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -729,19 +794,24 @@ body {
                                         <span class="rank-number">{{ $index + 1 }}</span>
                                     @endif
                                 </td>
-                                <td class="tim-name">{{ $item['tim']->nama_tim }}</td>
+                                <td class="tim-name" style="white-space: normal !important; word-wrap: break-word;">
+                                    {{ $item['tim']->nama_tim }}
+                                </td>
+                                <td style="text-align: center;">
+                                    <span class="fw-bold" style="color: #d4af37; font-size: 18px;">{{ $item['emas'] }}</span>
+                                </td>
+                                <td style="text-align: center;">
+                                    <span class="fw-bold" style="color: #c0c0c0; font-size: 18px;">{{ $item['perak'] }}</span>
+                                </td>
+                                <td style="text-align: center;">
+                                    <span class="fw-bold" style="color: #cd7f32; font-size: 18px;">{{ $item['perunggu'] }}</span>
+                                </td>
                                 <td class="total-nilai" style="text-align: center;">
                                     {{ number_format($item['total_nilai'], 1, ',', '.') }}
                                 </td>
-                                <td class="jml-menang" style="text-align: center;">{{ $item['jml_menang'] }}</td>
                                 <td style="text-align: center;">
                                     <button class="btn-action-public btn-detail-tim-public" 
                                             data-nama-tim="{{ $item['tim']->nama_tim }}"
-                                            data-total-nilai="{{ $item['total_nilai'] }}"
-                                            data-jml-menang="{{ $item['jml_menang'] }}"
-                                            data-detail='{{ json_encode($item['detail']) }}'
-                                            data-tim='{{ json_encode($item['tim']->load('pesertas', 'dosenPembimbing', 'kakakPembimbing')) }}'
-                                            data-penghargaan='{{ json_encode($item['penghargaan'] ?? []) }}'
                                             title="Detail">
                                         <i class="fas fa-eye"></i>
                                     </button>
@@ -749,7 +819,7 @@ body {
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5">
+                                <td colspan="7">
                                     <div class="public-empty">
                                         <i class="fas fa-trophy"></i>
                                         <h6>Belum ada data</h6>
@@ -785,7 +855,28 @@ body {
                     <h5 class="mt-3 fw-bold" id="modalNamaTim">-</h5>
                 </div>
 
-                <!-- Statistik Utama -->
+                <!-- Statistik Medali -->
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <div class="bg-light-custom">
+                            <div class="value" style="color: #d4af37; font-size: 32px;" id="modalEmas">-</div>
+                            <div class="label">🥇 Emas</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="bg-light-custom">
+                            <div class="value" style="color: #c0c0c0; font-size: 32px;" id="modalPerak">-</div>
+                            <div class="label">🥈 Perak</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="bg-light-custom">
+                            <div class="value" style="color: #cd7f32; font-size: 32px;" id="modalPerunggu">-</div>
+                            <div class="label">🥉 Perunggu</div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="row mb-4">
                     <div class="col-md-6">
                         <div class="bg-light-custom">
@@ -810,7 +901,6 @@ body {
                     </div>
                 </div>
 
-                <!-- SECTION: DETAIL LOMBA (Biru) -->
                 <div class="mb-4 p-3" style="background: #e3f2fd; border: 1px solid #90caf9; border-radius: 10px;">
                     <h6 class="fw-bold mb-2" style="color: #1565c0;">
                         <i class="fas fa-trophy me-2"></i> Detail Lomba yang Dimenangkan
@@ -819,7 +909,7 @@ body {
                         <span class="text-muted">Tidak ada lomba yang dimenangkan</span>
                     </div>
                 </div>
-                <!-- SECTION: PEMBIMBING (Abu-abu) -->
+
                 <div class="mb-4 p-3" style="background: #f5f5f5; border: 1px solid #e0e0e0; border-radius: 10px;">
                     <h6 class="fw-bold mb-2" style="color: #424242;">
                         <i class="fas fa-user-tie me-2"></i> Pembimbing dan Mentor
@@ -836,7 +926,6 @@ body {
                     </div>
                 </div>
 
-                <!-- SECTION: KETUA TIM (Ungu) -->
                 <div class="mb-4 p-3" style="background: #f3e5f5; border: 1px solid #ce93d8; border-radius: 10px;">
                     <h6 class="fw-bold mb-2" style="color: #6a1b9a;">
                         <i class="fas fa-crown me-2"></i> Ketua Tim
@@ -844,7 +933,6 @@ body {
                     <div id="modalKetua" style="font-size: 15px; color: #000000;">-</div>
                 </div>
 
-                <!-- SECTION: ANGGOTA TIM (Hijau) -->
                 <div class="mb-4 p-3" style="background: #e8f5e9; border: 1px solid #a5d6a7; border-radius: 10px;">
                     <h6 class="fw-bold mb-2" style="color: #2e7d32;">
                         <i class="fas fa-users me-2"></i> Anggota Tim
@@ -853,8 +941,6 @@ body {
                         <span class="text-muted">Tidak ada anggota</span>
                     </div>
                 </div>
-
-                
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn-secondary-custom" data-bs-dismiss="modal">
@@ -867,24 +953,19 @@ body {
 
 <!-- ===== SCRIPT ===== -->
 <script>
-// ===== ARRAY UNTUK MENYIMPAN DATA TIM =====
 let timDataArray = {};
 
-// ===== FUNGSI UNTUK MENGAMBIL DATA RANKING =====
 function fetchRanking() {
     fetch('/ranking/data')
         .then(response => response.json())
         .then(data => {
-            // Simpan data ke array global untuk digunakan saat klik
             data.forEach((item, index) => {
                 timDataArray[item.tim.nama_tim] = item;
             });
 
-            // Update tabel untuk Auth (jika ada)
             if (document.querySelector('#rankingTable tbody')) {
                 updateRankingTable(data);
             }
-            // Update tabel untuk Public (jika ada)
             if (document.querySelector('.public-table-wrapper tbody')) {
                 updatePublicRankingTable(data);
             }
@@ -892,19 +973,15 @@ function fetchRanking() {
         .catch(error => console.error('Error fetching ranking:', error));
 }
 
-// ===== UPDATE TABEL UNTUK AUTH (Panitia/Admin) =====
 function updateRankingTable(data) {
     const tbody = document.querySelector('#rankingTable tbody');
     if (!tbody) return;
 
-    // Kosongkan tabel
     tbody.innerHTML = '';
 
-    // Loop data
     data.forEach((item, index) => {
         const row = document.createElement('tr');
 
-        // Rank
         const rankCell = document.createElement('td');
         rankCell.style.textAlign = 'center';
         if (index === 0) {
@@ -918,25 +995,34 @@ function updateRankingTable(data) {
         }
         row.appendChild(rankCell);
 
-        // Nama Tim
         const nameCell = document.createElement('td');
         nameCell.className = 'fw-semibold';
+        nameCell.style.whiteSpace = 'normal';
+        nameCell.style.wordWrap = 'break-word';
+        nameCell.style.maxWidth = '300px';
         nameCell.textContent = item.tim.nama_tim;
         row.appendChild(nameCell);
 
-        // Total Nilai
+        const emasCell = document.createElement('td');
+        emasCell.style.textAlign = 'center';
+        emasCell.innerHTML = `<span class="fw-bold" style="color: #d4af37; font-size: 18px;">${item.emas}</span>`;
+        row.appendChild(emasCell);
+
+        const perakCell = document.createElement('td');
+        perakCell.style.textAlign = 'center';
+        perakCell.innerHTML = `<span class="fw-bold" style="color: #c0c0c0; font-size: 18px;">${item.perak}</span>`;
+        row.appendChild(perakCell);
+
+        const perungguCell = document.createElement('td');
+        perungguCell.style.textAlign = 'center';
+        perungguCell.innerHTML = `<span class="fw-bold" style="color: #cd7f32; font-size: 18px;">${item.perunggu}</span>`;
+        row.appendChild(perungguCell);
+
         const totalCell = document.createElement('td');
         totalCell.style.textAlign = 'center';
         totalCell.textContent = Number(item.total_nilai).toFixed(1).replace('.', ',');
         row.appendChild(totalCell);
 
-        // Jumlah Menang
-        const menangCell = document.createElement('td');
-        menangCell.style.textAlign = 'center';
-        menangCell.textContent = item.jml_menang;
-        row.appendChild(menangCell);
-
-        // Aksi (Detail) - HANYA NAMA TIM YANG DISIMPAN DI DATA ATTRIBUTE
         const actionCell = document.createElement('td');
         actionCell.style.textAlign = 'center';
         actionCell.innerHTML = `
@@ -952,19 +1038,15 @@ function updateRankingTable(data) {
     });
 }
 
-// ===== UPDATE TABEL UNTUK PUBLIC =====
 function updatePublicRankingTable(data) {
     const tbody = document.querySelector('.public-table-wrapper tbody');
     if (!tbody) return;
 
-    // Kosongkan tabel
     tbody.innerHTML = '';
 
-    // Loop data
     data.forEach((item, index) => {
         const row = document.createElement('tr');
 
-        // Rank
         const rankCell = document.createElement('td');
         rankCell.style.textAlign = 'center';
         if (index === 0) {
@@ -978,27 +1060,35 @@ function updatePublicRankingTable(data) {
         }
         row.appendChild(rankCell);
 
-        // Nama Tim
         const nameCell = document.createElement('td');
         nameCell.className = 'tim-name';
+        nameCell.style.whiteSpace = 'normal';
+        nameCell.style.wordWrap = 'break-word';
+        nameCell.style.maxWidth = '300px';
         nameCell.textContent = item.tim.nama_tim;
         row.appendChild(nameCell);
 
-        // Total Nilai
+        const emasCell = document.createElement('td');
+        emasCell.style.textAlign = 'center';
+        emasCell.innerHTML = `<span class="fw-bold" style="color: #d4af37; font-size: 18px;">${item.emas}</span>`;
+        row.appendChild(emasCell);
+
+        const perakCell = document.createElement('td');
+        perakCell.style.textAlign = 'center';
+        perakCell.innerHTML = `<span class="fw-bold" style="color: #c0c0c0; font-size: 18px;">${item.perak}</span>`;
+        row.appendChild(perakCell);
+
+        const perungguCell = document.createElement('td');
+        perungguCell.style.textAlign = 'center';
+        perungguCell.innerHTML = `<span class="fw-bold" style="color: #cd7f32; font-size: 18px;">${item.perunggu}</span>`;
+        row.appendChild(perungguCell);
+
         const totalCell = document.createElement('td');
         totalCell.className = 'total-nilai';
         totalCell.style.textAlign = 'center';
         totalCell.textContent = Number(item.total_nilai).toFixed(1).replace('.', ',');
         row.appendChild(totalCell);
 
-        // Jumlah Menang
-        const menangCell = document.createElement('td');
-        menangCell.className = 'jml-menang';
-        menangCell.style.textAlign = 'center';
-        menangCell.textContent = item.jml_menang;
-        row.appendChild(menangCell);
-
-        // Aksi (Detail) - HANYA NAMA TIM YANG DISIMPAN DI DATA ATTRIBUTE
         const actionCell = document.createElement('td');
         actionCell.style.textAlign = 'center';
         actionCell.innerHTML = `
@@ -1014,9 +1104,7 @@ function updatePublicRankingTable(data) {
     });
 }
 
-// ===== EVENT DELEGATION (AGAR TOMBOL SELALU BERFUNGSI) =====
 document.addEventListener('click', function(event) {
-    // Untuk tombol Auth
     const btnAuth = event.target.closest('.btn-detail-tim');
     if (btnAuth) {
         const namaTim = btnAuth.getAttribute('data-nama-tim');
@@ -1026,7 +1114,6 @@ document.addEventListener('click', function(event) {
         }
     }
 
-    // Untuk tombol Public
     const btnPublic = event.target.closest('.btn-detail-tim-public');
     if (btnPublic) {
         const namaTim = btnPublic.getAttribute('data-nama-tim');
@@ -1043,6 +1130,13 @@ function openModal(namaTim, totalNilai, jumlahMenang, detail, timData, pengharga
     document.getElementById('modalNamaTim').textContent = namaTim || '-';
     document.getElementById('modalTotalNilai').textContent = parseFloat(totalNilai).toFixed(1).replace('.', ',');
     document.getElementById('modalJumlahMenang').textContent = jumlahMenang || 0;
+
+    const item = timDataArray[namaTim];
+    if (item) {
+        document.getElementById('modalEmas').textContent = item.emas || 0;
+        document.getElementById('modalPerak').textContent = item.perak || 0;
+        document.getElementById('modalPerunggu').textContent = item.perunggu || 0;
+    }
 
     let penghargaanHtml = '<span class="text-muted">Tidak ada penghargaan</span>';
     if (penghargaan && Array.isArray(penghargaan) && penghargaan.length > 0) {
@@ -1100,7 +1194,6 @@ function openModal(namaTim, totalNilai, jumlahMenang, detail, timData, pengharga
 
 setInterval(fetchRanking, 5000);
 
-// Panggil pertama kali saat halaman dimuat
 document.addEventListener('DOMContentLoaded', function() {
     fetchRanking();
 });

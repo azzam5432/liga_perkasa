@@ -370,7 +370,6 @@ function onJuaraSelected(juara, timId) {
         }
     }
 
-    // Tampilkan nama tim di podium
     updatePodium();
 }
 

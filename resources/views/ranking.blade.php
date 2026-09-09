@@ -884,12 +884,6 @@ body {
                             <div class="label">Total Nilai</div>
                         </div>
                     </div>
-                    <div class="col-md-6">
-                        <div class="bg-light-custom">
-                            <div class="value" id="modalJumlahMenang">-</div>
-                            <div class="label">Jumlah Menang</div>
-                        </div>
-                    </div>
                 </div>
 
                 <div class="mb-4 p-3" style="background: #fff8e1; border: 1px solid #ffe082; border-radius: 10px;">
@@ -1129,7 +1123,6 @@ function openModal(namaTim, totalNilai, jumlahMenang, detail, timData, pengharga
     
     document.getElementById('modalNamaTim').textContent = namaTim || '-';
     document.getElementById('modalTotalNilai').textContent = parseFloat(totalNilai).toFixed(1).replace('.', ',');
-    document.getElementById('modalJumlahMenang').textContent = jumlahMenang || 0;
 
     const item = timDataArray[namaTim];
     if (item) {

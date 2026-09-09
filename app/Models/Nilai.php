@@ -15,7 +15,8 @@ class Nilai extends Model
         'id_juri',
         'nilai',
         'babak',
-        'juara', // Tambahkan ini
+        'juara',
+        'jumlah', // Tambahkan ini
     ];
 
     public function tim()

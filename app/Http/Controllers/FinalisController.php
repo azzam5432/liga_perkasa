@@ -114,11 +114,11 @@ class FinalisController extends Controller
 
                 foreach ($tim->nilai as $nilai) {
                     if ($nilai->juara == 1) {
-                        $emas++;
+                        $emas += $nilai->jumlah;
                     } elseif ($nilai->juara == 2) {
-                        $perak++;
+                        $perak += $nilai->jumlah;
                     } elseif ($nilai->juara == 3) {
-                        $perunggu++;
+                        $perunggu += $nilai->jumlah;
                     }
                 }
 
@@ -134,6 +134,7 @@ class FinalisController extends Controller
                             'babak' => $nilai->babak ?? '-',
                             'nilai' => $nilai->nilai,
                             'juara' => $nilai->juara ?? null,
+                            'jumlah' => $nilai->jumlah ?? 1,
                         ];
                     }),
                     'penghargaan' => $tim->penghargaan->map(function($p) {
@@ -168,11 +169,11 @@ class FinalisController extends Controller
 
                 foreach ($tim->nilai as $nilai) {
                     if ($nilai->juara == 1) {
-                        $emas++;
+                        $emas += $nilai->jumlah;
                     } elseif ($nilai->juara == 2) {
-                        $perak++;
+                        $perak += $nilai->jumlah;
                     } elseif ($nilai->juara == 3) {
-                        $perunggu++;
+                        $perunggu += $nilai->jumlah;
                     }
                 }
 
@@ -188,6 +189,7 @@ class FinalisController extends Controller
                             'babak' => $nilai->babak ?? '-',
                             'nilai' => $nilai->nilai,
                             'juara' => $nilai->juara ?? null,
+                            'jumlah' => $nilai->jumlah ?? 1,
                         ];
                     }),
                     'penghargaan' => $tim->penghargaan->map(function($p) {

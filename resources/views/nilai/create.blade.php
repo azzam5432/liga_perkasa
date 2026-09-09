@@ -267,7 +267,7 @@
 
 <div class="table-wrapper">
     <div class="table-scroll">
-        <form action="{{ route('nilai.store') }}" method="POST" id="formNilai">
+       <form action="{{ route('nilai.store') }}" method="POST" id="formNilai">
             @csrf
             <input type="hidden" name="id_lomba" value="{{ $lomba->id_lomba }}">
 
@@ -290,30 +290,37 @@
                             <td class="fw-semibold">{{ $t->nama_tim }}</td>
                             <td style="text-align: center;">
                                 <input type="radio" 
-                                       name="juara_1" 
-                                       value="{{ $t->id_tim }}" 
-                                       class="tim-radio"
-                                       id="juara1-{{ $t->id_tim }}"
-                                       onchange="onJuaraSelected(1, {{ $t->id_tim }})"
-                                       @if(isset($sudahDinilai) && $sudahDinilai) disabled @endif>
+                                    name="juara_1" 
+                                    value="{{ $t->id_tim }}" 
+                                    class="tim-radio"
+                                    id="juara1-{{ $t->id_tim }}"
+                                    onchange="onJuaraSelected(1, {{ $t->id_tim }})"
+                                    @if(isset($sudahDinilai) && $sudahDinilai) disabled @endif>
                             </td>
                             <td style="text-align: center;">
                                 <input type="radio" 
-                                       name="juara_2" 
-                                       value="{{ $t->id_tim }}" 
-                                       class="tim-radio"
-                                       id="juara2-{{ $t->id_tim }}"
-                                       onchange="onJuaraSelected(2, {{ $t->id_tim }})"
-                                       @if(isset($sudahDinilai) && $sudahDinilai) disabled @endif>
+                                    name="juara_2" 
+                                    value="{{ $t->id_tim }}" 
+                                    class="tim-radio"
+                                    id="juara2-{{ $t->id_tim }}"
+                                    onchange="onJuaraSelected(2, {{ $t->id_tim }})"
+                                    @if(isset($sudahDinilai) && $sudahDinilai) disabled @endif>
                             </td>
                             <td style="text-align: center;">
-                                <input type="radio" 
-                                       name="juara_3" 
-                                       value="{{ $t->id_tim }}" 
-                                       class="tim-radio"
-                                       id="juara3-{{ $t->id_tim }}"
-                                       onchange="onJuaraSelected(3, {{ $t->id_tim }})"
-                                       @if(isset($sudahDinilai) && $sudahDinilai) disabled @endif>
+                                <input type="checkbox" 
+                                    name="juara_3[]" 
+                                    value="{{ $t->id_tim }}" 
+                                    class="juara3-checkbox"
+                                    onchange="toggleJumlahPerunggu({{ $t->id_tim }})"
+                                    @if(isset($sudahDinilai) && $sudahDinilai) disabled @endif>
+                                <input type="number" 
+                                    name="jumlah_perunggu_{{ $t->id_tim }}" 
+                                    id="jumlah-perunggu-{{ $t->id_tim }}" 
+                                    value="1" 
+                                    min="1" 
+                                    class="form-control form-control-sm mt-1"
+                                    style="display: none; width: 80px; margin: 5px auto;"
+                                    @if(isset($sudahDinilai) && $sudahDinilai) disabled @endif>
                             </td>
                         </tr>
                     @empty
@@ -370,7 +377,20 @@ function onJuaraSelected(juara, timId) {
         }
     }
 
+    // Tampilkan nama tim di podium
     updatePodium();
+}
+
+function toggleJumlahPerunggu(timId) {
+    const checkbox = document.querySelector(`input[name="juara_3[]"][value="${timId}"]`);
+    const inputJumlah = document.getElementById(`jumlah-perunggu-${timId}`);
+
+    if (checkbox.checked) {
+        inputJumlah.style.display = 'block';
+    } else {
+        inputJumlah.style.display = 'none';
+        inputJumlah.value = 1;
+    }
 }
 
 function updatePodium() {
@@ -402,9 +422,18 @@ document.getElementById('formNilai').addEventListener('submit', function(e) {
         return false;
     @endif
 
-    if (selectedJuara[1] === null || selectedJuara[2] === null || selectedJuara[3] === null) {
+    // Validasi Juara 1 dan 2
+    if (selectedJuara[1] === null || selectedJuara[2] === null) {
         e.preventDefault();
-        alert('⚠️ Silakan pilih Juara 1, 2, dan 3!');
+        alert('⚠️ Silakan pilih Juara 1 dan Juara 2!');
+        return false;
+    }
+
+    // Validasi Juara 3 (checkbox)
+    const checkedJuara3 = document.querySelectorAll('input[name="juara_3[]"]:checked');
+    if (checkedJuara3.length === 0) {
+        e.preventDefault();
+        alert('⚠️ Silakan pilih minimal 1 tim untuk Juara 3!');
         return false;
     }
 

@@ -105,7 +105,8 @@ class NilaiController extends Controller
             'id_lomba' => 'required|exists:tb_lomba,id_lomba',
             'juara_1' => 'required|exists:tb_tim,id_tim',
             'juara_2' => 'required|exists:tb_tim,id_tim',
-            'juara_3' => 'required|exists:tb_tim,id_tim',
+            'juara_3' => 'required|array|min:1',
+            'juara_3.*' => 'exists:tb_tim,id_tim',
         ]);
 
         $id_lomba = $request->id_lomba;
@@ -120,8 +121,8 @@ class NilaiController extends Controller
         }
 
         if ($request->juara_1 == $request->juara_2 || 
-            $request->juara_1 == $request->juara_3 || 
-            $request->juara_2 == $request->juara_3) {
+            in_array($request->juara_1, $request->juara_3 ?? []) || 
+            in_array($request->juara_2, $request->juara_3 ?? [])) {
             return back()->with('error', 'Juara 1, 2, dan 3 harus tim yang berbeda!');
         }
 
@@ -145,56 +146,49 @@ class NilaiController extends Controller
         $poinJuara2 = round($bobot * 2, 2);
         $poinJuara3 = round($bobot * 1, 2);
 
-        // Simpan Juara 1 (Emas)
+        // Simpan Juara 1
         Nilai::create([
             'id_tim' => $request->juara_1,
             'id_lomba' => $id_lomba,
             'id_juri' => $juri->id_juri,
             'nilai' => $poinJuara1,
             'babak' => $babak,
-            'juara' => 1, // Tambahkan ini
+            'juara' => 1,
+            'jumlah' => 1,
         ]);
 
-        // Simpan Juara 2 (Perak)
+        // Simpan Juara 2
         Nilai::create([
             'id_tim' => $request->juara_2,
             'id_lomba' => $id_lomba,
             'id_juri' => $juri->id_juri,
             'nilai' => $poinJuara2,
             'babak' => $babak,
-            'juara' => 2, // Tambahkan ini
+            'juara' => 2,
+            'jumlah' => 1,
         ]);
 
-        // Simpan Juara 3 (Perunggu)
-        Nilai::create([
-            'id_tim' => $request->juara_3,
-            'id_lomba' => $id_lomba,
-            'id_juri' => $juri->id_juri,
-            'nilai' => $poinJuara3,
-            'babak' => $babak,
-            'juara' => 3, // Tambahkan ini
-        ]);
-
-        // Simpan tim lain yang tidak menang (0 poin, juara null)
-        $timLain = Tim::whereNotIn('id_tim', [$request->juara_1, $request->juara_2, $request->juara_3])->get();
-        foreach ($timLain as $tim) {
+        // Simpan Juara 3 (Bisa lebih dari 1 tim, dengan jumlah perunggu masing-masing)
+        foreach ($request->juara_3 ?? [] as $id_tim) {
+            $jumlah = $request->input('jumlah_perunggu_' . $id_tim, 1);
+            
             Nilai::create([
-                'id_tim' => $tim->id_tim,
+                'id_tim' => $id_tim,
                 'id_lomba' => $id_lomba,
                 'id_juri' => $juri->id_juri,
-                'nilai' => 0,
+                'nilai' => $poinJuara3 * $jumlah,
                 'babak' => $babak,
-                'juara' => null, // Tidak dapat medali
+                'juara' => 3,
+                'jumlah' => $jumlah,
             ]);
         }
 
-        if ($babak == 'penyisihan' && $lomba->jenis == 'penyisihan') {
-            $this->tentukanFinalisOtomatis($lomba);
-        }
-
+        // LOOPING untuk juara_3 (UPDATE FINALIS)
         $this->updateFinalis($lomba, $request->juara_1, $babak, $poinJuara1);
         $this->updateFinalis($lomba, $request->juara_2, $babak, $poinJuara2);
-        $this->updateFinalis($lomba, $request->juara_3, $babak, $poinJuara3);
+        foreach ($request->juara_3 ?? [] as $id_tim) {
+            $this->updateFinalis($lomba, $id_tim, $babak, $poinJuara3);
+        }
 
         $namaJuara1 = Tim::find($request->juara_1)->nama_tim ?? 'Tim';
 

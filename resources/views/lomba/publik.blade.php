@@ -197,7 +197,7 @@
                             @if($item['juara3'])
                                 <div class="podium-item">
                                     <span>{{ $item['juara3']->nama_tim }}</span>
-                                    <span class="poin">(+{{ number_format($item['bobot'], 1, ',', '.') }})</span>
+                                    <span class="poin">(+{{ number_format($item['bobot'], 1, ',', '.') }} × {{ $item['juara3']->jumlah ?? 1 }})</span>
                                 </div>
                             @else
                                 <span style="color: rgba(255,255,255,0.5);">Belum ada</span>

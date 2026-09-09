@@ -6,23 +6,17 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
-    public function up(): void
+    public function up()
     {
-        Schema::table('nilai', function (Blueprint $table) {
-            //
+        Schema::table('tb_nilai', function (Blueprint $table) {
+            $table->integer('jumlah')->default(1)->after('juara');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
+    public function down()
     {
-        Schema::table('nilai', function (Blueprint $table) {
-            //
+        Schema::table('tb_nilai', function (Blueprint $table) {
+            $table->dropColumn('jumlah');
         });
     }
 };

@@ -155,13 +155,15 @@ class LombaController extends Controller
                 // Ambil juara 1, 2, 3 dari tabel nilai (juara = 1, 2, 3)
                 $juara1 = $lomba->nilai->where('juara', 1)->first();
                 $juara2 = $lomba->nilai->where('juara', 2)->first();
-                $juara3 = $lomba->nilai->where('juara', 3)->first();
+                $juara3 = $lomba->nilai->where('juara', 3)->map(function($nilai) {
+                    return $nilai->tim;
+                })->filter()->values();
 
                 return [
                     'lomba' => $lomba,
                     'juara1' => $juara1 ? $juara1->tim : null,
                     'juara2' => $juara2 ? $juara2->tim : null,
-                    'juara3' => $juara3 ? $juara3->tim : null,
+                    'juara3' => $juara3,
                     'bobot' => $lomba->bobot,
                 ];
             });

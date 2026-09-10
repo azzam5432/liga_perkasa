@@ -83,16 +83,29 @@
     background: rgba(255, 255, 255, 0.1);
 }
 
-.podium-item {
-    display: inline-flex;
+/* TAMPILAN MULTI-LINE UNTUK JUARA 3 */
+.podium-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
     align-items: center;
-    gap: 8px;
+}
+
+.podium-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 215, 0, 0.1);
+    border: 1px solid rgba(255, 215, 0, 0.2);
+    border-radius: 8px;
+    padding: 4px 10px;
+    font-size: 13px;
 }
 
 .podium-item .poin {
     color: #ffd700;
     font-weight: 700;
-    font-size: 13px;
+    font-size: 12px;
 }
 
 .empty-state {
@@ -136,6 +149,12 @@
     .table-scroll table tbody td {
         padding: 10px 12px;
         font-size: 14px;
+    }
+
+    /* Di mobile, badge juara 3 jadi lebih kecil */
+    .podium-item {
+        font-size: 12px;
+        padding: 3px 8px;
     }
 }
 </style>
@@ -194,10 +213,18 @@
                             @endif
                         </td>
                         <td style="text-align: center;">
-                            @if($item['juara3'])
-                                <div class="podium-item">
-                                    <span>{{ $item['juara3']->nama_tim }}</span>
-                                    <span class="poin">(+{{ number_format($item['bobot'], 1, ',', '.') }} × {{ $item['juara3']->jumlah ?? 1 }})</span>
+                            @if($item['juara3'] && $item['juara3']->count() > 0)
+                                <div class="podium-list">
+                                    @foreach($item['juara3'] as $juara3)
+                                        @php
+                                            $nilaiTim = $item['lomba']->nilai->where('juara', 3)->where('id_tim', $juara3->id_tim)->first();
+                                            $jumlah = $nilaiTim->jumlah ?? 1;
+                                        @endphp
+                                        <div class="podium-item">
+                                            <span>{{ $juara3->nama_tim }}</span>
+                                            <span class="poin">(+{{ number_format($item['bobot'], 1, ',', '.') }} × {{ $jumlah }})</span>
+                                        </div>
+                                    @endforeach
                                 </div>
                             @else
                                 <span style="color: rgba(255,255,255,0.5);">Belum ada</span>

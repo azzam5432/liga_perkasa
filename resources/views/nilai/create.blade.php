@@ -253,7 +253,7 @@
 @if(isset($sudahDinilai) && $sudahDinilai)
     <div class="alert alert-info">
         <i class="fas fa-info-circle me-2"></i>
-        Lomba ini sudah dinilai oleh <strong>{{ $juriYangMenilai->user->name ?? 'Juri' }}</strong>. Anda tidak bisa menilai lagi.
+        Lomba ini sudah dinilai di <strong>babak {{ $babak }}</strong>. Anda tidak bisa menilai lagi.
     </div>
 @endif
 
@@ -422,22 +422,37 @@ document.getElementById('formNilai').addEventListener('submit', function(e) {
         return false;
     @endif
 
+    // ✅ AMBIL LANGSUNG DARI DOM
+    const juara1 = document.querySelector('input[name="juara_1"]:checked');
+    const juara2 = document.querySelector('input[name="juara_2"]:checked');
+    const juara3 = document.querySelectorAll('input[name="juara_3[]"]:checked');
+
     // Validasi Juara 1 dan 2
-    if (selectedJuara[1] === null || selectedJuara[2] === null) {
+    if (!juara1 || !juara2) {
         e.preventDefault();
         alert('⚠️ Silakan pilih Juara 1 dan Juara 2!');
         return false;
     }
 
-    // Validasi Juara 3 (checkbox)
-    const checkedJuara3 = document.querySelectorAll('input[name="juara_3[]"]:checked');
-    if (checkedJuara3.length === 0) {
+    // Validasi Juara 3
+    if (juara3.length === 0) {
         e.preventDefault();
         alert('⚠️ Silakan pilih minimal 1 tim untuk Juara 3!');
         return false;
     }
 
-    const namaJuara1 = document.querySelector('#row-' + selectedJuara[1] + ' .fw-semibold')?.textContent || 'Tim';
+    // Validasi tidak ada duplikat
+    const juara1Val = juara1.value;
+    const juara2Val = juara2.value;
+    const juara3Vals = Array.from(juara3).map(cb => cb.value);
+
+    if (juara1Val === juara2Val || juara3Vals.includes(juara1Val) || juara3Vals.includes(juara2Val)) {
+        e.preventDefault();
+        alert('⚠️ Juara 1, 2, dan 3 harus tim yang berbeda!');
+        return false;
+    }
+
+    const namaJuara1 = document.querySelector('#row-' + juara1Val + ' .fw-semibold')?.textContent || 'Tim';
     const bobot = {{ $lomba->bobot }};
     const poin1 = bobot * 3;
 

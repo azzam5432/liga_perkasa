@@ -30,15 +30,23 @@ class NilaiController extends Controller
         $user = Auth::user();
         $lomba = Lomba::findOrFail($id_lomba);
         
-        // Ambil semua tim (tanpa filter juri)
+        // Tentukan babak
+        $babak = $lomba->is_final_active ? 'final' : 'penyisihan';
+        
+        // Ambil semua tim
         $tim = Tim::all();
 
-        // Cek apakah sudah ada penilaian untuk lomba ini
-        $nilaiExisting = Nilai::where('id_lomba', $id_lomba)->get()->keyBy('id_tim');
+        // Cek apakah babak ini sudah dinilai (filter by babak!)
+        $sudahDinilai = Nilai::where('id_lomba', $id_lomba)
+            ->where('babak', $babak)
+            ->exists();
         
-        $sudahDinilai = Nilai::where('id_lomba', $id_lomba)->exists();
+        $nilaiExisting = Nilai::where('id_lomba', $id_lomba)
+            ->where('babak', $babak)
+            ->get()
+            ->keyBy('id_tim');
         
-        return view('nilai.create', compact('lomba', 'tim', 'nilaiExisting', 'sudahDinilai'));
+        return view('nilai.create', compact('lomba', 'tim', 'nilaiExisting', 'sudahDinilai', 'babak'));
     }
 
     // Menyimpan penilaian
@@ -46,35 +54,34 @@ class NilaiController extends Controller
     {
         $user = Auth::user();
 
-        // Validasi input
         $request->validate([
             'id_lomba' => 'required|exists:tb_lomba,id_lomba',
             'juara_1' => 'required|exists:tb_tim,id_tim',
             'juara_2' => 'required|exists:tb_tim,id_tim',
             'juara_3' => 'required|array|min:1',
             'juara_3.*' => 'exists:tb_tim,id_tim',
-            'jumlah_perunggu' => 'required|array',
-            'jumlah_perunggu.*' => 'integer|min:1',
         ]);
 
         $id_lomba = $request->id_lomba;
         $lomba = Lomba::findOrFail($id_lomba);
 
+        // Cek duplikat juara
         if ($request->juara_1 == $request->juara_2 || 
             in_array($request->juara_1, $request->juara_3 ?? []) || 
             in_array($request->juara_2, $request->juara_3 ?? [])) {
             return back()->with('error', 'Juara 1, 2, dan 3 harus tim yang berbeda!');
         }
 
+        // Tentukan babak
         $babak = $lomba->is_final_active ? 'final' : 'penyisihan';
 
-        // Cek apakah lomba sudah dinilai (oleh siapa pun)
+        // Cek apakah lomba sudah dinilai DI BABAK YANG SAMA
         $sudahDinilai = Nilai::where('id_lomba', $id_lomba)
             ->where('babak', $babak)
             ->exists();
 
         if ($sudahDinilai) {
-            return redirect()->route('dashboard')->with('error', "Lomba ini sudah dinilai di babak {$babak}!");
+            return back()->with('error', "Lomba ini sudah dinilai di babak {$babak}!");
         }
 
         $bobot = (float) $lomba->bobot;
@@ -102,9 +109,9 @@ class NilaiController extends Controller
             'jumlah' => 1,
         ]);
 
-        // Simpan Juara 3 (Bisa lebih dari 1 tim, dengan jumlah perunggu masing-masing)
-        foreach ($request->juara_3 ?? [] as $index => $id_tim) {
-            $jumlah = $request->jumlah_perunggu[$index] ?? 1;
+        // Simpan Juara 3 (bisa lebih dari 1 tim)
+        foreach ($request->juara_3 ?? [] as $id_tim) {
+            $jumlah = $request->input('jumlah_perunggu_' . $id_tim, 1);
             
             Nilai::create([
                 'id_tim' => $id_tim,
@@ -116,11 +123,7 @@ class NilaiController extends Controller
             ]);
         }
 
-        // Update data finalis (jika perlu)
-        if ($babak == 'penyisihan' && $lomba->jenis == 'penyisihan') {
-            $this->tentukanFinalisOtomatis($lomba);
-        }
-
+        // Update Finalis
         $this->updateFinalis($lomba, $request->juara_1, $babak, $poinJuara1);
         $this->updateFinalis($lomba, $request->juara_2, $babak, $poinJuara2);
         foreach ($request->juara_3 ?? [] as $id_tim) {

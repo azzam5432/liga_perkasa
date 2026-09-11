@@ -521,6 +521,16 @@ body {
     .public-table-wrapper table tbody td:nth-child(6),
     .table-scroll table thead th:nth-child(6),
     .table-scroll table tbody td:nth-child(6) { width: 14%; } /* Total Nilai */
+    
+    .table-scroll .fw-semibold,
+    .public-table-wrapper .tim-name {
+        cursor: pointer;
+    }
+
+    .table-scroll .fw-semibold:hover,
+    .public-table-wrapper .tim-name:hover {
+        color: #ffffff;
+    }
     @endif
 
     @if(Auth::check())
@@ -636,6 +646,7 @@ body {
         word-wrap: break-word;
         overflow-wrap: break-word;
     }
+    
     @endif
 
     @if(!Auth::check())
@@ -1189,6 +1200,25 @@ setInterval(fetchRanking, 5000);
 
 document.addEventListener('DOMContentLoaded', function() {
     fetchRanking();
+
+    document.addEventListener('click', function(e) {
+        // Cek apakah user di mobile
+        const isMobile = window.innerWidth <= 768;
+        if (!isMobile) return;
+
+        // Cek apakah yang diklik adalah nama tim
+        const namaTimEl = e.target.closest('.fw-semibold, .tim-name');
+        if (!namaTimEl) return;
+
+        // Ambil nama tim
+        const namaTim = namaTimEl.textContent.trim();
+
+        // Cari data tim
+        const item = timDataArray[namaTim];
+        if (item) {
+            openModal(item.tim.nama_tim, item.total_nilai, item.jml_menang, item.detail, item.tim, item.penghargaan);
+        }
+    });
 });
 </script>
 @endsection

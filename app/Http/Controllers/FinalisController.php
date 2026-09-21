@@ -103,10 +103,12 @@ class FinalisController extends Controller
 
     public function ranking()
     {
-        $rekapTim = Tim::with(['nilai', 'penghargaan', 'pesertas', 'dosenPembimbing', 'kakakPembimbing'])
+        $rekapTim = Tim::with(['nilai', 'pesertas', 'dosenPembimbing', 'kakakPembimbing'])
             ->get()
             ->map(function($tim) {
-                $totalNilai = $tim->nilai->sum('nilai') + $tim->penghargaan->sum('bobot');
+                // FITUR PENGHARGAAN DINONAKTIFKAN: bobot penghargaan tidak dijumlahkan
+                // $totalNilai = $tim->nilai->sum('nilai') + $tim->penghargaan->sum('bobot');
+                $totalNilai = $tim->nilai->sum('nilai');
 
                 $emas = 0;
                 $perak = 0;
@@ -137,12 +139,13 @@ class FinalisController extends Controller
                             'jumlah' => $nilai->jumlah ?? 1,
                         ];
                     }),
-                    'penghargaan' => $tim->penghargaan->map(function($p) {
-                        return [
-                            'kategori' => $p->kategori,
-                            'bobot' => $p->bobot,
-                        ];
-                    }),
+                    // FITUR PENGHARGAAN DINONAKTIFKAN
+                    // 'penghargaan' => $tim->penghargaan->map(function($p) {
+                    //     return [
+                    //         'kategori' => $p->kategori,
+                    //         'bobot' => $p->bobot,
+                    //     ];
+                    // }),
                 ];
             })
             ->sort(function($a, $b) {
@@ -158,10 +161,12 @@ class FinalisController extends Controller
 
     public function getRankingData()
     {
-        $rekapTim = Tim::with(['nilai', 'penghargaan', 'pesertas', 'dosenPembimbing', 'kakakPembimbing'])
+        $rekapTim = Tim::with(['nilai', 'pesertas', 'dosenPembimbing', 'kakakPembimbing'])
             ->get()
             ->map(function($tim) {
-                $totalNilai = $tim->nilai->sum('nilai') + $tim->penghargaan->sum('bobot');
+                // FITUR PENGHARGAAN DINONAKTIFKAN: bobot penghargaan tidak dijumlahkan
+                // $totalNilai = $tim->nilai->sum('nilai') + $tim->penghargaan->sum('bobot');
+                $totalNilai = $tim->nilai->sum('nilai');
 
                 $emas = 0;
                 $perak = 0;
@@ -192,12 +197,13 @@ class FinalisController extends Controller
                             'jumlah' => $nilai->jumlah ?? 1,
                         ];
                     }),
-                    'penghargaan' => $tim->penghargaan->map(function($p) {
-                        return [
-                            'kategori' => $p->kategori,
-                            'bobot' => $p->bobot,
-                        ];
-                    }),
+                    // FITUR PENGHARGAAN DINONAKTIFKAN
+                    // 'penghargaan' => $tim->penghargaan->map(function($p) {
+                    //     return [
+                    //         'kategori' => $p->kategori,
+                    //         'bobot' => $p->bobot,
+                    //     ];
+                    // }),
                 ];
             })
             ->sort(function($a, $b) {

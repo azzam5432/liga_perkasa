@@ -2,6 +2,12 @@
 
 @section('title', 'Penilaian - ' . $lomba->nama_lomba)
 
+@php
+    $isEdit = $isEdit ?? false;
+    $juara1Id = $nilaiExisting->firstWhere('juara', 1)->id_tim ?? null;
+    $juara2Id = $nilaiExisting->firstWhere('juara', 2)->id_tim ?? null;
+@endphp
+
 @section('content')
 <style>
 .page-header {
@@ -224,14 +230,19 @@
 
 <div class="page-header">
     <h4>
-        <i class="fas fa-pen me-2"></i> Penilaian - {{ $lomba->nama_lomba }}
+        <i class="fas fa-pen me-2"></i> {{ $isEdit ? 'Edit Penilaian' : 'Penilaian' }} - {{ $lomba->nama_lomba }}
     </h4>
     <div class="d-flex gap-2">
         <a href="{{ route('nilai.index') }}" class="btn-secondary-custom">
             <i class="fas fa-arrow-left"></i> Kembali
         </a>
+        @if(isset($sudahDinilai) && $sudahDinilai && !$isEdit)
+            <a href="{{ route('nilai.edit', $lomba->id_lomba) }}" class="btn-secondary-custom">
+                <i class="fas fa-edit"></i> Edit Nilai
+            </a>
+        @endif
         <button type="submit" form="formNilai" class="btn-submit-nilai" id="btnSimpanNilai">
-            <i class="fas fa-save"></i> Simpan Nilai
+            <i class="fas fa-save"></i> {{ $isEdit ? 'Perbarui Nilai' : 'Simpan Nilai' }}
         </button>
     </div>
 </div>
@@ -251,10 +262,17 @@
 @endif
 
 @if(isset($sudahDinilai) && $sudahDinilai)
-    <div class="alert alert-info">
-        <i class="fas fa-info-circle me-2"></i>
-        Lomba ini sudah dinilai di <strong>babak {{ $babak }}</strong>. Anda tidak bisa menilai lagi.
-    </div>
+    @if($isEdit)
+        <div class="alert alert-warning">
+            <i class="fas fa-edit me-2"></i>
+            Mode <strong>Edit</strong>: Anda sedang mengubah penilaian babak <strong>{{ $babak }}</strong>. Perubahan akan menimpa nilai lama.
+        </div>
+    @else
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i>
+            Lomba ini sudah dinilai di <strong>babak {{ $babak }}</strong>. Input dinonaktifkan — gunakan tombol <strong>Edit Nilai</strong> untuk mengubah.
+        </div>
+    @endif
 @endif
 
 <div class="info-badge mb-3">
@@ -267,8 +285,11 @@
 
 <div class="table-wrapper">
     <div class="table-scroll">
-       <form action="{{ route('nilai.store') }}" method="POST" id="formNilai">
+       <form action="{{ $isEdit ? route('nilai.update', $lomba->id_lomba) : route('nilai.store') }}" method="POST" id="formNilai">
             @csrf
+            @if($isEdit)
+                @method('PUT')
+            @endif
             <input type="hidden" name="id_lomba" value="{{ $lomba->id_lomba }}">
 
             <table>
@@ -283,7 +304,11 @@
                 </thead>
                 <tbody>
                     @forelse($tim as $index => $t)
-                        <tr id="row-{{ $t->id_tim }}" class="tim-row">
+                        @php
+                            $nilaiTim = $nilaiExisting[$t->id_tim] ?? null;
+                            $inputDisabled = isset($sudahDinilai) && $sudahDinilai && !$isEdit;
+                        @endphp
+                        <tr id="row-{{ $t->id_tim }}" class="tim-row @if($nilaiTim) selected @endif">
                             <td style="text-align: center; font-weight: 600; color: #1a2332;">
                                 {{ $loop->iteration }}
                             </td>
@@ -295,7 +320,8 @@
                                     class="tim-radio"
                                     id="juara1-{{ $t->id_tim }}"
                                     onchange="onJuaraSelected(1, {{ $t->id_tim }})"
-                                    @if(isset($sudahDinilai) && $sudahDinilai) disabled @endif>
+                                    @checked($nilaiTim && $nilaiTim->juara == 1)
+                                    @disabled($inputDisabled)>
                             </td>
                             <td style="text-align: center;">
                                 <input type="radio" 
@@ -304,7 +330,8 @@
                                     class="tim-radio"
                                     id="juara2-{{ $t->id_tim }}"
                                     onchange="onJuaraSelected(2, {{ $t->id_tim }})"
-                                    @if(isset($sudahDinilai) && $sudahDinilai) disabled @endif>
+                                    @checked($nilaiTim && $nilaiTim->juara == 2)
+                                    @disabled($inputDisabled)>
                             </td>
                             <td style="text-align: center;">
                                 <input type="checkbox" 
@@ -312,15 +339,16 @@
                                     value="{{ $t->id_tim }}" 
                                     class="juara3-checkbox"
                                     onchange="toggleJumlahPerunggu({{ $t->id_tim }})"
-                                    @if(isset($sudahDinilai) && $sudahDinilai) disabled @endif>
+                                    @checked($nilaiTim && $nilaiTim->juara == 3)
+                                    @disabled($inputDisabled)>
                                 <input type="number" 
                                     name="jumlah_perunggu_{{ $t->id_tim }}" 
                                     id="jumlah-perunggu-{{ $t->id_tim }}" 
-                                    value="1" 
+                                    value="{{ ($nilaiTim && $nilaiTim->juara == 3) ? $nilaiTim->jumlah : 1 }}" 
                                     min="1" 
                                     class="form-control form-control-sm mt-1"
                                     style="display: none; width: 80px; margin: 5px auto;"
-                                    @if(isset($sudahDinilai) && $sudahDinilai) disabled @endif>
+                                    @disabled($inputDisabled)>
                             </td>
                         </tr>
                     @empty
@@ -341,7 +369,11 @@
 </div>
 
 <script>
-let selectedJuara = { 1: null, 2: null, 3: null };
+let selectedJuara = {
+    1: {{ $juara1Id ?? 'null' }},
+    2: {{ $juara2Id ?? 'null' }},
+    3: null
+};
 
 function onJuaraSelected(juara, timId) {
     // Hapus radio lain yang sama di juara tersebut
@@ -416,9 +448,9 @@ function updatePodium() {
 }
 
 document.getElementById('formNilai').addEventListener('submit', function(e) {
-    @if(isset($sudahDinilai) && $sudahDinilai)
+    @if(isset($sudahDinilai) && $sudahDinilai && !$isEdit)
         e.preventDefault();
-        alert('⚠️ Lomba ini sudah dinilai!');
+        alert('⚠️ Lomba ini sudah dinilai! Gunakan tombol Edit Nilai untuk mengubah.');
         return false;
     @endif
 
@@ -456,7 +488,9 @@ document.getElementById('formNilai').addEventListener('submit', function(e) {
     const bobot = {{ $lomba->bobot }};
     const poin1 = bobot * 3;
 
-    if (!confirm(`Yakin dengan penilaian berikut?\n\nJuara 1: ${namaJuara1} (${poin1} poin)\n\nTim lain akan mendapat 0 poin.`)) {
+    const pesanAksi = @json($isEdit) ? 'perubahan penilaian' : 'penilaian';
+
+    if (!confirm(`Yakin dengan ${pesanAksi} berikut?\n\nJuara 1: ${namaJuara1} (${poin1} poin)\n\nTim lain akan mendapat 0 poin.`)) {
         e.preventDefault();
         return false;
     }
@@ -467,5 +501,11 @@ document.getElementById('formNilai').addEventListener('submit', function(e) {
 
     return true;
 });
+
+// Inisialisasi tampilan dari nilai yang sudah tersimpan (mode edit / sudah dinilai)
+document.querySelectorAll('input[name="juara_3[]"]:checked').forEach(cb => {
+    toggleJumlahPerunggu(cb.value);
+});
+updatePodium();
 </script>
 @endsection

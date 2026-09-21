@@ -692,11 +692,12 @@ body {
                 </a>
             @endif
             
-            @if(Auth::user()->isPanitia() || Auth::user()->isSuperAdmin())
+            {{-- FITUR PENGHARGAAN DINONAKTIFKAN --}}
+            {{-- @if(Auth::user()->isPanitia() || Auth::user()->isSuperAdmin())
                 <a href="{{ route('penghargaan.index') }}" class="btn-award">
                     <i class="fas fa-award"></i> Penghargaan
                 </a>
-            @endif
+            @endif --}}
         </div>
     </div>
 
@@ -897,14 +898,15 @@ body {
                     </div>
                 </div>
 
-                <div class="mb-4 p-3" style="background: #fff8e1; border: 1px solid #ffe082; border-radius: 10px;">
+                {{-- FITUR PENGHARGAAN DINONAKTIFKAN --}}
+                {{-- <div class="mb-4 p-3" style="background: #fff8e1; border: 1px solid #ffe082; border-radius: 10px;">
                     <h6 class="fw-bold mb-2" style="color: #f57f17;">
                         <i class="fas fa-award me-2"></i> Penghargaan
                     </h6>
                     <div id="modalPenghargaan" style="font-size: 15px; color: #000000;">
                         <span class="text-muted">Tidak ada penghargaan</span>
                     </div>
-                </div>
+                </div> --}}
 
                 <div class="mb-4 p-3" style="background: #e3f2fd; border: 1px solid #90caf9; border-radius: 10px;">
                     <h6 class="fw-bold mb-2" style="color: #1565c0;">
@@ -1142,17 +1144,18 @@ function openModal(namaTim, totalNilai, jumlahMenang, detail, timData, pengharga
         document.getElementById('modalPerunggu').textContent = item.perunggu || 0;
     }
 
-    let penghargaanHtml = '<span class="text-muted">Tidak ada penghargaan</span>';
-    if (penghargaan && Array.isArray(penghargaan) && penghargaan.length > 0) {
-        penghargaanHtml = penghargaan.map(p => `
-            <div class="d-flex align-items-center mb-2">
-                <i class="fas fa-medal me-2" style="color: #f57f17;"></i>
-                <span class="fw-semibold">${p.kategori}</span>
-                <span class="badge bg-warning text-dark ms-2">+${p.bobot} poin</span>
-            </div>
-        `).join('');
-    }
-    document.getElementById('modalPenghargaan').innerHTML = penghargaanHtml;
+    // ===== FITUR PENGHARGAAN DINONAKTIFKAN =====
+    // let penghargaanHtml = '<span class="text-muted">Tidak ada penghargaan</span>';
+    // if (penghargaan && Array.isArray(penghargaan) && penghargaan.length > 0) {
+    //     penghargaanHtml = penghargaan.map(p => `
+    //         <div class="d-flex align-items-center mb-2">
+    //             <i class="fas fa-medal me-2" style="color: #f57f17;"></i>
+    //             <span class="fw-semibold">${p.kategori}</span>
+    //             <span class="badge bg-warning text-dark ms-2">+${p.bobot} poin</span>
+    //         </div>
+    //     `).join('');
+    // }
+    // document.getElementById('modalPenghargaan').innerHTML = penghargaanHtml;
 
     let ketua = '-', anggotaHtml = '<span class="text-muted">Tidak ada anggota</span>';
     if (timData && timData.pesertas) {

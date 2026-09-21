@@ -192,9 +192,15 @@
                             @endif
                         </td>
                         <td style="text-align: center;">
-                            <a href="{{ route('nilai.create', $lomba->id_lomba) }}" class="btn-action btn-primary" title="Nilai Lomba">
-                                <i class="fas fa-pen"></i>
-                            </a>
+                            @if($lomba->nilai->isNotEmpty())
+                                <a href="{{ route('nilai.edit', $lomba->id_lomba) }}" class="btn-action btn-warning" title="Edit Nilai">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            @else
+                                <a href="{{ route('nilai.create', $lomba->id_lomba) }}" class="btn-action btn-primary" title="Nilai Lomba">
+                                    <i class="fas fa-pen"></i>
+                                </a>
+                            @endif
                         </td>
                     </tr>
                 @empty

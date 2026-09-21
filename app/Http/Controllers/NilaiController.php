@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class NilaiController extends Controller
 {
@@ -26,6 +27,17 @@ class NilaiController extends Controller
 
     // Menampilkan form penilaian untuk lomba tertentu
     public function create($id_lomba): View
+    {
+        return $this->renderForm($id_lomba, false);
+    }
+
+    // Menampilkan form edit penilaian yang sudah tersimpan
+    public function edit($id_lomba): View
+    {
+        return $this->renderForm($id_lomba, true);
+    }
+
+    private function renderForm($id_lomba, bool $isEdit): View
     {
         $user = Auth::user();
         $lomba = Lomba::findOrFail($id_lomba);
@@ -46,7 +58,7 @@ class NilaiController extends Controller
             ->get()
             ->keyBy('id_tim');
         
-        return view('nilai.create', compact('lomba', 'tim', 'nilaiExisting', 'sudahDinilai', 'babak'));
+        return view('nilai.create', compact('lomba', 'tim', 'nilaiExisting', 'sudahDinilai', 'babak', 'isEdit'));
     }
 
     // Menyimpan penilaian
@@ -81,7 +93,8 @@ class NilaiController extends Controller
             ->exists();
 
         if ($sudahDinilai) {
-            return back()->with('error', "Lomba ini sudah dinilai di babak {$babak}!");
+            return redirect()->route('nilai.edit', $id_lomba)
+                ->with('error', "Lomba ini sudah dinilai di babak {$babak}. Silakan ubah melalui menu Edit Nilai.");
         }
 
         $bobot = (float) $lomba->bobot;
@@ -134,6 +147,110 @@ class NilaiController extends Controller
 
         return redirect()->route('dashboard')
             ->with('success', "Penilaian berhasil! {$namaJuara1} menjadi juara 1 di babak {$babak}.");
+    }
+
+    // Mengubah penilaian yang sudah tersimpan
+    public function update(Request $request, $id_lomba): RedirectResponse
+    {
+        $request->validate([
+            'juara_1' => 'required|exists:tb_tim,id_tim',
+            'juara_2' => 'required|exists:tb_tim,id_tim',
+            'juara_3' => 'required|array|min:1',
+            'juara_3.*' => 'exists:tb_tim,id_tim',
+        ]);
+
+        $lomba = Lomba::findOrFail($id_lomba);
+
+        // Cek duplikat juara
+        if ($request->juara_1 == $request->juara_2 ||
+            in_array($request->juara_1, $request->juara_3 ?? []) ||
+            in_array($request->juara_2, $request->juara_3 ?? [])) {
+            return back()->with('error', 'Juara 1, 2, dan 3 harus tim yang berbeda!');
+        }
+
+        // Tentukan babak
+        $babak = $lomba->is_final_active ? 'final' : 'penyisihan';
+
+        DB::transaction(function () use ($lomba, $request, $babak) {
+            // Hapus & tulis ulang nilai babak ini sesuai input terbaru
+            $this->refillBabak($lomba, $babak, $request);
+
+            // Sinkronkan rekap finalis dengan nilai terbaru
+            $this->syncFinalis($lomba, $babak);
+        });
+
+        $namaJuara1 = Tim::find($request->juara_1)->nama_tim ?? 'Tim';
+
+        return redirect()->route('nilai.index')
+            ->with('success', "Penilaian babak {$babak} berhasil diperbarui! {$namaJuara1} menjadi juara 1.");
+    }
+
+    // Hapus & isi ulang semua nilai pada satu babak sesuai input (dipakai saat edit)
+    private function refillBabak(Lomba $lomba, string $babak, Request $request): void
+    {
+        $bobot = (float) $lomba->bobot;
+
+        Nilai::where('id_lomba', $lomba->id_lomba)
+            ->where('babak', $babak)
+            ->delete();
+
+        $rows = [
+            ['id_tim' => $request->juara_1, 'juara' => 1, 'poin' => $bobot * 3, 'jumlah' => 1],
+            ['id_tim' => $request->juara_2, 'juara' => 2, 'poin' => $bobot * 2, 'jumlah' => 1],
+        ];
+
+        foreach ($request->juara_3 ?? [] as $id_tim) {
+            $rows[] = [
+                'id_tim' => $id_tim,
+                'juara' => 3,
+                'poin' => $bobot,
+                'jumlah' => (int) $request->input('jumlah_perunggu_' . $id_tim, 1),
+            ];
+        }
+
+        foreach ($rows as $row) {
+            Nilai::create([
+                'id_tim' => $row['id_tim'],
+                'id_lomba' => $lomba->id_lomba,
+                'nilai' => round($row['poin'] * $row['jumlah'], 2),
+                'babak' => $babak,
+                'juara' => $row['juara'],
+                'jumlah' => $row['jumlah'],
+            ]);
+        }
+    }
+
+    // Sinkronkan tabel finalis dengan nilai terbaru pada babak yang diedit
+    private function syncFinalis(Lomba $lomba, string $babak): void
+    {
+        $totalPerTim = Nilai::where('id_lomba', $lomba->id_lomba)
+            ->where('babak', $babak)
+            ->select('id_tim', DB::raw('SUM(nilai) as total'))
+            ->groupBy('id_tim')
+            ->pluck('total', 'id_tim');
+
+        foreach ($totalPerTim as $id_tim => $total) {
+            $finalis = Finalis::where('id_lomba', $lomba->id_lomba)
+                ->where('id_tim', $id_tim)
+                ->first();
+
+            if ($babak == 'penyisihan') {
+                if ($finalis) {
+                    $finalis->update(['nilai_penyisihan' => round((float) $total, 2)]);
+                } else {
+                    Finalis::create([
+                        'id_lomba' => $lomba->id_lomba,
+                        'id_tim' => $id_tim,
+                        'nilai_penyisihan' => round((float) $total, 2),
+                        'babak' => 'penyisihan',
+                    ]);
+                }
+            }
+
+            if ($babak == 'final' && $finalis) {
+                $finalis->update(['nilai_final' => round((float) $total, 2)]);
+            }
+        }
     }
 
     // Fungsi untuk menentukan finalis otomatis

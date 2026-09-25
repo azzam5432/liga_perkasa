@@ -152,18 +152,21 @@ class LombaController extends Controller
             ->orderBy('nama_lomba', 'asc')
             ->get()
             ->map(function($lomba) {
-                // Ambil juara 1, 2, 3 dari tabel nilai (juara = 1, 2, 3)
-                $juara1 = $lomba->nilai->where('juara', 1)->first();
-                $juara2 = $lomba->nilai->where('juara', 2)->first();
-                $juara3 = $lomba->nilai->where('juara', 3)->map(function($nilai) {
-                    return $nilai->tim;
-                })->filter()->values();
+                // Satu tim bisa dapat beberapa gelar sekaligus, jadi ambil semua pemenang per gelar
+                $pemenang = function ($gelar) use ($lomba) {
+                    return $lomba->nilai
+                        ->where('juara', $gelar)
+                        ->map(fn ($nilai) => $nilai->tim)
+                        ->filter()
+                        ->unique('id_tim')
+                        ->values();
+                };
 
                 return [
                     'lomba' => $lomba,
-                    'juara1' => $juara1 ? $juara1->tim : null,
-                    'juara2' => $juara2 ? $juara2->tim : null,
-                    'juara3' => $juara3,
+                    'juara1' => $pemenang(1),
+                    'juara2' => $pemenang(2),
+                    'juara3' => $pemenang(3),
                     'bobot' => $lomba->bobot,
                 ];
             });

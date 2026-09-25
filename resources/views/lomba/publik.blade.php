@@ -193,20 +193,28 @@
                             <span style="color: #ffd700; font-weight: 700;">{{ $item['bobot'] }}</span>
                         </td>
                         <td style="text-align: center;">
-                            @if($item['juara1'])
-                                <div class="podium-item">
-                                    <span>{{ $item['juara1']->nama_tim }}</span>
-                                    <span class="poin">(+{{ number_format($item['bobot'] * 3, 1, ',', '.') }})</span>
+                            @if($item['juara1'] && $item['juara1']->count() > 0)
+                                <div class="podium-list">
+                                    @foreach($item['juara1'] as $juara1)
+                                        <div class="podium-item">
+                                            <span>{{ $juara1->nama_tim }}</span>
+                                            <span class="poin">(+{{ number_format($item['bobot'] * 3, 1, ',', '.') }})</span>
+                                        </div>
+                                    @endforeach
                                 </div>
                             @else
                                 <span style="color: rgba(255,255,255,0.5);">Belum ada</span>
                             @endif
                         </td>
                         <td style="text-align: center;">
-                            @if($item['juara2'])
-                                <div class="podium-item">
-                                    <span>{{ $item['juara2']->nama_tim }}</span>
-                                    <span class="poin">(+{{ number_format($item['bobot'] * 2, 1, ',', '.') }})</span>
+                            @if($item['juara2'] && $item['juara2']->count() > 0)
+                                <div class="podium-list">
+                                    @foreach($item['juara2'] as $juara2)
+                                        <div class="podium-item">
+                                            <span>{{ $juara2->nama_tim }}</span>
+                                            <span class="poin">(+{{ number_format($item['bobot'] * 2, 1, ',', '.') }})</span>
+                                        </div>
+                                    @endforeach
                                 </div>
                             @else
                                 <span style="color: rgba(255,255,255,0.5);">Belum ada</span>
@@ -217,8 +225,8 @@
                                 <div class="podium-list">
                                     @foreach($item['juara3'] as $juara3)
                                         @php
-                                            $nilaiTim = $item['lomba']->nilai->where('juara', 3)->where('id_tim', $juara3->id_tim)->first();
-                                            $jumlah = $nilaiTim->jumlah ?? 1;
+                                            // Satu tim bisa dapat Juara 3 lebih dari satu kali: jumlahkan semua barisnya
+                                            $jumlah = $item['lomba']->nilai->where('juara', 3)->where('id_tim', $juara3->id_tim)->sum('jumlah');
                                         @endphp
                                         <div class="podium-item">
                                             <span>{{ $juara3->nama_tim }}</span>

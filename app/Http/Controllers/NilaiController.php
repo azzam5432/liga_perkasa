@@ -53,10 +53,11 @@ class NilaiController extends Controller
             ->where('babak', $babak)
             ->exists();
         
+        // Satu tim bisa dapat beberapa gelar sekaligus, jadi kumpulkan per tim
         $nilaiExisting = Nilai::where('id_lomba', $id_lomba)
             ->where('babak', $babak)
             ->get()
-            ->keyBy('id_tim');
+            ->groupBy('id_tim');
         
         return view('nilai.create', compact('lomba', 'tim', 'nilaiExisting', 'sudahDinilai', 'babak', 'isEdit'));
     }
@@ -68,20 +69,17 @@ class NilaiController extends Controller
 
         $request->validate([
             'id_lomba' => 'required|exists:tb_lomba,id_lomba',
-            'juara_1' => 'required|exists:tb_tim,id_tim',
-            'juara_2' => 'required|exists:tb_tim,id_tim',
-            'juara_3' => 'required|array|min:1',
-            'juara_3.*' => 'exists:tb_tim,id_tim',
+            'gelar' => 'required|array',
         ]);
 
         $id_lomba = $request->id_lomba;
         $lomba = Lomba::findOrFail($id_lomba);
 
-        // Cek duplikat juara
-        if ($request->juara_1 == $request->juara_2 || 
-            in_array($request->juara_1, $request->juara_3 ?? []) || 
-            in_array($request->juara_2, $request->juara_3 ?? [])) {
-            return back()->with('error', 'Juara 1, 2, dan 3 harus tim yang berbeda!');
+        // Parse input gelar: Juara 1 & 2 tepat 1 tim (tim sama boleh pegang keduanya),
+        // Juara 3 bebas: bisa beberapa tim, dan 1 tim bisa lebih dari satu kali.
+        $parsed = $this->parseGelar($request);
+        if (is_string($parsed)) {
+            return back()->with('error', $parsed)->withInput();
         }
 
         // Tentukan babak
@@ -98,52 +96,13 @@ class NilaiController extends Controller
         }
 
         $bobot = (float) $lomba->bobot;
-        $poinJuara1 = round($bobot * 3, 2);
-        $poinJuara2 = round($bobot * 2, 2);
-        $poinJuara3 = round($bobot * 1, 2);
 
-        // Simpan Juara 1
-        Nilai::create([
-            'id_tim' => $request->juara_1,
-            'id_lomba' => $id_lomba,
-            'nilai' => $poinJuara1,
-            'babak' => $babak,
-            'juara' => 1,
-            'jumlah' => 1,
-        ]);
+        $this->simpanGelar($id_lomba, $babak, $bobot, $parsed);
 
-        // Simpan Juara 2
-        Nilai::create([
-            'id_tim' => $request->juara_2,
-            'id_lomba' => $id_lomba,
-            'nilai' => $poinJuara2,
-            'babak' => $babak,
-            'juara' => 2,
-            'jumlah' => 1,
-        ]);
+        // Sinkronkan rekap finalis dengan total nilai per tim di babak ini
+        $this->syncFinalis($lomba, $babak);
 
-        // Simpan Juara 3 (bisa lebih dari 1 tim)
-        foreach ($request->juara_3 ?? [] as $id_tim) {
-            $jumlah = $request->input('jumlah_perunggu_' . $id_tim, 1);
-            
-            Nilai::create([
-                'id_tim' => $id_tim,
-                'id_lomba' => $id_lomba,
-                'nilai' => $poinJuara3 * $jumlah,
-                'babak' => $babak,
-                'juara' => 3,
-                'jumlah' => $jumlah,
-            ]);
-        }
-
-        // Update Finalis
-        $this->updateFinalis($lomba, $request->juara_1, $babak, $poinJuara1);
-        $this->updateFinalis($lomba, $request->juara_2, $babak, $poinJuara2);
-        foreach ($request->juara_3 ?? [] as $id_tim) {
-            $this->updateFinalis($lomba, $id_tim, $babak, $poinJuara3);
-        }
-
-        $namaJuara1 = Tim::find($request->juara_1)->nama_tim ?? 'Tim';
+        $namaJuara1 = Tim::find($parsed[1][0]['id_tim'])->nama_tim ?? 'Tim';
 
         return redirect()->route('dashboard')
             ->with('success', "Penilaian berhasil! {$namaJuara1} menjadi juara 1 di babak {$babak}.");
@@ -153,70 +112,108 @@ class NilaiController extends Controller
     public function update(Request $request, $id_lomba): RedirectResponse
     {
         $request->validate([
-            'juara_1' => 'required|exists:tb_tim,id_tim',
-            'juara_2' => 'required|exists:tb_tim,id_tim',
-            'juara_3' => 'required|array|min:1',
-            'juara_3.*' => 'exists:tb_tim,id_tim',
+            'gelar' => 'required|array',
         ]);
 
         $lomba = Lomba::findOrFail($id_lomba);
 
-        // Cek duplikat juara
-        if ($request->juara_1 == $request->juara_2 ||
-            in_array($request->juara_1, $request->juara_3 ?? []) ||
-            in_array($request->juara_2, $request->juara_3 ?? [])) {
-            return back()->with('error', 'Juara 1, 2, dan 3 harus tim yang berbeda!');
+        // Parse input gelar: Juara 1 & 2 tepat 1 tim (tim sama boleh pegang keduanya),
+        // Juara 3 bebas: bisa beberapa tim, dan 1 tim bisa lebih dari satu kali.
+        $parsed = $this->parseGelar($request);
+        if (is_string($parsed)) {
+            return back()->with('error', $parsed)->withInput();
         }
 
         // Tentukan babak
         $babak = $lomba->is_final_active ? 'final' : 'penyisihan';
 
-        DB::transaction(function () use ($lomba, $request, $babak) {
+        DB::transaction(function () use ($lomba, $babak, $parsed) {
             // Hapus & tulis ulang nilai babak ini sesuai input terbaru
-            $this->refillBabak($lomba, $babak, $request);
+            $bobot = (float) $lomba->bobot;
+
+            Nilai::where('id_lomba', $lomba->id_lomba)
+                ->where('babak', $babak)
+                ->delete();
+
+            $this->simpanGelar($lomba->id_lomba, $babak, $bobot, $parsed);
 
             // Sinkronkan rekap finalis dengan nilai terbaru
             $this->syncFinalis($lomba, $babak);
         });
 
-        $namaJuara1 = Tim::find($request->juara_1)->nama_tim ?? 'Tim';
+        $namaJuara1 = Tim::find($parsed[1][0]['id_tim'])->nama_tim ?? 'Tim';
 
         return redirect()->route('nilai.index')
             ->with('success', "Penilaian babak {$babak} berhasil diperbarui! {$namaJuara1} menjadi juara 1.");
     }
 
-    // Hapus & isi ulang semua nilai pada satu babak sesuai input (dipakai saat edit)
-    private function refillBabak(Lomba $lomba, string $babak, Request $request): void
+    // Parse input form "gelar[tim_id][]" menjadi daftar baris nilai per gelar.
+    // Aturan: Juara 1 & 2 tepat 1 tim (boleh tim yang sama), Juara 3 bebas
+    // (bisa beberapa tim, dan satu tim bisa lebih dari satu kali via kolom jumlah).
+    private function parseGelar(Request $request)
     {
-        $bobot = (float) $lomba->bobot;
+        $input = $request->input('gelar', []);
 
-        Nilai::where('id_lomba', $lomba->id_lomba)
-            ->where('babak', $babak)
-            ->delete();
+        $juara1 = [];
+        $juara2 = [];
+        $juara3 = [];
 
-        $rows = [
-            ['id_tim' => $request->juara_1, 'juara' => 1, 'poin' => $bobot * 3, 'jumlah' => 1],
-            ['id_tim' => $request->juara_2, 'juara' => 2, 'poin' => $bobot * 2, 'jumlah' => 1],
-        ];
+        foreach ($input as $id_tim => $gelars) {
+            $gelars = array_unique((array) $gelars);
 
-        foreach ($request->juara_3 ?? [] as $id_tim) {
-            $rows[] = [
-                'id_tim' => $id_tim,
-                'juara' => 3,
-                'poin' => $bobot,
-                'jumlah' => (int) $request->input('jumlah_perunggu_' . $id_tim, 1),
-            ];
+            foreach ($gelars as $gelar) {
+                if ($gelar == 1) {
+                    $juara1[] = $id_tim;
+                } elseif ($gelar == 2) {
+                    $juara2[] = $id_tim;
+                } elseif ($gelar == 3) {
+                    $jumlah = max(1, (int) $request->input('jumlah_j3_' . $id_tim, 1));
+
+                    // Satu tim bisa mendapat Juara 3 lebih dari satu kali
+                    for ($i = 0; $i < $jumlah; $i++) {
+                        $juara3[] = ['id_tim' => $id_tim, 'jumlah' => 1];
+                    }
+                }
+            }
         }
 
-        foreach ($rows as $row) {
-            Nilai::create([
-                'id_tim' => $row['id_tim'],
-                'id_lomba' => $lomba->id_lomba,
-                'nilai' => round($row['poin'] * $row['jumlah'], 2),
-                'babak' => $babak,
-                'juara' => $row['juara'],
-                'jumlah' => $row['jumlah'],
-            ]);
+        if (count($juara1) !== 1 || count($juara2) !== 1) {
+            return 'Juara 1 dan Juara 2 harus dipilih tepat 1 tim (tim yang sama boleh memegang keduanya)!';
+        }
+
+        if (count($juara3) === 0) {
+            return 'Pilih minimal 1 tim untuk Juara 3!';
+        }
+
+        foreach (array_merge($juara1, $juara2, array_column($juara3, 'id_tim')) as $id_tim) {
+            if (!Tim::find($id_tim)) {
+                return 'Tim tidak ditemukan!';
+            }
+        }
+
+        return [
+            1 => [['id_tim' => $juara1[0], 'jumlah' => 1]],
+            2 => [['id_tim' => $juara2[0], 'jumlah' => 1]],
+            3 => $juara3,
+        ];
+    }
+
+    // Simpan semua baris nilai dari hasil parseGelar
+    private function simpanGelar($id_lomba, string $babak, float $bobot, array $parsed): void
+    {
+        $poin = [1 => $bobot * 3, 2 => $bobot * 2, 3 => $bobot];
+
+        foreach ($parsed as $gelar => $rows) {
+            foreach ($rows as $row) {
+                Nilai::create([
+                    'id_tim' => $row['id_tim'],
+                    'id_lomba' => $id_lomba,
+                    'nilai' => round($poin[$gelar] * $row['jumlah'], 2),
+                    'babak' => $babak,
+                    'juara' => $gelar,
+                    'jumlah' => $row['jumlah'],
+                ]);
+            }
         }
     }
 

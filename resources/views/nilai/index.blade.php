@@ -113,6 +113,64 @@
     background: #fefcbf;
 }
 
+.dashboard-tabs {
+    background: #ffffff;
+    border: 1px solid #edf2f7;
+    border-radius: 10px;
+    padding: 6px;
+    display: inline-flex;
+    gap: 4px;
+    margin-bottom: 20px;
+}
+
+.dashboard-tabs .nav-link {
+    font-size: 13px;
+    font-weight: 600;
+    color: #4a5568;
+    border: none;
+    border-radius: 7px;
+    padding: 7px 20px;
+    transition: all 0.2s ease;
+}
+
+.dashboard-tabs .nav-link:hover {
+    color: #1a365d;
+    background: #f7fafc;
+}
+
+.dashboard-tabs .nav-link.active {
+    background: #1a365d;
+    color: #ffffff;
+}
+
+.kelas-subtitle {
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 10px;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 3px 12px;
+    border-radius: 20px;
+    background: {{ ($kelas ?? 'A') === 'B' ? '#fefcbf' : '#ebf8ff' }};
+    color: {{ ($kelas ?? 'A') === 'B' ? '#975a16' : '#2b6cb0' }};
+}
+
+.kelas-pill {
+    display: inline-block;
+    margin-left: 8px;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: #ebf8ff;
+    color: #2b6cb0;
+}
+
+.kelas-pill.kelas-b {
+    background: #fefcbf;
+    color: #975a16;
+}
+
 .empty-state {
     padding: 40px 16px;
     text-align: center;
@@ -149,8 +207,22 @@
 </style>
 
 <div class="page-header">
-    <h4><i class="fas fa-pen me-2"></i> Penilaian Lomba</h4>
+    <h4><i class="fas fa-pen me-2"></i> Penilaian Lomba <span class="kelas-subtitle">Kelas {{ $kelas ?? 'A' }}</span></h4>
 </div>
+
+<!-- Tab Reguler A / B -->
+<ul class="nav dashboard-tabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link {{ ($kelas ?? 'A') === 'A' ? 'active' : '' }}" type="button" onclick="gantiKelas('A')">
+            <i class="fas fa-crown me-1"></i> Reguler A
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link {{ ($kelas ?? 'A') === 'B' ? 'active' : '' }}" type="button" onclick="gantiKelas('B')">
+            <i class="fas fa-medal me-1"></i> Reguler B
+        </button>
+    </li>
+</ul>
 
 @if(session('success'))
     <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm rounded-3 mb-4">
@@ -182,7 +254,10 @@
                 @forelse($lombas as $index => $lomba)
                     <tr>
                         <td>{{ $index + 1 }}</td>
-                        <td class="fw-semibold">{{ $lomba->nama_lomba }}</td>
+                        <td class="fw-semibold">
+                            {{ $lomba->nama_lomba }}
+                            <span class="kelas-pill {{ $lomba->kelas === 'B' ? 'kelas-b' : '' }}">Kelas {{ $lomba->kelas }}</span>
+                        </td>
                         <td>{{ $lomba->bobot }}</td>
                         <td>
                             @if($lomba->nilai->isNotEmpty())
@@ -218,4 +293,11 @@
         </table>
     </div>
 </div>
+<script>
+function gantiKelas(kelas) {
+    const url = new URL(window.location.href);
+    url.searchParams.set('kelas', kelas);
+    window.location.href = url.toString();
+}
+</script>
 @endsection

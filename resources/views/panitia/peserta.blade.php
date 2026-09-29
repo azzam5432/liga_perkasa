@@ -45,6 +45,48 @@
     color: #ffffff;
 }
 
+.dashboard-tabs {
+    background: #ffffff;
+    border: 1px solid #edf2f7;
+    border-radius: 10px;
+    padding: 6px;
+    display: inline-flex;
+    gap: 4px;
+    margin-bottom: 20px;
+}
+
+.dashboard-tabs .nav-link {
+    font-size: 13px;
+    font-weight: 600;
+    color: #4a5568;
+    border: none;
+    border-radius: 7px;
+    padding: 7px 20px;
+    transition: all 0.2s ease;
+}
+
+.dashboard-tabs .nav-link:hover {
+    color: #1a365d;
+    background: #f7fafc;
+}
+
+.dashboard-tabs .nav-link.active {
+    background: #1a365d;
+    color: #ffffff;
+}
+
+.kelas-subtitle {
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 10px;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 3px 12px;
+    border-radius: 20px;
+    background: {{ ($kelas ?? 'A') === 'B' ? '#fefcbf' : '#ebf8ff' }};
+    color: {{ ($kelas ?? 'A') === 'B' ? '#975a16' : '#2b6cb0' }};
+}
+
 .filter-bar {
     display: flex;
     gap: 12px;
@@ -94,6 +136,35 @@
     font-size: 14px;
 }
 
+.filter-bar .search-box .clear-search {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: none;
+    background: #e2e8f0;
+    color: #4a5568;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    font-size: 10px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    padding: 0;
+}
+
+.filter-bar .search-box .clear-search:hover {
+    background: #cbd5e0;
+    color: #1a2332;
+}
+
+.filter-bar .search-box input {
+    padding-right: 38px;
+}
+
 .table-wrapper {
     background: #ffffff;
     border-radius: 10px;
@@ -110,17 +181,18 @@
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 0;
-    font-size: 14px;
+    font-size: 15px;
+    min-width: 500px;
 }
 
 .table-scroll table thead th {
     background: #f7fafc;
     color: #4a5568;
-    font-weight: 600;
-    font-size: 11px;
+    font-weight: 700;
+    font-size: 12px;
     text-transform: uppercase;
     letter-spacing: 0.4px;
-    padding: 10px 14px;
+    padding: 12px 14px;
     border-bottom: 2px solid #edf2f7;
     text-align: left;
     white-space: nowrap;
@@ -130,7 +202,7 @@
 }
 
 .table-scroll table tbody td {
-    padding: 10px 14px;
+    padding: 12px 14px;
     vertical-align: middle;
     color: #2d3748;
     border-bottom: 1px solid #f7fafc;
@@ -157,7 +229,8 @@
     right: 0;
     z-index: 5;
     background: #ffffff;
-    min-width: 110px;
+    min-width: 120px;
+    text-align: center;
 }
 
 .table-scroll table thead .col-sticky-left,
@@ -179,18 +252,20 @@
     box-shadow: -2px 0 8px rgba(0,0,0,0.03);
 }
 
-.badge-count {
-    background: #ebf8ff;
-    color: #2b6cb0;
-    padding: 2px 12px;
-    border-radius: 12px;
+.badge-pembimbing {
+    background: transparent;
+    color: #4a5568;
+    padding: 0;
+    border-radius: 0;
+    font-size: 14px;
     font-weight: 600;
-    font-size: 12px;
+    display: inline-block;
+    margin: 2px;
 }
 
 .btn-action {
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
     border-radius: 6px;
     display: inline-flex;
     align-items: center;
@@ -199,7 +274,7 @@
     background: transparent;
     color: #a0aec0;
     transition: all 0.2s ease;
-    font-size: 12px;
+    font-size: 13px;
     text-decoration: none;
     cursor: pointer;
 }
@@ -244,7 +319,7 @@
 }
 
 .pagination-wrapper .info-text {
-    font-size: 12px;
+    font-size: 13px;
     color: #a0aec0;
 }
 
@@ -262,7 +337,7 @@
     border-radius: 6px;
     color: #4a5568;
     font-weight: 500;
-    font-size: 12px;
+    font-size: 13px;
     padding: 4px 10px;
     transition: all 0.2s ease;
     background: transparent;
@@ -303,7 +378,7 @@
 
 .empty-state p {
     color: #a0aec0;
-    font-size: 13px;
+    font-size: 14px;
     margin-bottom: 14px;
 }
 
@@ -337,7 +412,7 @@
 
 .modal-custom .form-label {
     font-weight: 600;
-    font-size: 13px;
+    font-size: 14px;
     color: #1a2332;
 }
 
@@ -345,7 +420,7 @@
 .modal-custom .form-select {
     border: 1px solid #e2e8f0;
     border-radius: 8px;
-    padding: 8px 14px;
+    padding: 10px 14px;
     font-size: 14px;
     transition: all 0.2s ease;
 }
@@ -389,6 +464,42 @@
     cursor: not-allowed;
 }
 
+.jenis-card {
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.jenis-card:hover {
+    border-color: #1a365d;
+    background: #f7fafc;
+}
+
+.jenis-card.selected {
+    border-color: #1a365d;
+    background: #ebf8ff;
+}
+
+.jenis-card .jenis-icon {
+    font-size: 28px;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.jenis-card .jenis-title {
+    font-weight: 600;
+    font-size: 13px;
+    color: #1a2332;
+}
+
+.jenis-card .jenis-desc {
+    font-size: 11px;
+    color: #718096;
+}
+
 .member-item {
     display: flex;
     align-items: center;
@@ -414,6 +525,7 @@
     flex-shrink: 0;
 }
 
+/* RESPONSIVE - JANGAN DIUBAH */
 @media (max-width: 768px) {
     .page-header {
         flex-direction: row;
@@ -519,11 +631,25 @@
 </style>
 
 <div class="page-header">
-    <h4>Data Tim</h4>
+    <h4><i class="fas fa-users me-2"></i> Data Tim <span class="kelas-subtitle">Kelas {{ $kelas ?? 'A' }}</span></h4>
     <button class="btn-primary-custom" onclick="openTambahTimModal()">
         <i class="fas fa-plus"></i> Tambah Tim
     </button>
 </div>
+
+<!-- Tab Reguler A / B -->
+<ul class="nav dashboard-tabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link {{ ($kelas ?? 'A') === 'A' ? 'active' : '' }}" type="button" onclick="gantiKelas('A')">
+            <i class="fas fa-crown me-1"></i> Reguler A
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link {{ ($kelas ?? 'A') === 'B' ? 'active' : '' }}" type="button" onclick="gantiKelas('B')">
+            <i class="fas fa-medal me-1"></i> Reguler B
+        </button>
+    </li>
+</ul>
 
 @if (session('success'))
     <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm rounded-3 mb-4">
@@ -542,7 +668,13 @@
 <div class="filter-bar">
     <div class="search-box">
         <i class="fas fa-search"></i>
-        <input type="text" id="searchInput" placeholder="Cari nama tim..." onkeyup="filterTable()">
+        <input type="text" id="searchInput" placeholder="Cari nama tim..." value="{{ request('search') }}"
+               autocomplete="off" onkeyup="debouncedSearch()" onsearch="directSearch()">
+        @if(request('search'))
+            <button type="button" class="clear-search" onclick="clearSearch()" title="Hapus pencarian">
+                <i class="fas fa-times"></i>
+            </button>
+        @endif
     </div>
 </div>
 
@@ -554,9 +686,9 @@
                     <th style="width: 40px; min-width: 40px;">No</th>
                     <th class="col-sticky-left" style="min-width: 170px;">Nama Tim</th>
                     <th style="min-width: 150px;">Ketua</th>
-                    <th style="min-width: 200px;">Dosen Pembimbing</th>
-                    <th style="min-width: 200px;">Kakak Mentor</th>
-                    <th class="col-sticky-right" style="min-width: 110px; text-align: center;">Aksi</th>
+                    <th style="width: 90px; min-width: 90px; text-align: center;">Anggota</th>
+                    <th style="min-width: 220px;">Pembimbing</th>
+                    <th class="col-sticky-right" style="min-width: 120px; text-align: center;">Aksi</th>
                 </tr>
             </thead>
             <tbody>
@@ -573,19 +705,29 @@
                 <tr>
                     <td>{{ $loop->iteration }}</td>
                     <td class="col-sticky-left">
-                        <span class="fw-semibold" style="font-size: 13px;">{{ $item->nama_tim }}</span>
+                        <span class="fw-semibold" style="font-size: 15px;">{{ $item->nama_tim }}</span>
                     </td>
-                    <td style="font-size: 13px;">{{ $ketua->ketua_peserta ?? '-' }}</td>
-                    <td style="font-size: 13px;">
-                        @if(count($dosenArray) > 0)
-                            {{ implode(', ', $dosenArray) }}
-                        @else
-                            <span class="text-muted">-</span>
-                        @endif
+                    <td>
+                        <span style="font-size: 15px;">{{ $ketua->ketua_peserta ?? '-' }}</span>
                     </td>
-                    <td style="font-size: 13px;">
-                        @if(count($kakakArray) > 0)
-                            {{ implode(', ', $kakakArray) }}
+                    <td style="text-align: center;">
+                        <span style="font-size: 15px;">{{ $item->pesertas_count ?? $pesertas->count() }} org</span>
+                    </td>
+                    <td style="font-size: 15px;">
+                        @if(count($dosenArray) > 0 || count($kakakArray) > 0)
+                            @php
+                                $semuaPembimbing = [];
+                                foreach ($dosenArray as $nama) { $semuaPembimbing[] = $nama; }
+                                foreach ($kakakArray as $nama) { $semuaPembimbing[] = $nama; }
+                                $tampil = array_slice($semuaPembimbing, 0, 3);
+                                $sisanya = count($semuaPembimbing) - 3;
+                            @endphp
+                            @foreach($tampil as $nama)
+                                <span class="badge-pembimbing">{{ $nama }}</span>@if(!$loop->last), @endif
+                            @endforeach
+                            @if($sisanya > 0)
+                                <span class="badge-pembimbing" style="color: #4a5568;">+{{ $sisanya }} lagi</span>
+                            @endif
                         @else
                             <span class="text-muted">-</span>
                         @endif
@@ -601,7 +743,7 @@
                             )">
                                 <i class="fas fa-eye"></i>
                             </button>
-                            <button class="btn-action btn-warning" title="Edit" onclick="openEditTimModal(
+                            <button class="btn-action btn-warning" title="Edit" onclick="openEditTimModalKelas = '{{ $item->kelas }}'; openEditTimModal(
                                 '{{ $item->id_tim }}',
                                 '{{ addslashes($item->nama_tim) }}',
                                 '{{ addslashes($ketua->ketua_peserta ?? '-') }}',
@@ -663,6 +805,25 @@
                     <div class="mb-3">
                         <label for="modal_nama_tim" class="form-label">Nama Tim <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" id="modal_nama_tim" name="nama_tim" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Kelas Tim <span class="text-danger">*</span></label>
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <div class="jenis-card" data-value="A" onclick="pilihKelasTim(this)">
+                                    <div class="jenis-title">Reguler A</div>
+                                    <div class="jenis-desc">Kelas Reguler A</div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="jenis-card" data-value="B" onclick="pilihKelasTim(this)">
+                                    <div class="jenis-title">Reguler B</div>
+                                    <div class="jenis-desc">Kelas Reguler B</div>
+                                </div>
+                            </div>
+                        </div>
+                        <input type="hidden" id="modal_kelas" name="kelas" value="A">
                     </div>
 
                     <div class="mb-3">
@@ -757,6 +918,25 @@
                     <div class="mb-3">
                         <label for="edit_nama_tim" class="form-label">Nama Tim <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" id="edit_nama_tim" name="nama_tim" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Kelas Tim <span class="text-danger">*</span></label>
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <div class="jenis-card" data-value="A" onclick="pilihKelasTimEdit(this)">
+                                    <div class="jenis-title">Reguler A</div>
+                                    <div class="jenis-desc">Kelas Reguler A</div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="jenis-card" data-value="B" onclick="pilihKelasTimEdit(this)">
+                                    <div class="jenis-title">Reguler B</div>
+                                    <div class="jenis-desc">Kelas Reguler B</div>
+                                </div>
+                            </div>
+                        </div>
+                        <input type="hidden" id="edit_kelas" name="kelas" value="A">
                     </div>
 
                     <div class="mb-3">
@@ -881,6 +1061,54 @@
 </div>
 
 <script>
+function gantiKelas(kelas) {
+    const url = new URL(window.location.href);
+    url.searchParams.set('kelas', kelas);
+    url.searchParams.set('page', 1);
+    window.location.href = url.toString();
+}
+
+// ===== Search server-side dengan debounce (tidak reload di setiap ketikan) =====
+let searchTimer = null;
+
+function directSearch() {
+    const url = new URL(window.location.href);
+    const search = document.getElementById('searchInput').value.trim();
+    if (search) {
+        url.searchParams.set('search', search);
+    } else {
+        url.searchParams.delete('search');
+    }
+    url.searchParams.set('page', 1);
+    window.location.href = url.toString();
+}
+
+function debouncedSearch() {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(directSearch, 600);
+}
+
+function clearSearch() {
+    document.getElementById('searchInput').value = '';
+    directSearch();
+}
+
+function pilihKelasTim(element) {
+    document.querySelectorAll('#tambahTimModal .jenis-card[data-value="A"], #tambahTimModal .jenis-card[data-value="B"]').forEach(card => {
+        card.classList.remove('selected');
+    });
+    element.classList.add('selected');
+    document.getElementById('modal_kelas').value = element.dataset.value;
+}
+
+function pilihKelasTimEdit(element) {
+    document.querySelectorAll('#editTimModal .jenis-card[data-value="A"], #editTimModal .jenis-card[data-value="B"]').forEach(card => {
+        card.classList.remove('selected');
+    });
+    element.classList.add('selected');
+    document.getElementById('edit_kelas').value = element.dataset.value;
+}
+
 function filterTable() {
     const searchInput = document.getElementById('searchInput').value.toLowerCase();
     const rows = document.querySelectorAll('#timTable tbody tr');
@@ -1155,6 +1383,16 @@ function hapusKakakEdit(button) {
 }
 
 function openTambahTimModal() {
+    // Default kelas ikut tab yang sedang aktif
+    const params = new URLSearchParams(window.location.search);
+    const kelasAktif = params.get('kelas') === 'B' ? 'B' : 'A';
+    document.getElementById('modal_kelas').value = kelasAktif;
+    document.querySelectorAll('#tambahTimModal .jenis-card[data-value="A"], #tambahTimModal .jenis-card[data-value="B"]').forEach(card => {
+        card.classList.remove('selected');
+        if (card.dataset.value === kelasAktif) {
+            card.classList.add('selected');
+        }
+    });
     const modal = new bootstrap.Modal(document.getElementById('tambahTimModal'));
     modal.show();
 }
@@ -1263,6 +1501,17 @@ function openEditTimModal(id, nama, ketua, anggota, dosen, kakak) {
     document.getElementById('edit_tim_id').value = id;
     document.getElementById('edit_nama_tim').value = nama || '';
     document.getElementById('edit_ketua').value = ketua || '';
+
+    // Set kelas tim di modal edit (dikirim dari baris tabel via openEditTimModalKelas)
+    const kelasTim = window.openEditTimModalKelas || 'A';
+    document.getElementById('edit_kelas').value = kelasTim;
+    document.querySelectorAll('#editTimModal .jenis-card[data-value="A"], #editTimModal .jenis-card[data-value="B"]').forEach(card => {
+        card.classList.remove('selected');
+        if (card.dataset.value === kelasTim) {
+            card.classList.add('selected');
+        }
+    });
+    window.openEditTimModalKelas = null;
 
     const list = document.getElementById('edit_member_list');
     list.innerHTML = '';

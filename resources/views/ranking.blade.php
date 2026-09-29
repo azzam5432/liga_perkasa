@@ -682,9 +682,23 @@ body {
 @if(Auth::check())
 <!-- ===== TAMPILAN PANITIA / ADMIN ===== -->
 <div class="ranking-page">
-    
+
+    <!-- Tab Reguler A / B -->
+    <ul class="nav dashboard-tabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link {{ ($kelas ?? 'A') === 'A' ? 'active' : '' }}" type="button" onclick="gantiKelasRanking('A')">
+                <i class="fas fa-crown me-1"></i> Reguler A
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link {{ ($kelas ?? 'A') === 'B' ? 'active' : '' }}" type="button" onclick="gantiKelasRanking('B')">
+                <i class="fas fa-medal me-1"></i> Reguler B
+            </button>
+        </li>
+    </ul>
+
     <div class="page-header">
-        <h4><i class="fas fa-trophy"></i> Ranking Lomba</h4>
+        <h4><i class="fas fa-trophy"></i> Ranking Lomba <span class="kelas-subtitle">Kelas {{ $kelas ?? 'A' }}</span></h4>
         <div class="d-flex gap-2">
             @if(Auth::user()->isSuperAdmin())
                 <a href="{{ route('ranking.export') }}" class="btn btn-success">
@@ -776,6 +790,20 @@ body {
         <div class="public-header">
             <h1><i class="fas fa-trophy"></i> Ranking Lomba Liga Perkasa</h1>
             <p>Berikut adalah daftar peringkat tim berdasarkan total nilai yang telah dikumpulkan.</p>
+
+            <!-- Tab Reguler A / B -->
+            <ul class="nav dashboard-tabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link {{ ($kelas ?? 'A') === 'A' ? 'active' : '' }}" type="button" onclick="gantiKelasRanking('A')">
+                        <i class="fas fa-crown me-1"></i> Reguler A
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link {{ ($kelas ?? 'A') === 'B' ? 'active' : '' }}" type="button" onclick="gantiKelasRanking('B')">
+                        <i class="fas fa-medal me-1"></i> Reguler B
+                    </button>
+                </li>
+            </ul>
         </div>
 
         <div class="public-table-wrapper">
@@ -959,11 +987,64 @@ body {
 </div>
 
 <!-- ===== SCRIPT ===== -->
+<style>
+/* Tab Reguler A / B */
+.dashboard-tabs {
+    background: #ffffff;
+    border: 1px solid #edf2f7;
+    border-radius: 10px;
+    padding: 6px;
+    display: inline-flex;
+    gap: 4px;
+    margin-bottom: 20px;
+}
+
+.dashboard-tabs .nav-link {
+    font-size: 13px;
+    font-weight: 600;
+    color: #4a5568;
+    border: none;
+    border-radius: 7px;
+    padding: 7px 20px;
+    transition: all 0.2s ease;
+}
+
+.dashboard-tabs .nav-link:hover {
+    color: #1a365d;
+    background: #f7fafc;
+}
+
+.dashboard-tabs .nav-link.active {
+    background: #1a365d;
+    color: #ffffff;
+}
+
+.kelas-subtitle {
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 10px;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 3px 12px;
+    border-radius: 20px;
+    background: {{ ($kelas ?? 'A') === 'B' ? '#fefcbf' : '#ebf8ff' }};
+    color: {{ ($kelas ?? 'A') === 'B' ? '#975a16' : '#2b6cb0' }};
+}
+</style>
+
 <script>
 let timDataArray = {};
 
+function gantiKelasRanking(kelas) {
+    const url = new URL(window.location.href);
+    url.searchParams.set('kelas', kelas);
+    window.location.href = url.toString();
+}
+
 function fetchRanking() {
-    fetch('/ranking/data')
+    const params = new URLSearchParams(window.location.search);
+    const kelas = params.get('kelas') || 'A';
+    fetch('/ranking/data?kelas=' + kelas)
         .then(response => response.json())
         .then(data => {
             data.forEach((item, index) => {

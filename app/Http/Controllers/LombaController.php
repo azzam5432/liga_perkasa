@@ -34,11 +34,19 @@ class LombaController extends Controller
             $query->where('jenis', $request->jenis);
         }
 
+        // Filter kelas (default Reguler A)
+        $kelas = $request->query('kelas', 'A');
+        if (!in_array($kelas, ['A', 'B'])) {
+            $kelas = 'A';
+        }
+        $query->where('kelas', $kelas);
+
         $lombas = $query->orderByRaw("CASE WHEN jenis = 'penyisihan' THEN 0 ELSE 1 END")
             ->orderBy('nama_lomba', 'asc')
-            ->paginate(10);
+            ->paginate(10)
+            ->appends($request->query());
 
-        return view('lomba.index', compact('lombas'));
+        return view('lomba.index', compact('lombas', 'kelas'));
     }
 
     public function create()
@@ -57,6 +65,7 @@ class LombaController extends Controller
             'jenis' => 'required|in:langsung,penyisihan',
             'bobot' => 'required|numeric|min:0|max:100',
             'jumlah_finalis' => 'nullable|integer|min:0',
+            'kelas' => 'required|in:A,B',
         ]);
 
         $data = $request->all();
@@ -120,6 +129,7 @@ class LombaController extends Controller
             'jenis' => 'required|in:langsung,penyisihan',
             'bobot' => 'required|numeric|min:0|max:100',
             'jumlah_finalis' => 'nullable|integer|min:0',
+            'kelas' => 'required|in:A,B',
         ]);
 
         $data = $request->all();

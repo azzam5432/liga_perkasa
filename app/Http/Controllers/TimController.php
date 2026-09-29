@@ -22,9 +22,16 @@ class TimController extends Controller
             $query->where('nama_tim', 'LIKE', "%{$search}%");
         }
 
-        $tim = $query->orderBy('nama_tim', 'asc')->paginate(10);
+        // Filter kelas (default Reguler A)
+        $kelas = $request->query('kelas', 'A');
+        if (!in_array($kelas, ['A', 'B'])) {
+            $kelas = 'A';
+        }
+        $query->where('kelas', $kelas);
 
-        return view('panitia.peserta', compact('tim'));
+        $tim = $query->withCount('pesertas')->orderBy('nama_tim', 'asc')->paginate(10)->appends($request->query());
+
+        return view('panitia.peserta', compact('tim', 'kelas'));
     }
 
     public function store(Request $request)
@@ -38,11 +45,13 @@ class TimController extends Controller
             'dosen_pembimbing.*' => 'required|string|max:255',
             'kakak_pembimbing' => 'required|array|min:1',
             'kakak_pembimbing.*' => 'required|string|max:255',
+            'kelas' => 'required|in:A,B',
         ]);
 
         // Buat Tim
         $tim = Tim::create([
             'nama_tim' => $request->nama_tim,
+            'kelas' => $request->kelas,
         ]);
 
         // Buat Ketua
@@ -108,11 +117,13 @@ class TimController extends Controller
             'dosen_pembimbing.*' => 'required|string|max:255',
             'kakak_pembimbing' => 'required|array|min:1',
             'kakak_pembimbing.*' => 'required|string|max:255',
+            'kelas' => 'required|in:A,B',
         ]);
 
         // Update Tim
         $tim->update([
             'nama_tim' => $request->nama_tim,
+            'kelas' => $request->kelas,
         ]);
 
         // Hapus semua peserta lama

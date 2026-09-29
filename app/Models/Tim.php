@@ -8,7 +8,7 @@ class Tim extends Model
 {
     protected $table = 'tb_tim';
     protected $primaryKey = 'id_tim';
-    protected $fillable = ['nama_tim', 'id_lomba'];
+    protected $fillable = ['nama_tim', 'id_lomba', 'kelas'];
 
     public function pesertas()
     {
@@ -38,6 +38,16 @@ class Tim extends Model
     public function penghargaan()
     {
         return $this->hasMany(Penghargaan::class, 'id_tim', 'id_tim');
+    }
+
+    // Kelas tim: 'A' (Reguler A) atau 'B' (Reguler B)
+    public function getKelasLabelAttribute()
+    {
+        $labels = [
+            'A' => 'Reguler A',
+            'B' => 'Reguler B',
+        ];
+        return $labels[$this->kelas] ?? $this->kelas;
     }
 
     public function getTotalNilaiAttribute()

@@ -16,43 +16,76 @@ class DashboardController extends Controller
     public function index(): View
     {
         $user = Auth::user();
-        
-        // Data untuk Panitia
-        $dataPeserta = Tim::with(['pesertas' => function($query) {
-            $query->select('id_tim', 'ketua_peserta', 'nama_peserta', 'no_telp');
-        }])->withCount('pesertas')->select('id_tim', 'nama_tim')->latest()->paginate(5);
-        
-        $totalTim = Tim::count();
-        $totalPeserta = Peserta::count();
-        
-        // **KUNCI UTAMA**: Data untuk Juri
+
+        // Kumpulkan data per kelas (A / B) supaya tab Reguler A & B menampilkan data terpisah
+        $dataPerKelas = [];
+        foreach (['A', 'B'] as $kelas) {
+            $dataPerKelas[$kelas] = $this->buildDataKelas($user, $kelas);
+        }
+
+        return view('panitia.dashboard', [
+            'dataPerKelas' => $dataPerKelas,
+            // Default variabel lama (kompatibel dengan tampilan tab aktif pertama)
+            'dataPeserta' => $dataPerKelas['A']['dataPeserta'],
+            'totalTim' => $dataPerKelas['A']['totalTim'],
+            'totalPeserta' => $dataPerKelas['A']['totalPeserta'],
+            'lombaDitugaskan' => $dataPerKelas['A']['lombaDitugaskan'],
+            'totalLomba' => $dataPerKelas['A']['totalLomba'],
+            'totalTimSudahDinilai' => $dataPerKelas['A']['totalTimSudahDinilai'],
+            'juri' => $dataPerKelas['A']['juri'],
+        ]);
+    }
+
+    private function buildDataKelas($user, string $kelas): array
+    {
+        // Data untuk Panitia (tim & peserta di kelas ini)
+        $dataPeserta = Tim::with(['pesertas' => function ($query) {
+                $query->select('id_tim', 'ketua_peserta', 'nama_peserta', 'no_telp');
+            }])
+            ->withCount('pesertas')
+            ->select('id_tim', 'nama_tim', 'kelas')
+            ->where('kelas', $kelas)
+            ->latest()
+            ->paginate(5, ['*'], 'page_' . strtolower($kelas));
+
+        $totalTim = Tim::where('kelas', $kelas)->count();
+        $totalPeserta = Peserta::whereHas('tim', function ($q) use ($kelas) {
+            $q->where('kelas', $kelas);
+        })->count();
+
+        // Data untuk Juri (lomba di kelas ini)
         $juri = Juri::where('user_id', $user->id)->first();
-        
-        // Jika juri tidak ditemukan, BUAT OBJEK KOSONG agar tidak null
+
         if (!$juri) {
             $juri = new Juri();
             $juri->id_juri = 0; // Dummy ID
             $juri->lomba = collect(); // Relasi kosong
         }
-        
-        $lombaDitugaskan = $juri->lomba()->get();
+
+        $lombaDitugaskan = $juri->lomba()
+            ->where('tb_lomba.kelas', $kelas)
+            ->get();
+
         $totalLomba = $lombaDitugaskan->count();
-        
+
         $totalTimSudahDinilai = 0;
         if ($juri->id_juri != 0) {
             $totalTimSudahDinilai = Nilai::where('id_juri', $juri->id_juri)
+                ->whereHas('lomba', function ($q) use ($kelas) {
+                    $q->where('kelas', $kelas);
+                })
                 ->distinct('id_tim')
                 ->count('id_tim');
         }
-        
-        return view('panitia.dashboard', compact(
-            'dataPeserta', 
-            'totalTim', 
-            'totalPeserta',
-            'lombaDitugaskan',
-            'totalLomba',
-            'totalTimSudahDinilai',
-            'juri'
-        ));
+
+        return [
+            'dataPeserta' => $dataPeserta,
+            'totalTim' => $totalTim,
+            'totalPeserta' => $totalPeserta,
+            'lombaDitugaskan' => $lombaDitugaskan,
+            'totalLomba' => $totalLomba,
+            'totalTimSudahDinilai' => $totalTimSudahDinilai,
+            'juri' => $juri,
+        ];
     }
 }

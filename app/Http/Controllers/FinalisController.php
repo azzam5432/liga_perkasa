@@ -101,78 +101,52 @@ class FinalisController extends Controller
             ->with('success', 'Babak final berhasil diaktifkan!');
     }
 
-    public function ranking()
+    public function ranking(Request $request)
     {
-        $rekapTim = Tim::with(['nilai', 'pesertas', 'dosenPembimbing', 'kakakPembimbing'])
-            ->get()
-            ->map(function($tim) {
-                // FITUR PENGHARGAAN DINONAKTIFKAN: bobot penghargaan tidak dijumlahkan
-                // $totalNilai = $tim->nilai->sum('nilai') + $tim->penghargaan->sum('bobot');
-                $totalNilai = $tim->nilai->sum('nilai');
+        [$rekapTim, $kelas] = $this->buildRekapTim($request);
 
-                $emas = 0;
-                $perak = 0;
-                $perunggu = 0;
-
-                foreach ($tim->nilai as $nilai) {
-                    if ($nilai->juara == 1) {
-                        $emas += $nilai->jumlah;
-                    } elseif ($nilai->juara == 2) {
-                        $perak += $nilai->jumlah;
-                    } elseif ($nilai->juara == 3) {
-                        $perunggu += $nilai->jumlah;
-                    }
-                }
-
-                return [
-                    'tim' => $tim,
-                    'total_nilai' => $totalNilai,
-                    'emas' => $emas,
-                    'perak' => $perak,
-                    'perunggu' => $perunggu,
-                    'detail' => $tim->nilai->map(function($nilai) {
-                        return [
-                            'lomba' => $nilai->lomba->nama_lomba ?? '-',
-                            'babak' => $nilai->babak ?? '-',
-                            'nilai' => $nilai->nilai,
-                            'juara' => $nilai->juara ?? null,
-                            'jumlah' => $nilai->jumlah ?? 1,
-                        ];
-                    }),
-                    // FITUR PENGHARGAAN DINONAKTIFKAN
-                    // 'penghargaan' => $tim->penghargaan->map(function($p) {
-                    //     return [
-                    //         'kategori' => $p->kategori,
-                    //         'bobot' => $p->bobot,
-                    //     ];
-                    // }),
-                ];
-            })
-            ->sort(function($a, $b) {
-                if ($a['total_nilai'] == $b['total_nilai']) {
-                    return strcasecmp($a['tim']->nama_tim, $b['tim']->nama_tim);
-                }
-                return $b['total_nilai'] <=> $a['total_nilai'];
-            })
-            ->values();
-
-        return view('ranking', compact('rekapTim'));
+        return view('ranking', compact('rekapTim', 'kelas'));
     }
 
-    public function getRankingData()
+    public function getRankingData(Request $request)
     {
-        $rekapTim = Tim::with(['nilai', 'pesertas', 'dosenPembimbing', 'kakakPembimbing'])
+        [$rekapTim] = $this->buildRekapTim($request);
+
+        return response()->json($rekapTim);
+    }
+
+    /**
+     * Rekap ranking tim, difilter per kelas (A/B).
+     * Ranking Reguler B = tim kelas B, total nilai diambil dari lomba kelas B.
+     *
+     * @return array{0: \Illuminate\Support\Collection, 1: string} [rekapTim, kelas]
+     */
+    private function buildRekapTim(Request $request): array
+    {
+        // Filter kelas (default Reguler A)
+        $kelas = $request->query('kelas', 'A');
+        if (!in_array($kelas, ['A', 'B'])) {
+            $kelas = 'A';
+        }
+
+        $query = Tim::with(['nilai', 'pesertas', 'dosenPembimbing', 'kakakPembimbing'])
+            ->where('kelas', $kelas);
+
+        $rekapTim = $query
             ->get()
-            ->map(function($tim) {
-                // FITUR PENGHARGAAN DINONAKTIFKAN: bobot penghargaan tidak dijumlahkan
-                // $totalNilai = $tim->nilai->sum('nilai') + $tim->penghargaan->sum('bobot');
-                $totalNilai = $tim->nilai->sum('nilai');
+            ->map(function ($tim) {
+                // Nilai hanya dihitung dari lomba yang kelasnya sama dengan kelas tim
+                $nilaiKelasSama = $tim->nilai->filter(function ($nilai) use ($tim) {
+                    return !$nilai->lomba || $nilai->lomba->kelas === $tim->kelas;
+                });
+
+                $totalNilai = $nilaiKelasSama->sum('nilai');
 
                 $emas = 0;
                 $perak = 0;
                 $perunggu = 0;
 
-                foreach ($tim->nilai as $nilai) {
+                foreach ($nilaiKelasSama as $nilai) {
                     if ($nilai->juara == 1) {
                         $emas += $nilai->jumlah;
                     } elseif ($nilai->juara == 2) {
@@ -188,7 +162,8 @@ class FinalisController extends Controller
                     'emas' => $emas,
                     'perak' => $perak,
                     'perunggu' => $perunggu,
-                    'detail' => $tim->nilai->map(function($nilai) {
+                    'jml_menang' => $nilaiKelasSama->count(),
+                    'detail' => $nilaiKelasSama->map(function ($nilai) {
                         return [
                             'lomba' => $nilai->lomba->nama_lomba ?? '-',
                             'babak' => $nilai->babak ?? '-',
@@ -197,16 +172,9 @@ class FinalisController extends Controller
                             'jumlah' => $nilai->jumlah ?? 1,
                         ];
                     }),
-                    // FITUR PENGHARGAAN DINONAKTIFKAN
-                    // 'penghargaan' => $tim->penghargaan->map(function($p) {
-                    //     return [
-                    //         'kategori' => $p->kategori,
-                    //         'bobot' => $p->bobot,
-                    //     ];
-                    // }),
                 ];
             })
-            ->sort(function($a, $b) {
+            ->sort(function ($a, $b) {
                 if ($a['total_nilai'] == $b['total_nilai']) {
                     return strcasecmp($a['tim']->nama_tim, $b['tim']->nama_tim);
                 }
@@ -214,6 +182,6 @@ class FinalisController extends Controller
             })
             ->values();
 
-        return response()->json($rekapTim);
+        return [$rekapTim, $kelas];
     }
 }

@@ -15,14 +15,22 @@ use Illuminate\Support\Facades\DB;
 class NilaiController extends Controller
 {
     // Menampilkan daftar lomba yang bisa dinilai (semua lomba)
-    public function index(): View
+    public function index(Request $request): View
     {
         $user = Auth::user();
-        
-        // Ambil semua lomba (tanpa filter juri)
-        $lombas = Lomba::with(['finalis.tim', 'nilai'])->get();
 
-        return view('nilai.index', compact('lombas'));
+        $query = Lomba::with(['finalis.tim', 'nilai']);
+
+        // Filter kelas (default Reguler A)
+        $kelas = $request->query('kelas', 'A');
+        if (!in_array($kelas, ['A', 'B'])) {
+            $kelas = 'A';
+        }
+        $query->where('kelas', $kelas);
+
+        $lombas = $query->get();
+
+        return view('nilai.index', compact('lombas', 'kelas'));
     }
 
     // Menampilkan form penilaian untuk lomba tertentu
@@ -45,8 +53,8 @@ class NilaiController extends Controller
         // Tentukan babak
         $babak = $lomba->is_final_active ? 'final' : 'penyisihan';
         
-        // Ambil semua tim
-        $tim = Tim::all();
+        // Ambil tim yang kelasnya sama dengan kelas lomba (Reg A / Reg B)
+        $tim = Tim::where('kelas', $lomba->kelas)->get();
 
         // Cek apakah babak ini sudah dinilai (filter by babak!)
         $sudahDinilai = Nilai::where('id_lomba', $id_lomba)

@@ -318,6 +318,56 @@
     cursor: not-allowed;
 }
 
+/* ===== Chip Kelas ===== */
+.kelas-chip {
+    display: inline-flex;
+    align-items: center;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 6px 16px;
+    border-radius: 20px;
+    background: #ebf8ff;
+    color: #2b6cb0;
+    border: 1px solid #bee3f8;
+}
+
+.kelas-chip-b {
+    background: #fefcbf;
+    color: #975a16;
+    border-color: #f6e05e;
+}
+
+/* ===== Tab Reguler A / B ===== */
+.dashboard-tabs {
+    background: #ffffff;
+    border: 1px solid #edf2f7;
+    border-radius: 10px;
+    padding: 6px;
+    display: inline-flex;
+    gap: 4px;
+    margin-bottom: 20px;
+}
+
+.dashboard-tabs .nav-link {
+    font-size: 13px;
+    font-weight: 600;
+    color: #4a5568;
+    border: none;
+    border-radius: 7px;
+    padding: 7px 20px;
+    transition: all 0.2s ease;
+}
+
+.dashboard-tabs .nav-link:hover {
+    color: #1a365d;
+    background: #f7fafc;
+}
+
+.dashboard-tabs .nav-link.active {
+    background: #1a365d;
+    color: #ffffff;
+}
+
 @media (max-width: 768px) {
     .welcome-section {
         flex-direction: column;
@@ -347,6 +397,10 @@
     }
     .pagination-wrapper .pagination {
         justify-content: center;
+    }
+    .dashboard-tabs .nav-link {
+        padding: 6px 14px;
+        font-size: 12px;
     }
 }
 
@@ -383,177 +437,26 @@
 }
 </style>
 
-<div class="welcome-section">
-    <div class="welcome-text">
-        <h2>Selamat Datang, {{ Auth::user()->name }}</h2>
-        <p>{{ Auth::user()->role_label }} — {{ now()->format('l, d F Y') }}</p>
-    </div>
-</div>
+<ul class="nav dashboard-tabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="tab-reguler-a" data-bs-toggle="tab" data-bs-target="#pane-reguler-a" type="button" role="tab" aria-controls="pane-reguler-a" aria-selected="true">
+            <i class="fas fa-th-large me-1"></i> Reguler A
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tab-reguler-b" data-bs-toggle="tab" data-bs-target="#pane-reguler-b" type="button" role="tab" aria-controls="pane-reguler-b" aria-selected="false">
+            <i class="fas fa-th-large me-1"></i> Reguler B
+        </button>
+    </li>
+</ul>
 
-<div class="row g-3 mb-4">
-    <div class="col-6 col-md-6 col-lg-6 col-xl-3">
-        <div class="stat-card d-flex align-items-center">
-            <div class="stat-icon stat-icon-primary me-3">
-                <i class="fas fa-users"></i>
-            </div>
-            <div>
-                <div class="stat-number">{{ $totalTim ?? 0 }}</div>
-                <div class="stat-label">Total Tim</div>
-            </div>
-        </div>
+<div class="tab-content">
+    <div class="tab-pane fade show active" id="pane-reguler-a" role="tabpanel" aria-labelledby="tab-reguler-a" tabindex="0">
+        @include('panitia.dashboard-content', ['kelas' => 'A', 'd' => $dataPerKelas['A']])
     </div>
 
-    <div class="col-6 col-md-6 col-lg-6 col-xl-3">
-        <div class="stat-card d-flex align-items-center">
-            <div class="stat-icon stat-icon-success me-3">
-                <i class="fas fa-user-friends"></i>
-            </div>
-            <div>
-                <div class="stat-number">{{ $totalPeserta ?? 0 }}</div>
-                <div class="stat-label">Total Peserta</div>
-            </div>
-        </div>
-    </div>
-
-    @if(isset($juri) && $juri)
-    <div class="col-6 col-md-6 col-lg-6 col-xl-3">
-        <div class="stat-card d-flex align-items-center">
-            <div class="stat-icon stat-icon-info me-3">
-                <i class="fas fa-trophy"></i>
-            </div>
-            <div>
-                <div class="stat-number">{{ $totalLomba ?? 0 }}</div>
-                <div class="stat-label">Lomba Ditugaskan</div>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-6 col-md-6 col-lg-6 col-xl-3">
-        <div class="stat-card d-flex align-items-center">
-            <div class="stat-icon stat-icon-warning me-3">
-                <i class="fas fa-pen"></i>
-            </div>
-            <div>
-                <div class="stat-number">{{ $totalTimSudahDinilai ?? 0 }}</div>
-                <div class="stat-label">Tim Sudah Dinilai</div>
-            </div>
-        </div>
-    </div>
-    @endif
-</div>
-
-@if(isset($juri) && $juri && isset($lombaDitugaskan) && $lombaDitugaskan->count() > 0)
-<div class="row">
-    <div class="col-12 mb-4">
-        <div class="card border-0 shadow-sm">
-            <div class="card-header-custom">
-                <h6><i class="fas fa-tasks text-primary me-2"></i> Lomba yang Ditugaskan</h6>
-            </div>
-            <div class="card-body">
-                <div class="row g-3">
-                    @foreach($lombaDitugaskan as $lomba)
-                        @php
-                            $sudahDinilai = \App\Models\Nilai::where('id_lomba', $lomba->id_lomba)
-                                ->where('id_juri', $juri->id_juri)
-                                ->exists();
-                            $babak = $lomba->is_final_active ? 'final' : ($lomba->jenis == 'penyisihan' ? 'penyisihan' : 'langsung');
-                        @endphp
-                        <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6">
-                            <div class="lomba-card">
-                                <div class="card-body">
-                                    <div class="lomba-title">{{ $lomba->nama_lomba }}</div>
-                                    <span class="lomba-babak {{ $babak }}">
-                                        {{ ucfirst($babak) }}
-                                    </span>
-                                    <div class="lomba-meta">
-                                        <i class="fas fa-tag"></i> {{ $lomba->kategori ?? 'Umum' }}
-                                    </div>
-                                    <div>
-                                        @if($sudahDinilai)
-                                            <a href="{{ route('nilai.index') }}" class="btn-penilaian sudah">
-                                                <i class="fas fa-check me-1"></i> Sudah Dinilai
-                                            </a>
-                                        @else
-                                            <a href="{{ route('nilai.create', $lomba->id_lomba) }}" class="btn-penilaian">
-                                                <i class="fas fa-pen me-1"></i> Beri Nilai
-                                            </a>
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-@elseif(isset($juri) && $juri)
-<div class="row">
-    <div class="col-12">
-        <div class="alert alert-info">
-            <i class="fas fa-info-circle me-2"></i>
-            Belum ada lomba yang ditugaskan kepada Anda. Silakan hubungi admin.
-        </div>
-    </div>
-</div>
-@endif
-
-<div class="row">
-    <div class="col-12">
-        <div class="card border-0 shadow-sm">
-            <div class="card-header-custom">
-                <h6><i class="fas fa-users text-primary me-2"></i> Data Tim Terbaru</h6>
-                <a href="{{ route('panitia.index') }}" class="btn-outline-primary">
-                    <i class="fas fa-arrow-right me-1"></i> Lihat Semua
-                </a>
-            </div>
-            <div class="table-container">
-                <div class="table-responsive">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th style="width: 50px;">No</th>
-                                <th>Nama Tim</th>
-                                <th>Ketua</th>
-                                <th style="text-align: center;">Jumlah</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($dataPeserta ?? [] as $item)
-                            <tr>
-                                <td>{{ $loop->iteration }}</td>
-                                <td><strong>{{ $item->nama_tim }}</strong></td>
-                                <td>{{ $item->pesertas->whereNotNull('ketua_peserta')->first()->ketua_peserta ?? '-' }}</td>
-                                <td style="text-align: center;">
-                                    <span class="badge-count">{{ $item->pesertas->count() }}</span>
-                                </td>
-                            </tr>
-                            @empty
-                            <tr>
-                                <td colspan="4">
-                                    <div class="empty-state">
-                                        <i class="fas fa-users"></i>
-                                        <h6>Belum ada data tim</h6>
-                                        <p>Silakan tambahkan tim melalui menu Data Tim.</p>
-                                    </div>
-                                </td>
-                            </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-
-                @if(isset($dataPeserta) && $dataPeserta->hasPages())
-                <div class="pagination-wrapper">
-                    <span class="info-text">
-                        Menampilkan <strong>{{ $dataPeserta->firstItem() }}</strong> sampai <strong>{{ $dataPeserta->lastItem() }}</strong> dari <strong>{{ $dataPeserta->total() }}</strong> tim
-                    </span>
-                    {{ $dataPeserta->links('pagination::bootstrap-5') }}
-                </div>
-                @endif
-            </div>
-        </div>
+    <div class="tab-pane fade" id="pane-reguler-b" role="tabpanel" aria-labelledby="tab-reguler-b" tabindex="0">
+        @include('panitia.dashboard-content', ['kelas' => 'B', 'd' => $dataPerKelas['B']])
     </div>
 </div>
 @endsection

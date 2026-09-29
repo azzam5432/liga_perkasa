@@ -45,6 +45,48 @@
     color: #ffffff;
 }
 
+.dashboard-tabs {
+    background: #ffffff;
+    border: 1px solid #edf2f7;
+    border-radius: 10px;
+    padding: 6px;
+    display: inline-flex;
+    gap: 4px;
+    margin-bottom: 20px;
+}
+
+.dashboard-tabs .nav-link {
+    font-size: 13px;
+    font-weight: 600;
+    color: #4a5568;
+    border: none;
+    border-radius: 7px;
+    padding: 7px 20px;
+    transition: all 0.2s ease;
+}
+
+.dashboard-tabs .nav-link:hover {
+    color: #1a365d;
+    background: #f7fafc;
+}
+
+.dashboard-tabs .nav-link.active {
+    background: #1a365d;
+    color: #ffffff;
+}
+
+.kelas-subtitle {
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 10px;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 3px 12px;
+    border-radius: 20px;
+    background: {{ ($kelas ?? 'A') === 'B' ? '#fefcbf' : '#ebf8ff' }};
+    color: {{ ($kelas ?? 'A') === 'B' ? '#975a16' : '#2b6cb0' }};
+}
+
 .filter-bar {
     display: flex;
     gap: 12px;
@@ -92,6 +134,35 @@
     transform: translateY(-50%);
     color: #a0aec0;
     font-size: 14px;
+}
+
+.filter-bar .search-box .clear-search {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: none;
+    background: #e2e8f0;
+    color: #4a5568;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    font-size: 10px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    padding: 0;
+}
+
+.filter-bar .search-box .clear-search:hover {
+    background: #cbd5e0;
+    color: #1a2332;
+}
+
+.filter-bar .search-box input {
+    padding-right: 38px;
 }
 
 .table-wrapper {
@@ -537,11 +608,25 @@
 </style>
 
 <div class="page-header">
-    <h4><i class="fas fa-trophy me-2"></i> Data Lomba</h4>
+    <h4><i class="fas fa-trophy me-2"></i> Data Lomba <span class="kelas-subtitle">Kelas {{ $kelas ?? 'A' }}</span></h4>
     <button class="btn-primary-custom" onclick="openTambahLombaModal()">
         <i class="fas fa-plus"></i> Tambah Lomba
     </button>
 </div>
+
+<!-- Tab Reguler A / B -->
+<ul class="nav dashboard-tabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link {{ ($kelas ?? 'A') === 'A' ? 'active' : '' }}" type="button" onclick="gantiKelas('A')">
+            <i class="fas fa-crown me-1"></i> Reguler A
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link {{ ($kelas ?? 'A') === 'B' ? 'active' : '' }}" type="button" onclick="gantiKelas('B')">
+            <i class="fas fa-medal me-1"></i> Reguler B
+        </button>
+    </li>
+</ul>
 
 @if (session('success'))
     <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm rounded-3 mb-4">
@@ -560,7 +645,13 @@
 <div class="filter-bar">
     <div class="search-box">
         <i class="fas fa-search"></i>
-        <input type="text" id="searchInput" placeholder="Cari nama lomba..." onkeyup="filterTable()">
+        <input type="text" id="searchInput" placeholder="Cari nama lomba / kategori..." value="{{ request('search') }}"
+               autocomplete="off" onkeyup="debouncedSearch()" onsearch="directSearch()">
+        @if(request('search'))
+            <button type="button" class="clear-search" onclick="clearSearch()" title="Hapus pencarian">
+                <i class="fas fa-times"></i>
+            </button>
+        @endif
     </div>
 </div>
 
@@ -667,6 +758,25 @@
                         <input type="text" class="form-control" id="modal_nama_lomba" name="nama_lomba" required>
                     </div>
 
+                    <div class="mb-3">
+                        <label class="form-label">Kelas Lomba <span class="text-danger">*</span></label>
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <div class="jenis-card" data-value="A" onclick="pilihKelas(this)">
+                                    <div class="jenis-title">Reguler A</div>
+                                    <div class="jenis-desc">Kelas Reguler A</div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="jenis-card" data-value="B" onclick="pilihKelas(this)">
+                                    <div class="jenis-title">Reguler B</div>
+                                    <div class="jenis-desc">Kelas Reguler B</div>
+                                </div>
+                            </div>
+                        </div>
+                        <input type="hidden" id="modal_kelas" name="kelas" value="A">
+                    </div>
+
                     <div class="row">
                         <div class="col-md-8">
                             <div class="mb-3">
@@ -743,6 +853,25 @@
                     <div class="mb-3">
                         <label for="edit_nama_lomba" class="form-label">Nama Lomba <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" id="edit_nama_lomba" name="nama_lomba" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Kelas Lomba <span class="text-danger">*</span></label>
+                        <div class="row g-2" id="editKelasContainer">
+                            <div class="col-6">
+                                <div class="jenis-card" data-value="A" onclick="pilihKelasEdit(this)">
+                                    <div class="jenis-title">Reguler A</div>
+                                    <div class="jenis-desc">Kelas Reguler A</div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="jenis-card" data-value="B" onclick="pilihKelasEdit(this)">
+                                    <div class="jenis-title">Reguler B</div>
+                                    <div class="jenis-desc">Kelas Reguler B</div>
+                                </div>
+                            </div>
+                        </div>
+                        <input type="hidden" id="edit_kelas" name="kelas" value="A">
                     </div>
 
                     <div class="row">
@@ -835,12 +964,57 @@
 </div>
 
 <script>
-function filterTable() {
-    const search = document.getElementById('searchInput').value;
-    let url = new URL(window.location.href);
-    url.searchParams.set('search', search);
+function gantiKelas(kelas) {
+    const url = new URL(window.location.href);
+    url.searchParams.set('kelas', kelas);
     url.searchParams.set('page', 1);
     window.location.href = url.toString();
+}
+
+// ===== Search dengan debounce (tidak reload di setiap ketikan) =====
+let searchTimer = null;
+
+function directSearch() {
+    const url = new URL(window.location.href);
+    const search = document.getElementById('searchInput').value.trim();
+    if (search) {
+        url.searchParams.set('search', search);
+    } else {
+        url.searchParams.delete('search');
+    }
+    url.searchParams.set('page', 1);
+    window.location.href = url.toString();
+}
+
+function filterTable() {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(directSearch, 600);
+}
+
+function debouncedSearch() {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(directSearch, 600);
+}
+
+function clearSearch() {
+    document.getElementById('searchInput').value = '';
+    directSearch();
+}
+
+function pilihKelas(element) {
+    document.querySelectorAll('#tambahLombaModal .jenis-card[data-value="A"], #tambahLombaModal .jenis-card[data-value="B"]').forEach(card => {
+        card.classList.remove('selected');
+    });
+    element.classList.add('selected');
+    document.getElementById('modal_kelas').value = element.dataset.value;
+}
+
+function pilihKelasEdit(element) {
+    document.querySelectorAll('#editLombaModal .jenis-card[data-value="A"], #editLombaModal .jenis-card[data-value="B"]').forEach(card => {
+        card.classList.remove('selected');
+    });
+    element.classList.add('selected');
+    document.getElementById('edit_kelas').value = element.dataset.value;
 }
 
 function pilihJenis(element) {
@@ -947,6 +1121,15 @@ function openEditLombaModal(id) {
         document.getElementById('edit_deskripsi').value = data.deskripsi || '';
         document.getElementById('edit_bobot').value = data.bobot || 0;
         document.getElementById('edit_jumlah_finalis').value = data.jumlah_finalis || 5;
+
+        const kelasLomba = data.kelas || 'A';
+        document.getElementById('edit_kelas').value = kelasLomba;
+        document.querySelectorAll('#editLombaModal .jenis-card[data-value="A"], #editLombaModal .jenis-card[data-value="B"]').forEach(card => {
+            card.classList.remove('selected');
+            if (card.dataset.value === kelasLomba) {
+                card.classList.add('selected');
+            }
+        });
         
         const jenis = data.jenis || 'langsung';
         document.getElementById('edit_jenis').value = jenis;
@@ -1222,6 +1405,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const defaultCard = document.querySelector('#jenisContainer .jenis-card[data-value="langsung"]');
     if (defaultCard) {
         defaultCard.classList.add('selected');
+    }
+
+    // Default kelas: ikut tab yang aktif saat ini, kalau tidak ada pilih A
+    const params = new URLSearchParams(window.location.search);
+    const kelasAktif = params.get('kelas') === 'B' ? 'B' : 'A';
+    const kelasCard = document.querySelector(`#tambahLombaModal .jenis-card[data-value="${kelasAktif}"]`);
+    if (kelasCard) {
+        kelasCard.classList.add('selected');
+        document.getElementById('modal_kelas').value = kelasAktif;
     }
 });
 </script>

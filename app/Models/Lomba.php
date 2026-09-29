@@ -12,6 +12,7 @@ class Lomba extends Model
     
     protected $fillable = [
         'nama_lomba',
+        'kelas',
         'deskripsi',
         'kategori',
         'tanggal_mulai',
@@ -68,6 +69,20 @@ class Lomba extends Model
     public function nilaiFinal()
     {
         return $this->hasMany(Nilai::class, 'id_lomba', 'id_lomba')->where('babak', 'final');
+    }
+
+    public function getKelasLabelAttribute()
+    {
+        $labels = [
+            'A' => 'Reguler A',
+            'B' => 'Reguler B',
+        ];
+        return $labels[$this->kelas] ?? $this->kelas;
+    }
+
+    public function scopeKelas($query, $kelas)
+    {
+        return $query->where('kelas', $kelas);
     }
 
     public function getJenisLabelAttribute()

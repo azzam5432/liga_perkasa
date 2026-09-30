@@ -129,7 +129,7 @@ class FinalisController extends Controller
             $kelas = 'A';
         }
 
-        $query = Tim::with(['nilai', 'pesertas', 'dosenPembimbing', 'kakakPembimbing'])
+        $query = Tim::with(['nilai.lomba', 'pesertas', 'dosenPembimbing', 'kakakPembimbing'])
             ->where('kelas', $kelas);
 
         $rekapTim = $query
@@ -164,9 +164,13 @@ class FinalisController extends Controller
                     'perunggu' => $perunggu,
                     'jml_menang' => $nilaiKelasSama->count(),
                     'detail' => $nilaiKelasSama->map(function ($nilai) {
+                        $babak = ($nilai->lomba && $nilai->lomba->jenis === 'langsung')
+                            ? 'langsung'
+                            : ($nilai->babak ?? '-');
+
                         return [
                             'lomba' => $nilai->lomba->nama_lomba ?? '-',
-                            'babak' => $nilai->babak ?? '-',
+                            'babak' => $babak,
                             'nilai' => $nilai->nilai,
                             'juara' => $nilai->juara ?? null,
                             'jumlah' => $nilai->jumlah ?? 1,

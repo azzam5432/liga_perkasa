@@ -1,6 +1,6 @@
 @extends(Auth::check() ? 'layouts.master' : 'layouts.public')
 
-@section('title', 'Ranking Lomba')
+@section('title', 'Klasemen Liga Perkasa')
 
 @section('content')
 <style>
@@ -102,7 +102,7 @@ body {
 .public-table-wrapper .rank-number {
     font-size: 15px;
     font-weight: 700;
-    color: rgba(255, 255, 255, 0.7);
+    color: rgba(255, 255, 255, 0.9);
 }
 
 .public-table-wrapper .tim-name {
@@ -372,6 +372,37 @@ body {
 .modal-custom .btn-secondary-custom:hover {
     background: #e9ecef;
     color: #000000;
+}
+
+.detail-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #c5cae9;
+}
+
+.detail-item:last-child {
+    border-bottom: none;
+}
+
+.detail-item .detail-lomba {
+    font-weight: 700;
+    font-size: 15px;
+    color: #000000;
+}
+
+.detail-item .detail-babak {
+    font-size: 13px;
+    color: #555555;
+    font-style: italic;
+    margin-left: 6px;
+}
+
+.detail-item .detail-nilai {
+    font-weight: 700;
+    font-size: 16px;
+    color: #1565c0;
 }
 
 .info-list {
@@ -698,11 +729,17 @@ body {
     </ul>
 
     <div class="page-header">
-        <h4><i class="fas fa-trophy"></i> Ranking Lomba <span class="kelas-subtitle">Kelas {{ $kelas ?? 'A' }}</span></h4>
+        <div>
+            <h4><i class="fas fa-trophy"></i> Klasemen Liga Perkasa <span class="kelas-subtitle">Kelas {{ $kelas ?? 'A' }}</span></h4>
+            <p class="realtime-clock text-muted mb-0" style="font-size: 13px; margin-top: 4px;">Per {{ now()->timezone('Asia/Jakarta')->format('d') }} {{ ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'][now()->timezone('Asia/Jakarta')->format('n') - 1] }} {{ now()->timezone('Asia/Jakarta')->format('Y, H:i:s') }} WIB</p>
+        </div>
         <div class="d-flex gap-2">
             @if(Auth::user()->isSuperAdmin())
-                <a href="{{ route('ranking.export') }}" class="btn btn-success">
-                    <i class="fas fa-file-excel me-1"></i> Export Excel
+                <a href="{{ route('ranking.export') }}" class="btn btn-success" title="Export Rekap Nilai Tim">
+                    <i class="fas fa-file-excel me-1"></i> Export Klasemen
+                </a>
+                <a href="{{ route('ranking.export-lomba') }}" class="btn btn-primary" title="Export Rekap Skor dan Pemenang Lomba">
+                    <i class="fas fa-file-alt me-1"></i> Export Rekap Lomba
                 </a>
             @endif
             
@@ -733,15 +770,7 @@ body {
                     @forelse($rekapTim as $index => $item)
                         <tr>
                             <td style="text-align: center;">
-                                @if($index == 0)
-                                    <span class="medal-emoji">🥇</span>
-                                @elseif($index == 1)
-                                    <span class="medal-emoji">🥈</span>
-                                @elseif($index == 2)
-                                    <span class="medal-emoji">🥉</span>
-                                @else
-                                    <span class="rank-number">{{ $index + 1 }}</span>
-                                @endif
+                                <span class="rank-number">{{ $index + 1 }}</span>
                             </td>
                             <td class="fw-semibold" style="white-space: normal !important; word-wrap: break-word;">
                                 {{ $item['tim']->nama_tim }}
@@ -788,8 +817,8 @@ body {
 <div class="ranking-page">
     <div class="public-ranking-wrapper">
         <div class="public-header">
-            <h1><i class="fas fa-trophy"></i> Ranking Lomba Liga Perkasa</h1>
-            <p>Berikut adalah daftar peringkat tim berdasarkan total nilai yang telah dikumpulkan.</p>
+            <h1><i class="fas fa-trophy"></i> Klasemen Liga Perkasa</h1>
+            <p class="realtime-clock">Per {{ now()->timezone('Asia/Jakarta')->format('d') }} {{ ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'][now()->timezone('Asia/Jakarta')->format('n') - 1] }} {{ now()->timezone('Asia/Jakarta')->format('Y, H:i:s') }} WIB</p>
 
             <!-- Tab Reguler A / B -->
             <ul class="nav dashboard-tabs" role="tablist">
@@ -824,15 +853,7 @@ body {
                         @forelse($rekapTim as $index => $item)
                             <tr>
                                 <td style="text-align: center;">
-                                    @if($index == 0)
-                                        <span class="medal-emoji">🥇</span>
-                                    @elseif($index == 1)
-                                        <span class="medal-emoji">🥈</span>
-                                    @elseif($index == 2)
-                                        <span class="medal-emoji">🥉</span>
-                                    @else
-                                        <span class="rank-number">{{ $index + 1 }}</span>
-                                    @endif
+                                    <span class="rank-number">{{ $index + 1 }}</span>
                                 </td>
                                 <td class="tim-name" style="white-space: normal !important; word-wrap: break-word;">
                                     {{ $item['tim']->nama_tim }}
@@ -1034,6 +1055,14 @@ body {
 
 <script>
 let timDataArray = {};
+const initialData = @json($rekapTim ?? []);
+if (Array.isArray(initialData)) {
+    initialData.forEach(item => {
+        if (item && item.tim && item.tim.nama_tim) {
+            timDataArray[item.tim.nama_tim] = item;
+        }
+    });
+}
 
 function gantiKelasRanking(kelas) {
     const url = new URL(window.location.href);
@@ -1072,15 +1101,7 @@ function updateRankingTable(data) {
 
         const rankCell = document.createElement('td');
         rankCell.style.textAlign = 'center';
-        if (index === 0) {
-            rankCell.innerHTML = '<span class="medal-emoji">🥇</span>';
-        } else if (index === 1) {
-            rankCell.innerHTML = '<span class="medal-emoji">🥈</span>';
-        } else if (index === 2) {
-            rankCell.innerHTML = '<span class="medal-emoji">🥉</span>';
-        } else {
-            rankCell.innerHTML = `<span class="rank-number">${index + 1}</span>`;
-        }
+        rankCell.innerHTML = `<span class="rank-number">${index + 1}</span>`;
         row.appendChild(rankCell);
 
         const nameCell = document.createElement('td');
@@ -1137,15 +1158,7 @@ function updatePublicRankingTable(data) {
 
         const rankCell = document.createElement('td');
         rankCell.style.textAlign = 'center';
-        if (index === 0) {
-            rankCell.innerHTML = '<span class="medal-emoji">🥇</span>';
-        } else if (index === 1) {
-            rankCell.innerHTML = '<span class="medal-emoji">🥈</span>';
-        } else if (index === 2) {
-            rankCell.innerHTML = '<span class="medal-emoji">🥉</span>';
-        } else {
-            rankCell.innerHTML = `<span class="rank-number">${index + 1}</span>`;
-        }
+        rankCell.innerHTML = `<span class="rank-number">${index + 1}</span>`;
         row.appendChild(rankCell);
 
         const nameCell = document.createElement('td');
@@ -1280,9 +1293,35 @@ function openModal(namaTim, totalNilai, jumlahMenang, detail, timData, pengharga
     modal.show();
 }
 
+function updateRealtimeClock() {
+    const clockElements = document.querySelectorAll('.realtime-clock');
+    if (!clockElements.length) return;
+
+    const now = new Date();
+    const months = [
+        'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+        'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+    ];
+
+    const day = now.getDate();
+    const month = months[now.getMonth()];
+    const year = now.getFullYear();
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+
+    const formattedTime = `Per ${day} ${month} ${year}, ${hours}:${minutes}:${seconds} WIB`;
+    clockElements.forEach(el => {
+        el.textContent = formattedTime;
+    });
+}
+
+updateRealtimeClock();
+setInterval(updateRealtimeClock, 1000);
 setInterval(fetchRanking, 5000);
 
 document.addEventListener('DOMContentLoaded', function() {
+    updateRealtimeClock();
     fetchRanking();
 
     document.addEventListener('click', function(e) {

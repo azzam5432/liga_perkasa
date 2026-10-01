@@ -156,4 +156,19 @@ class ExportController extends Controller
         $writer->save('php://output');
         exit;
     }
+
+    public function exportRekapLomba(\App\Services\RekapScoreExportService $service)
+    {
+        $spreadsheet = $service->generate();
+
+        $writer = new Xlsx($spreadsheet);
+        $fileName = 'rekap_score_liga_perkasa_' . date('Ymd_His') . '.xlsx';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $fileName . '"');
+        header('Cache-Control: max-age=0');
+
+        $writer->save('php://output');
+        exit;
+    }
 }

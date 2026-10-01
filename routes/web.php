@@ -78,4 +78,5 @@ Route::middleware(['auth', 'super_admin'])->group(function () {
     // Route::get('/get-juri-by-lomba/{id_lomba}', [JuriLombaController::class, 'getJuriByLomba'])->name('get.juri.by.lomba');
 
     Route::get('/ranking/export', [ExportController::class, 'exportRanking'])->name('ranking.export');
+    Route::get('/ranking/export-lomba', [ExportController::class, 'exportRekapLomba'])->name('ranking.export-lomba');
 });

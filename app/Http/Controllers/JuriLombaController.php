@@ -3,16 +3,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Juri;
-use App\Models\Lomba;
-use App\Models\JuriLomba;
-use App\Models\User;
+// ===== SISTEM JURI DINONAKTIFKAN: penilaian kini dikelola panitia =====
+// use App\Models\Juri;
+// use App\Models\Lomba;
+// use App\Models\JuriLomba;
+// use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
 
 class JuriLombaController extends Controller
 {
+    /*
     public function index(Request $request)
     {
         $query = JuriLomba::with(['juri.user', 'lomba']);
@@ -131,4 +133,5 @@ class JuriLombaController extends Controller
 
         return redirect()->route('juri_lomba.index')->with('success', 'Penugasan juri berhasil dihapus!');
     }
+    */
 }

@@ -7,7 +7,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TimController;
 use App\Http\Controllers\PanitiaController;
 use App\Http\Controllers\SuperAdminDashboardController;
-use App\Http\Controllers\JuriLombaController;
+// use App\Http\Controllers\JuriLombaController; // SISTEM JURI DINONAKTIFKAN: penilaian kini dikelola panitia
 use App\Http\Controllers\FinalisController;
 use App\Http\Controllers\NilaiController;
 use App\Http\Controllers\ExportController;
@@ -73,8 +73,9 @@ Route::middleware(['auth', 'super_admin'])->group(function () {
     
     Route::resource('admin', PanitiaController::class);
     
-    Route::resource('juri_lomba', JuriLombaController::class);
-    Route::get('/get-juri-by-lomba/{id_lomba}', [JuriLombaController::class, 'getJuriByLomba'])->name('get.juri.by.lomba');
+    // ===== SISTEM JURI DINONAKTIFKAN: penilaian kini dikelola panitia =====
+    // Route::resource('juri_lomba', JuriLombaController::class);
+    // Route::get('/get-juri-by-lomba/{id_lomba}', [JuriLombaController::class, 'getJuriByLomba'])->name('get.juri.by.lomba');
 
     Route::get('/ranking/export', [ExportController::class, 'exportRanking'])->name('ranking.export');
 });

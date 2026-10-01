@@ -334,7 +334,7 @@
 
 <div class="alert alert-light border mb-3" style="font-size: 13px;">
     <i class="fas fa-lightbulb text-warning me-1"></i>
-    Satu tim bisa mendapat <strong>lebih dari satu gelar</strong> sekaligus (misalnya Juara 1 sekaligus Juara 2). Untuk <strong>Juara 3</strong>: bisa diisi lebih dari satu tim, dan satu tim bisa mendapat Juara 3 lebih dari satu kali — atur kolom <strong>Jumlah</strong> yang muncul saat mencentang J3.
+    Satu tim bisa mendapat <strong>lebih dari satu gelar</strong> sekaligus (misalnya Juara 1 sekaligus Juara 2). <strong>Juara 3 opsional</strong> — boleh dikosongkan; jika diisi bisa lebih dari satu tim, dan satu tim bisa mendapat Juara 3 lebih dari satu kali — atur kolom <strong>Jumlah</strong> yang muncul saat mencentang J3.
 </div>
 <div class="table-wrapper">
     <div class="table-scroll">
@@ -511,9 +511,9 @@ document.getElementById('formNilai').addEventListener('submit', function(e) {
     var gelar2 = hitungGelar(2);
     var gelar3 = hitungGelar(3);
 
-    if (gelar1 === 0 || gelar2 === 0 || gelar3 === 0) {
+    if (gelar1 === 0 || gelar2 === 0) {
         e.preventDefault();
-        alert('Silakan pilih tim untuk Juara 1, Juara 2, dan Juara 3!');
+        alert('Silakan pilih tim untuk Juara 1 dan Juara 2! (Juara 3 opsional)');
         return false;
     }
 
@@ -537,7 +537,9 @@ document.getElementById('formNilai').addEventListener('submit', function(e) {
     var pesanAksi = @json($isEdit) ? 'perubahan penilaian' : 'penilaian';
     var poinJuara1 = parseFloat(POIN[1]) || 0;
 
-    if (!confirm('Yakin dengan ' + pesanAksi + ' berikut?\n\nJuara 1: ' + namaJuara1 + ' (' + poinJuara1 + ' poin)\nJuara 3: ' + juara3List.join(', ') + '\n\nSatu tim boleh mendapat lebih dari satu gelar; poin dijumlahkan.')) {
+    var ringkasanJuara3 = juara3List.length > 0 ? '\nJuara 3: ' + juara3List.join(', ') : '\nJuara 3: (tidak diisi)';
+
+    if (!confirm('Yakin dengan ' + pesanAksi + ' berikut?\n\nJuara 1: ' + namaJuara1 + ' (' + poinJuara1 + ' poin)' + ringkasanJuara3 + '\n\nSatu tim boleh mendapat lebih dari satu gelar; poin dijumlahkan. Juara 3 opsional.')) {
         e.preventDefault();
         return false;
     }

@@ -12,7 +12,7 @@ class Nilai extends Model
     protected $fillable = [
         'id_tim',
         'id_lomba',
-        'id_juri',
+        'id_juri', // SISTEM JURI DINONAKTIFKAN: kolom lama, tidak lagi diisi (penilaian kini dikelola panitia)
         'nilai',
         'babak',
         'juara',
@@ -29,10 +29,11 @@ class Nilai extends Model
         return $this->belongsTo(Lomba::class, 'id_lomba', 'id_lomba');
     }
 
-    public function juri()
-    {
-        return $this->belongsTo(Juri::class, 'id_juri', 'id_juri');
-    }
+    // SISTEM JURI DINONAKTIFKAN: penilaian kini dikelola panitia
+    // public function juri()
+    // {
+    //     return $this->belongsTo(Juri::class, 'id_juri', 'id_juri');
+    // }
 
     public function scopePenyisihan($query)
     {

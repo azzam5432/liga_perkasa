@@ -4,10 +4,14 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
+// ===== SISTEM KRITERIA DINONAKTIFKAN: penilaian kini dikelola panitia =====
+// Tabel tb_penilaian (penilaian per kriteria per juri) tidak lagi digunakan;
+// penilaian sekarang lewat tb_nilai (NilaiController, dikelola panitia).
 return new class extends Migration
 {
     public function up(): void
     {
+        /*
         Schema::create('tb_penilaian', function (Blueprint $table) {
             $table->id('id_penilaian');
             $table->foreignId('id_tim')->constrained('tb_tim', 'id_tim')->onDelete('cascade');
@@ -21,10 +25,11 @@ return new class extends Migration
             
             $table->unique(['id_tim', 'id_juri', 'id_kriteria']);
         });
+        */
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('tb_penilaian');
+        // Schema::dropIfExists('tb_penilaian');
     }
 };

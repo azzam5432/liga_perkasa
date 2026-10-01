@@ -4,10 +4,13 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
+// ===== SISTEM KRITERIA DINONAKTIFKAN: penilaian kini dikelola panitia =====
+// Tabel tb_kriteria tidak lagi digunakan (tidak ada model/controller/view).
 return new class extends Migration
 {
     public function up(): void
     {
+        /*
         Schema::create('tb_kriteria', function (Blueprint $table) {
             $table->id('id_kriteria');
             $table->string('nama_kriteria');
@@ -19,10 +22,11 @@ return new class extends Migration
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
+        */
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('tb_kriteria');
+        // Schema::dropIfExists('tb_kriteria');
     }
 };

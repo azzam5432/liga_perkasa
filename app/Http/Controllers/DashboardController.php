@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Tim;
 use App\Models\Peserta;
 use App\Models\Lomba;
-use App\Models\Juri;
+// use App\Models\Juri; // SISTEM JURI DINONAKTIFKAN: penilaian kini dikelola panitia
 use App\Models\Nilai;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Auth;
@@ -29,10 +29,11 @@ class DashboardController extends Controller
             'dataPeserta' => $dataPerKelas['A']['dataPeserta'],
             'totalTim' => $dataPerKelas['A']['totalTim'],
             'totalPeserta' => $dataPerKelas['A']['totalPeserta'],
-            'lombaDitugaskan' => $dataPerKelas['A']['lombaDitugaskan'],
-            'totalLomba' => $dataPerKelas['A']['totalLomba'],
-            'totalTimSudahDinilai' => $dataPerKelas['A']['totalTimSudahDinilai'],
-            'juri' => $dataPerKelas['A']['juri'],
+            // SISTEM JURI DINONAKTIFKAN: penilaian kini dikelola panitia
+            // 'lombaDitugaskan' => $dataPerKelas['A']['lombaDitugaskan'],
+            // 'totalLomba' => $dataPerKelas['A']['totalLomba'],
+            // 'totalTimSudahDinilai' => $dataPerKelas['A']['totalTimSudahDinilai'],
+            // 'juri' => $dataPerKelas['A']['juri'],
         ]);
     }
 
@@ -53,6 +54,8 @@ class DashboardController extends Controller
             $q->where('kelas', $kelas);
         })->count();
 
+        // ===== SISTEM JURI DINONAKTIFKAN: penilaian kini dikelola panitia =====
+        /*
         // Data untuk Juri (lomba di kelas ini)
         $juri = Juri::where('user_id', $user->id)->first();
 
@@ -77,15 +80,16 @@ class DashboardController extends Controller
                 ->distinct('id_tim')
                 ->count('id_tim');
         }
+        */
 
         return [
             'dataPeserta' => $dataPeserta,
             'totalTim' => $totalTim,
             'totalPeserta' => $totalPeserta,
-            'lombaDitugaskan' => $lombaDitugaskan,
-            'totalLomba' => $totalLomba,
-            'totalTimSudahDinilai' => $totalTimSudahDinilai,
-            'juri' => $juri,
+            // 'lombaDitugaskan' => $lombaDitugaskan,
+            // 'totalLomba' => $totalLomba,
+            // 'totalTimSudahDinilai' => $totalTimSudahDinilai,
+            // 'juri' => $juri,
         ];
     }
 }

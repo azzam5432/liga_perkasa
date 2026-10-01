@@ -663,7 +663,8 @@
                     <th style="width: 40px; min-width: 40px;">No</th>
                     <th class="col-sticky-left" style="min-width: 170px;">Nama Lomba</th>
                     <th style="min-width: 120px;">Jenis</th>
-                    <th style="min-width: 200px;">Juri</th>
+                    {{-- SISTEM JURI DINONAKTIFKAN: penilaian kini dikelola panitia --}}
+                    {{-- <th style="min-width: 200px;">Juri</th> --}}
                     <th class="col-sticky-right" style="min-width: 120px; text-align: center;">Aksi</th>
                 </tr>
             </thead>
@@ -681,6 +682,8 @@
                                 <span class="text-muted" style="font-size: 15px;">-</span>
                             @endif
                         </td>
+                        {{-- SISTEM JURI DINONAKTIFKAN: penilaian kini dikelola panitia --}}
+                        {{--
                         <td style="font-size: 15px;">
                             @if($item->juri->count() > 0)
                                 @foreach($item->juri->take(3) as $juri)
@@ -695,6 +698,7 @@
                                 <span class="text-muted">-</span>
                             @endif
                         </td>
+                        --}}
                         <td class="col-sticky-right text-center">
                             <div class="d-flex gap-1 justify-content-center">
                                 <button class="btn-action btn-info" title="Detail" onclick="openShowLombaModal({{ $item->id_lomba }})">
@@ -716,7 +720,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5">
+                        <td colspan="4">
                             <div class="empty-state">
                                 <i class="fas fa-trophy"></i>
                                 <h6>Belum ada data lomba</h6>
@@ -1231,7 +1235,8 @@ function openShowLombaModal(id) {
     })
     .then(data => {
         const lomba = data.lomba;
-        const juriList = data.juri_list || [];
+        // SISTEM JURI DINONAKTIFKAN: penilaian kini dikelola panitia
+        // const juriList = data.juri_list || [];
         
         let html = `
             <div class="text-center mb-4">
@@ -1261,6 +1266,7 @@ function openShowLombaModal(id) {
             `;
         }
 
+        /* SISTEM JURI DINONAKTIFKAN: penilaian kini dikelola panitia
         html += `
             <div class="mb-3">
                 <label class="text-muted small fw-bold d-block">Daftar Juri</label>
@@ -1273,16 +1279,11 @@ function openShowLombaModal(id) {
                 </div>
             </div>
         `;
+        */
 
         html += `
             <div class="row mt-3">
-                <div class="col-md-6">
-                    <div class="text-center p-2 bg-light rounded">
-                        <div class="fw-bold" style="font-size: 20px; color: #1a365d;">${data.juri_count || 0}</div>
-                        <small class="text-muted">Jumlah Juri</small>
-                    </div>
-                </div>
-                <div class="col-md-6">
+                <div class="col-md-6 offset-md-3">
                     <div class="text-center p-2 bg-light rounded">
                         <div class="fw-bold" style="font-size: 20px; color: #1a365d;">${data.finalis_count || 0}</div>
                         <small class="text-muted">Jumlah Finalis</small>

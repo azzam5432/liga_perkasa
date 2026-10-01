@@ -156,8 +156,8 @@ class NilaiController extends Controller
     }
 
     // Parse input form "gelar[tim_id][]" menjadi daftar baris nilai per gelar.
-    // Aturan: Juara 1 & 2 tepat 1 tim (boleh tim yang sama), Juara 3 bebas
-    // (bisa beberapa tim, dan satu tim bisa lebih dari satu kali via kolom jumlah).
+    // Aturan: Juara 1 & 2 tepat 1 tim (boleh tim yang sama), Juara 3 opsional
+    // (boleh kosong; jika diisi bisa beberapa tim, dan satu tim bisa lebih dari satu kali via kolom jumlah).
     private function parseGelar(Request $request)
     {
         $input = $request->input('gelar', []);
@@ -189,10 +189,6 @@ class NilaiController extends Controller
             return 'Juara 1 dan Juara 2 harus dipilih tepat 1 tim (tim yang sama boleh memegang keduanya)!';
         }
 
-        if (count($juara3) === 0) {
-            return 'Pilih minimal 1 tim untuk Juara 3!';
-        }
-
         foreach (array_merge($juara1, $juara2, array_column($juara3, 'id_tim')) as $id_tim) {
             if (!Tim::find($id_tim)) {
                 return 'Tim tidak ditemukan!';
@@ -202,7 +198,7 @@ class NilaiController extends Controller
         return [
             1 => [['id_tim' => $juara1[0], 'jumlah' => 1]],
             2 => [['id_tim' => $juara2[0], 'jumlah' => 1]],
-            3 => $juara3,
+            3 => $juara3, // opsional: boleh kosong (tidak ada Juara 3)
         ];
     }
 

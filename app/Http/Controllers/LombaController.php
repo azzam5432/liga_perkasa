@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Lomba;
 use App\Models\Tim;
-use App\Models\Juri;
+// use App\Models\Juri; // SISTEM JURI DINONAKTIFKAN: penilaian kini dikelola panitia
 use App\Models\Finalis;
 use App\Models\Kriteria;
 use Illuminate\Http\Request;
@@ -89,15 +89,16 @@ class LombaController extends Controller
         $lomba = Lomba::with(['juri.user', 'finalis.tim'])->findOrFail($id);
         
         if (request()->ajax()) {
-            $juriList = $lomba->juri->map(function($juri) {
-                return $juri->user->name ?? 'Juri';
-            });
+            // ===== SISTEM JURI DINONAKTIFKAN: penilaian kini dikelola panitia =====
+            // $juriList = $lomba->juri->map(function($juri) {
+            //     return $juri->user->name ?? 'Juri';
+            // });
             
             // HAPUS KriteriaCount
             return response()->json([
                 'lomba' => $lomba,
-                'juri_list' => $juriList,
-                'juri_count' => $lomba->juri->count(),
+                // 'juri_list' => $juriList,
+                // 'juri_count' => $lomba->juri->count(),
                 'finalis_count' => $lomba->finalis->count(),
             ]);
         }

@@ -3,6 +3,7 @@
 @section('title', 'Penugasan Juri')
 
 @section('content')
+@if (false) {{-- SISTEM JURI DINONAKTIFKAN: penilaian kini dikelola panitia. Seluruh halaman Penugasan Juri dinonaktifkan. --}}
 <style>
 .page-header {
     display: flex;
@@ -1115,4 +1116,5 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
+@endif
 @endsection

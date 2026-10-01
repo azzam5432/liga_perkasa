@@ -5,20 +5,23 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
+// ===== SISTEM KRITERIA DINONAKTIFKAN: penilaian kini dikelola panitia =====
 return new class extends Migration
 {
     public function up(): void
     {
+        /*
         Schema::table('tb_kriteria', function (Blueprint $table) {
             $table->foreignId('id_lomba')->nullable()->constrained('tb_lomba', 'id_lomba')->onDelete('cascade')->after('id_kriteria');
         });
+        */
     }
 
     public function down(): void
     {
-        Schema::table('tb_kriteria', function (Blueprint $table) {
-            $table->dropForeign(['id_lomba']);
-            $table->dropColumn('id_lomba');
-        });
+        // Schema::table('tb_kriteria', function (Blueprint $table) {
+        //     $table->dropForeign(['id_lomba']);
+        //     $table->dropColumn('id_lomba');
+        // });
     }
 };

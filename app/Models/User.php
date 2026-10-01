@@ -51,10 +51,11 @@ class User extends Authenticatable
     }
 
     // ✅ TAMBAHKAN METHOD INI
-    public function isJuri(): bool
-    {
-        return $this->juri()->exists();
-    }
+    // SISTEM JURI DINONAKTIFKAN: penilaian kini dikelola panitia
+    // public function isJuri(): bool
+    // {
+    //     return $this->juri()->exists();
+    // }
 
     // Helper untuk role
     public function getRoleLabelAttribute(): string
@@ -116,8 +117,9 @@ class User extends Authenticatable
     }
 
     // ✅ RELASI KE JURI
-    public function juri()
-    {
-        return $this->hasOne(Juri::class, 'user_id', 'id');
-    }
+    // SISTEM JURI DINONAKTIFKAN: penilaian kini dikelola panitia
+    // public function juri()
+    // {
+    //     return $this->hasOne(Juri::class, 'user_id', 'id');
+    // }
 }

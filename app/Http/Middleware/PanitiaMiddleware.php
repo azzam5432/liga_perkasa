@@ -22,8 +22,10 @@ class PanitiaMiddleware
 
     $user = Auth::user();
     
-    // Super Admin, Panitia, dan Juri boleh akses
-    if ($user->isSuperAdmin() || $user->isPanitia() || $user->isJuri()) {
+    // Super Admin dan Panitia boleh akses
+    // SISTEM JURI DINONAKTIFKAN: penilaian kini dikelola panitia
+    // if ($user->isSuperAdmin() || $user->isPanitia() || $user->isJuri()) {
+    if ($user->isSuperAdmin() || $user->isPanitia()) {
         return $next($request);
     }
 

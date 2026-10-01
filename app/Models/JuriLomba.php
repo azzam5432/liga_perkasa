@@ -5,8 +5,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+// ===== SISTEM JURI DINONAKTIFKAN: penilaian kini dikelola panitia =====
 class JuriLomba extends Model
 {
+    /*
     protected $table = 'tb_juri_lomba';
     protected $primaryKey = 'id_juri_lomba';
     
@@ -34,4 +36,5 @@ class JuriLomba extends Model
     {
         return $query->where('status', 'aktif');
     }
+    */
 }

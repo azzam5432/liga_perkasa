@@ -355,7 +355,8 @@
                             <div class="empty-state">
                                 <i class="fas fa-trophy"></i>
                                 <h6>Belum ada finalis</h6>
-                                <p>Finalis akan ditentukan otomatis setelah juri memberikan nilai penyisihan.</p>
+                                {{-- SISTEM JURI DINONAKTIFKAN: penilaian kini dikelola panitia --}}
+                                <p>Finalis akan ditentukan otomatis setelah nilai penyisihan diberikan.</p>
                             </div>
                         </td>
                     </tr>
@@ -377,8 +378,8 @@
             </div>
             <div class="modal-body">
                 <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3 d-block"></i>
-                <p class="fw-semibold" style="color: #1a2332;">Finalis belum bisa ditambahkan</p>
-                <p class="text-muted">Karena belum ada penilaian penyisihan untuk lomba ini.</p>
+                <p class="fw-semibold" style="color: #1a2332;">Finalis belum bisa ditambahkan</p>                                {{-- SISTEM JURI DINONAKTIFKAN: penilaian kini dikelola panitia --}}
+                                <p class="text-muted">Karena belum ada penilaian penyisihan untuk lomba ini.</p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn-secondary-custom" data-bs-dismiss="modal">

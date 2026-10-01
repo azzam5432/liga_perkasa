@@ -16,7 +16,8 @@ class LombaController extends Controller
 {
     public function index(Request $request): View
     {
-        $query = Lomba::with(['juri.user', 'finalis.tim']);
+        // SISTEM JURI DINONAKTIFKAN: penilaian kini dikelola panitia
+        $query = Lomba::with(['finalis.tim']);
 
         if ($request->filled('search')) {
             $search = $request->search;
@@ -86,7 +87,7 @@ class LombaController extends Controller
 
     public function show($id)
     {
-        $lomba = Lomba::with(['juri.user', 'finalis.tim'])->findOrFail($id);
+        $lomba = Lomba::with(['finalis.tim'])->findOrFail($id);
         
         if (request()->ajax()) {
             // ===== SISTEM JURI DINONAKTIFKAN: penilaian kini dikelola panitia =====

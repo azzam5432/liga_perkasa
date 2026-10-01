@@ -38,6 +38,8 @@ class RekapScoreExportService
             return [
                 'id_lomba' => $lomba->id_lomba,
                 'nama_lomba' => $lomba->nama_lomba,
+                'bobot' => (float) $lomba->bobot,
+                'kelas' => $lomba->kelas ?? 'A',
                 'jenis' => ucfirst($lomba->jenis), // Langsung / Penyisihan
                 'status_pelaksanaan' => $statusPelaksanaan,
                 'tanggal_diumumkan' => $tgl,
@@ -64,18 +66,30 @@ class RekapScoreExportService
         })->values();
 
         $completedLombas = $sortedLombas->where('is_selesai', true)->values();
+        $regulerALombas = $sortedLombas->where('kelas', 'A')->values();
+        $regulerBLombas = $sortedLombas->where('kelas', 'B')->values();
 
         $spreadsheet = new Spreadsheet();
 
         // Sheet 1: Semua Lomba (diurutkan awal diumumkan)
         $sheet1 = $spreadsheet->getActiveSheet();
         $sheet1->setTitle('Rekap Semua Lomba');
-        $this->buildSheet($sheet1, $sortedLombas, 'REKAPITULASI SKOR DAN STATUS LOMBA LIGA PERKASA', 'Seluruh 45 Lomba (Diurutkan dari yang Paling Awal Diumumkan)');
+        $this->buildSheet($sheet1, $sortedLombas, 'REKAPITULASI SKOR DAN STATUS LOMBA LIGA PERKASA', 'Seluruh ' . $sortedLombas->count() . ' Lomba (Diurutkan dari yang Paling Awal Diumumkan)');
 
         // Sheet 2: Hanya Lomba yang Sudah Selesai / Diumumkan
         $sheet2 = $spreadsheet->createSheet();
         $sheet2->setTitle('Lomba Sudah Selesai');
-        $this->buildSheet($sheet2, $completedLombas, 'DAFTAR LOMBA YANG TELAH DIUMUMKAN', 'Lomba dengan Nilai & Pemenang Juara 1, 2, 3 (Diurutkan Kronologis Pengumuman)');
+        $this->buildSheet($sheet2, $completedLombas, 'DAFTAR LOMBA YANG TELAH DIUMUMKAN', 'Lomba dengan Nilai & Pemenang Juara 1, 2, 3 (' . $completedLombas->count() . ' Lomba Telah Selesai)');
+
+        // Sheet 3: Reguler A
+        $sheet3 = $spreadsheet->createSheet();
+        $sheet3->setTitle('Reguler A');
+        $this->buildSheet($sheet3, $regulerALombas, 'REKAPITULASI LOMBA REGULER A', 'Seluruh ' . $regulerALombas->count() . ' Lomba Reguler A (Diurutkan Kronologis Pengumuman)');
+
+        // Sheet 4: Reguler B
+        $sheet4 = $spreadsheet->createSheet();
+        $sheet4->setTitle('Reguler B');
+        $this->buildSheet($sheet4, $regulerBLombas, 'REKAPITULASI LOMBA REGULER B', 'Seluruh ' . $regulerBLombas->count() . ' Lomba Reguler B (Diurutkan Kronologis Pengumuman)');
 
         // Set active sheet back to Sheet 1
         $spreadsheet->setActiveSheetIndex(0);
@@ -92,14 +106,14 @@ class RekapScoreExportService
 
         // 1. Header Judul Laporan
         $sheet->setCellValue('A1', $title);
-        $sheet->mergeCells('A1:H1');
+        $sheet->mergeCells('A1:I1');
         $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('FF1E293B'));
         $sheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER)->setVertical(Alignment::VERTICAL_CENTER);
         $sheet->getRowDimension(1)->setRowHeight(28);
 
         // 2. Subtitle & Tanggal Cetak
         $sheet->setCellValue('A2', $subtitle . ' • Per ' . $this->formatTanggalIndo(now()));
-        $sheet->mergeCells('A2:H2');
+        $sheet->mergeCells('A2:I2');
         $sheet->getStyle('A2')->getFont()->setSize(10)->setItalic(true)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('FF64748B'));
         $sheet->getStyle('A2')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER)->setVertical(Alignment::VERTICAL_CENTER);
         $sheet->getRowDimension(2)->setRowHeight(18);
@@ -114,58 +128,61 @@ class RekapScoreExportService
         $sheet->setCellValue('B4', 'Lomba');
         $sheet->mergeCells('B4:B5');
 
-        $sheet->setCellValue('C4', 'Pemenang');
-        $sheet->mergeCells('C4:E4');
+        $sheet->setCellValue('C4', 'Bobot');
+        $sheet->mergeCells('C4:C5');
 
-        $sheet->setCellValue('F4', "Status Lomba\n(Sistem)");
-        $sheet->mergeCells('F4:F5');
+        $sheet->setCellValue('D4', 'Pemenang');
+        $sheet->mergeCells('D4:F4');
 
-        $sheet->setCellValue('G4', "Status Lomba\n(Pelaksanaan)");
+        $sheet->setCellValue('G4', "Status Lomba\n(Sistem)");
         $sheet->mergeCells('G4:G5');
 
-        $sheet->setCellValue('H4', 'Tanggal Diumumkan');
+        $sheet->setCellValue('H4', "Status Lomba\n(Pelaksanaan)");
         $sheet->mergeCells('H4:H5');
 
+        $sheet->setCellValue('I4', 'Tanggal Diumumkan');
+        $sheet->mergeCells('I4:I5');
+
         // Baris 5 (Sub-kolom Pemenang)
-        $sheet->setCellValue('C5', '1 (Juara 1)');
-        $sheet->setCellValue('D5', '2 (Juara 2)');
-        $sheet->setCellValue('E5', '3 (Juara 3)');
+        $sheet->setCellValue('D5', '1 (Juara 1)');
+        $sheet->setCellValue('E5', '2 (Juara 2)');
+        $sheet->setCellValue('F5', '3 (Juara 3)');
 
         // Tinggi baris header
         $sheet->getRowDimension(4)->setRowHeight(24);
         $sheet->getRowDimension(5)->setRowHeight(24);
 
-        // Styling Header Utama (A4:H5)
-        $headerRange = 'A4:H5';
+        // Styling Header Utama (A4:I5)
+        $headerRange = 'A4:I5';
         $sheet->getStyle($headerRange)->getFont()->setBold(true)->setSize(10);
         $sheet->getStyle($headerRange)->getAlignment()
             ->setHorizontal(Alignment::HORIZONTAL_CENTER)
             ->setVertical(Alignment::VERTICAL_CENTER)
             ->setWrapText(true);
 
-        // Warna Background Header Umum (A4:B5, F4:H5)
-        $sheet->getStyle('A4:B5')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FF1E3A8A');
-        $sheet->getStyle('A4:B5')->getFont()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('FFFFFFFF'));
+        // Warna Background Header Umum (A4:C5, G4:I5)
+        $sheet->getStyle('A4:C5')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FF1E3A8A');
+        $sheet->getStyle('A4:C5')->getFont()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('FFFFFFFF'));
 
-        $sheet->getStyle('F4:H5')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FF1E3A8A');
-        $sheet->getStyle('F4:H5')->getFont()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('FFFFFFFF'));
+        $sheet->getStyle('G4:I5')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FF1E3A8A');
+        $sheet->getStyle('G4:I5')->getFont()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('FFFFFFFF'));
 
-        // Pemenang Header (C4:E4)
-        $sheet->getStyle('C4:E4')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FF0F172A');
-        $sheet->getStyle('C4:E4')->getFont()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('FFFFFFFF'));
+        // Pemenang Header (D4:F4)
+        $sheet->getStyle('D4:F4')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FF0F172A');
+        $sheet->getStyle('D4:F4')->getFont()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('FFFFFFFF'));
 
         // Sub-kolom Juara:
         // Juara 1: Aksen Emas
-        $sheet->getStyle('C5')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FFFEF08A');
-        $sheet->getStyle('C5')->getFont()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('FF854D0E'));
+        $sheet->getStyle('D5')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FFFEF08A');
+        $sheet->getStyle('D5')->getFont()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('FF854D0E'));
 
         // Juara 2: Aksen Perak
-        $sheet->getStyle('D5')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FFE2E8F0');
-        $sheet->getStyle('D5')->getFont()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('FF334155'));
+        $sheet->getStyle('E5')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FFE2E8F0');
+        $sheet->getStyle('E5')->getFont()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('FF334155'));
 
         // Juara 3: Aksen Perunggu
-        $sheet->getStyle('E5')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FFFED7AA');
-        $sheet->getStyle('E5')->getFont()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('FF9A3412'));
+        $sheet->getStyle('F5')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FFFED7AA');
+        $sheet->getStyle('F5')->getFont()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('FF9A3412'));
 
         // 4. Pengisian Data Rows
         $currentRow = 6;
@@ -177,80 +194,90 @@ class RekapScoreExportService
             $sheet->getStyle('A' . $currentRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER)->setVertical(Alignment::VERTICAL_CENTER);
 
             // Nama Lomba
-            $sheet->setCellValue('B' . $currentRow, $item['nama_lomba']);
+            $namaDisplay = $item['nama_lomba'];
+            if (($item['kelas'] ?? 'A') === 'B') {
+                $namaDisplay .= ' (Reguler B)';
+            }
+            $sheet->setCellValue('B' . $currentRow, $namaDisplay);
             $sheet->getStyle('B' . $currentRow)->getFont()->setBold($isSelesai);
             $sheet->getStyle('B' . $currentRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT)->setVertical(Alignment::VERTICAL_CENTER)->setWrapText(true);
 
-            // Juara 1
-            $sheet->setCellValue('C' . $currentRow, $item['juara_1']);
-            $sheet->getStyle('C' . $currentRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT)->setVertical(Alignment::VERTICAL_CENTER)->setWrapText(true);
-            if ($isSelesai && $item['juara_1'] !== '-') {
-                $sheet->getStyle('C' . $currentRow)->getFont()->setBold(true)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('FF854D0E'));
-                $sheet->getStyle('C' . $currentRow)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FFFEFCE8');
-            } else {
-                $sheet->getStyle('C' . $currentRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-                $sheet->getStyle('C' . $currentRow)->getFont()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('FF94A3B8'));
-            }
+            // Bobot
+            $sheet->setCellValue('C' . $currentRow, (float) $item['bobot']);
+            $sheet->getStyle('C' . $currentRow)->getNumberFormat()->setFormatCode('0.0');
+            $sheet->getStyle('C' . $currentRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER)->setVertical(Alignment::VERTICAL_CENTER);
+            $sheet->getStyle('C' . $currentRow)->getFont()->setBold(true);
 
-            // Juara 2
-            $sheet->setCellValue('D' . $currentRow, $item['juara_2']);
+            // Juara 1
+            $sheet->setCellValue('D' . $currentRow, $item['juara_1']);
             $sheet->getStyle('D' . $currentRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT)->setVertical(Alignment::VERTICAL_CENTER)->setWrapText(true);
-            if ($isSelesai && $item['juara_2'] !== '-') {
-                $sheet->getStyle('D' . $currentRow)->getFont()->setBold(true)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('FF334155'));
-                $sheet->getStyle('D' . $currentRow)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FFF8FAFC');
+            if ($isSelesai && $item['juara_1'] !== '-') {
+                $sheet->getStyle('D' . $currentRow)->getFont()->setBold(true)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('FF854D0E'));
+                $sheet->getStyle('D' . $currentRow)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FFFEFCE8');
             } else {
                 $sheet->getStyle('D' . $currentRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
                 $sheet->getStyle('D' . $currentRow)->getFont()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('FF94A3B8'));
             }
 
-            // Juara 3
-            $sheet->setCellValue('E' . $currentRow, $item['juara_3']);
+            // Juara 2
+            $sheet->setCellValue('E' . $currentRow, $item['juara_2']);
             $sheet->getStyle('E' . $currentRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT)->setVertical(Alignment::VERTICAL_CENTER)->setWrapText(true);
-            if ($isSelesai && $item['juara_3'] !== '-') {
-                $sheet->getStyle('E' . $currentRow)->getFont()->setBold(true)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('FF9A3412'));
-                $sheet->getStyle('E' . $currentRow)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FFFFF7ED');
+            if ($isSelesai && $item['juara_2'] !== '-') {
+                $sheet->getStyle('E' . $currentRow)->getFont()->setBold(true)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('FF334155'));
+                $sheet->getStyle('E' . $currentRow)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FFF8FAFC');
             } else {
                 $sheet->getStyle('E' . $currentRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
                 $sheet->getStyle('E' . $currentRow)->getFont()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('FF94A3B8'));
             }
 
+            // Juara 3
+            $sheet->setCellValue('F' . $currentRow, $item['juara_3']);
+            $sheet->getStyle('F' . $currentRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT)->setVertical(Alignment::VERTICAL_CENTER)->setWrapText(true);
+            if ($isSelesai && $item['juara_3'] !== '-') {
+                $sheet->getStyle('F' . $currentRow)->getFont()->setBold(true)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('FF9A3412'));
+                $sheet->getStyle('F' . $currentRow)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FFFFF7ED');
+            } else {
+                $sheet->getStyle('F' . $currentRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                $sheet->getStyle('F' . $currentRow)->getFont()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('FF94A3B8'));
+            }
+
             // Status Sistem (Penyisihan / Langsung)
-            $sheet->setCellValue('F' . $currentRow, $item['jenis']);
-            $sheet->getStyle('F' . $currentRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER)->setVertical(Alignment::VERTICAL_CENTER);
+            $sheet->setCellValue('G' . $currentRow, $item['jenis']);
+            $sheet->getStyle('G' . $currentRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER)->setVertical(Alignment::VERTICAL_CENTER);
 
             // Status Pelaksanaan (Selesai / Belum Dimulai / Sedang Dimulai)
-            $sheet->setCellValue('G' . $currentRow, $item['status_pelaksanaan']);
-            $sheet->getStyle('G' . $currentRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER)->setVertical(Alignment::VERTICAL_CENTER);
-            $sheet->getStyle('G' . $currentRow)->getFont()->setBold(true);
+            $sheet->setCellValue('H' . $currentRow, $item['status_pelaksanaan']);
+            $sheet->getStyle('H' . $currentRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER)->setVertical(Alignment::VERTICAL_CENTER);
+            $sheet->getStyle('H' . $currentRow)->getFont()->setBold(true);
 
             if ($item['status_pelaksanaan'] === 'Selesai') {
-                $sheet->getStyle('G' . $currentRow)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FFDCFCE7');
-                $sheet->getStyle('G' . $currentRow)->getFont()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('FF15803D'));
+                $sheet->getStyle('H' . $currentRow)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FFDCFCE7');
+                $sheet->getStyle('H' . $currentRow)->getFont()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('FF15803D'));
             } elseif ($item['status_pelaksanaan'] === 'Sedang Dimulai') {
-                $sheet->getStyle('G' . $currentRow)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FFDBEAFE');
-                $sheet->getStyle('G' . $currentRow)->getFont()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('FF1D4ED8'));
+                $sheet->getStyle('H' . $currentRow)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FFDBEAFE');
+                $sheet->getStyle('H' . $currentRow)->getFont()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('FF1D4ED8'));
             } else {
-                $sheet->getStyle('G' . $currentRow)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FFF1F5F9');
-                $sheet->getStyle('G' . $currentRow)->getFont()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('FF64748B'))->setBold(false);
+                $sheet->getStyle('H' . $currentRow)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FFF1F5F9');
+                $sheet->getStyle('H' . $currentRow)->getFont()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('FF64748B'))->setBold(false);
             }
 
             // Tanggal Diumumkan
             $tglText = $this->formatTanggalIndo($item['tanggal_diumumkan']);
-            $sheet->setCellValue('H' . $currentRow, $tglText);
-            $sheet->getStyle('H' . $currentRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER)->setVertical(Alignment::VERTICAL_CENTER);
+            $sheet->setCellValue('I' . $currentRow, $tglText);
+            $sheet->getStyle('I' . $currentRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER)->setVertical(Alignment::VERTICAL_CENTER);
             if (!$isSelesai) {
-                $sheet->getStyle('H' . $currentRow)->getFont()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('FF94A3B8'));
+                $sheet->getStyle('I' . $currentRow)->getFont()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('FF94A3B8'));
             }
 
             // Alternating Row background untuk baris yang belum selesai agar mudah dibaca
             if (!$isSelesai && ($index % 2 == 1)) {
-                $sheet->getStyle('A' . $currentRow . ':B' . $currentRow)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FFFAFAFA');
-                $sheet->getStyle('F' . $currentRow)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FFFAFAFA');
-                $sheet->getStyle('H' . $currentRow)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FFFAFAFA');
+                $sheet->getStyle('A' . $currentRow . ':C' . $currentRow)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FFFAFAFA');
+                $sheet->getStyle('G' . $currentRow)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FFFAFAFA');
+                $sheet->getStyle('I' . $currentRow)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FFFAFAFA');
             }
 
             // Hitung tinggi baris dinamis agar nama tim / multi-line tidak terpotong
-            $linesLomba = (int) ceil(mb_strlen($item['nama_lomba']) / 42);
+            $linesLomba = (int) ceil(mb_strlen($namaDisplay) / 40);
             $linesJ1 = substr_count($item['juara_1'], "\n") + 1;
             $linesJ2 = substr_count($item['juara_2'], "\n") + 1;
             $linesJ3 = substr_count($item['juara_3'], "\n") + 1;
@@ -261,14 +288,14 @@ class RekapScoreExportService
             $currentRow++;
         }
 
-        $lastRow = $currentRow - 1;
+        $lastRow = max(5, $currentRow - 1);
 
         // 5. Border Tipis untuk Seluruh Sel Tabel
-        $tableRange = 'A4:H' . $lastRow;
+        $tableRange = 'A4:I' . $lastRow;
         $sheet->getStyle($tableRange)->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN)->getColor()->setARGB('FFCBD5E1');
 
         // Border Tebal di bawah Header
-        $sheet->getStyle('A5:H5')->getBorders()->getBottom()->setBorderStyle(Border::BORDER_MEDIUM)->getColor()->setARGB('FF1E293B');
+        $sheet->getStyle('A5:I5')->getBorders()->getBottom()->setBorderStyle(Border::BORDER_MEDIUM)->getColor()->setARGB('FF1E293B');
 
         // 6. Baris Ringkasan (Summary) di Bawah Tabel
         $summaryRow = $currentRow + 1;
@@ -277,24 +304,33 @@ class RekapScoreExportService
         $totalBelum = $totalLomba - $totalSelesai;
 
         $sheet->setCellValue('B' . $summaryRow, "Ringkasan:");
-        $sheet->setCellValue('C' . $summaryRow, "Total Lomba: {$totalLomba}");
-        $sheet->setCellValue('D' . $summaryRow, "Selesai: {$totalSelesai}");
-        $sheet->setCellValue('E' . $summaryRow, "Belum Dimulai: {$totalBelum}");
+        if ($lastRow >= 6) {
+            $sheet->setCellValue('C' . $summaryRow, "=SUM(C6:C" . $lastRow . ")");
+            $sheet->getStyle('C' . $summaryRow)->getNumberFormat()->setFormatCode('0.0');
+        } else {
+            $sheet->setCellValue('C' . $summaryRow, "0.0");
+        }
+        $sheet->getStyle('C' . $summaryRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-        $sheet->getStyle('B' . $summaryRow . ':E' . $summaryRow)->getFont()->setBold(true)->setSize(10);
-        $sheet->getStyle('B' . $summaryRow . ':E' . $summaryRow)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FFF1F5F9');
-        $sheet->getStyle('B' . $summaryRow . ':E' . $summaryRow)->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN)->getColor()->setARGB('FFCBD5E1');
+        $sheet->setCellValue('D' . $summaryRow, "Total: {$totalLomba}");
+        $sheet->setCellValue('E' . $summaryRow, "Selesai: {$totalSelesai}");
+        $sheet->setCellValue('F' . $summaryRow, "Belum: {$totalBelum}");
+
+        $sheet->getStyle('B' . $summaryRow . ':F' . $summaryRow)->getFont()->setBold(true)->setSize(10);
+        $sheet->getStyle('B' . $summaryRow . ':F' . $summaryRow)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FFF1F5F9');
+        $sheet->getStyle('B' . $summaryRow . ':F' . $summaryRow)->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN)->getColor()->setARGB('FFCBD5E1');
         $sheet->getRowDimension($summaryRow)->setRowHeight(22);
 
         // 7. Pengaturan Lebar Kolom
         $sheet->getColumnDimension('A')->setWidth(6);
-        $sheet->getColumnDimension('B')->setWidth(48);
-        $sheet->getColumnDimension('C')->setWidth(26);
+        $sheet->getColumnDimension('B')->setWidth(46);
+        $sheet->getColumnDimension('C')->setWidth(10);
         $sheet->getColumnDimension('D')->setWidth(26);
-        $sheet->getColumnDimension('E')->setWidth(40);
-        $sheet->getColumnDimension('F')->setWidth(18);
-        $sheet->getColumnDimension('G')->setWidth(22);
-        $sheet->getColumnDimension('H')->setWidth(30);
+        $sheet->getColumnDimension('E')->setWidth(26);
+        $sheet->getColumnDimension('F')->setWidth(38);
+        $sheet->getColumnDimension('G')->setWidth(18);
+        $sheet->getColumnDimension('H')->setWidth(22);
+        $sheet->getColumnDimension('I')->setWidth(30);
     }
 
     /**

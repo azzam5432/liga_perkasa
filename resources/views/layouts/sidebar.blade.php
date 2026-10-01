@@ -24,12 +24,14 @@
                         <span>Data Panitia</span>
                     </a>
                 </li>
-                <!-- <li class="nav-item">
+                {{-- SISTEM JURI DINONAKTIFKAN: penilaian kini dikelola panitia
+                <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('juri_lomba.*') ? 'active' : '' }}" 
                         href="{{ route('juri_lomba.index') }}">
                         <i class="fas fa-user-tag me-2"></i> Penugasan Juri
                     </a>
-                </li> -->
+                </li>
+                --}}
             @elseif(Auth::user()->isPanitia())
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" 

@@ -1,0 +1,18 @@
+# ==============================================================================
+# File ini opsional: Gunakan JIKA Anda mengunggah SELURUH folder proyek
+# langsung ke dalam folder `public_html/` di Hostinger Shared Hosting.
+# Ubah nama file ini menjadi `.htaccess` dan letakkan di root `public_html/`.
+# ==============================================================================
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Keamanan: Blokir akses langsung ke file sensitif & konfigurasi
+    RewriteRule ^(\.env|\.git|composer\.(json|lock)|package\.(json|lock)|artisan|phpunit\.xml) - [F,L,NC]
+    RewriteRule ^(app|bootstrap|config|database|resources|routes|tests)/(.*)$ - [F,L,NC]
+    RewriteRule ^storage/logs/(.*)$ - [F,L,NC]
+
+    # Arahkan semua request publik ke folder /public/
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>

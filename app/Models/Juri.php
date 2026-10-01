@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 // ===== SISTEM JURI DINONAKTIFKAN: penilaian kini dikelola panitia =====
 class Juri extends Model
 {
-    /*
     protected $table = 'tb_juri';
     protected $primaryKey = 'id_juri';
     
@@ -67,5 +66,4 @@ class Juri extends Model
     {
         return $this->user->foto_profil_url ?? asset('img/default-avatar.png');
     }
-    */
 }
